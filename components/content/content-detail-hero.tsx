@@ -337,6 +337,7 @@ export function ContentDetailHero({
                 resumeLabel={content.resumeLabel}
                 durationSeconds={content.durationSeconds}
                 audioUrl={content.audioUrl}
+                clipUrl={content.previewUrl}
                 lyrics={content.lyrics}
                 accent={content.accent}
                 initialFavorited={initialFavorited}

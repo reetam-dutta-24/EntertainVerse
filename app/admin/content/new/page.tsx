@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { ContentForm } from "@/components/admin/content-form";
 import { requireContentAdmin } from "@/lib/auth-guards";
-import { activeProvider, PROVIDER_LABELS } from "@/lib/ai/provider";
-import { isTmdbConfigured } from "@/lib/catalog-import/sources/tmdb";
+import { adminAiSettings } from "@/lib/ai/settings";
 import type { ContentFormInput } from "@/lib/validators/admin/content";
 
 export const metadata: Metadata = {
@@ -50,15 +49,6 @@ const emptyForm: ContentFormInput = {
   catalogReviews: [],
 };
 
-function aiSettings() {
-  const provider = activeProvider();
-  return {
-    enabled: provider !== null,
-    tmdbEnabled: isTmdbConfigured(),
-    providerLabel: provider ? PROVIDER_LABELS[provider] : undefined,
-  };
-}
-
 export default async function AdminNewContentPage() {
   await requireContentAdmin();
 
@@ -74,7 +64,7 @@ export default async function AdminNewContentPage() {
       <ContentForm
         mode="create"
         initial={emptyForm}
-        ai={aiSettings()}
+        ai={adminAiSettings()}
       />
     </div>
   );

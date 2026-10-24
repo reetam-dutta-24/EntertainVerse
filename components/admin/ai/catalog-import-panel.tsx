@@ -1,48 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Globe, LoaderCircle, Search, Sparkles } from "lucide-react";
 import { AiProgress } from "@/components/admin/ai/ai-progress";
 import { useAiTask } from "@/hooks/use-ai-task";
-import { SOURCE_LABELS, type CatalogCandidate, type ContentImportResult } from "@/lib/catalog-import/types";
+import { SOURCE_LABELS, type CatalogCandidate } from "@/lib/catalog-import/types";
 import { cn } from "@/lib/utils";
 
-const TYPE_HINTS = [
-  { value: "", label: "Any type" },
-  { value: "anime", label: "Anime" },
-  { value: "show", label: "Show" },
-  { value: "kdrama", label: "K-Drama" },
-  { value: "movie", label: "Movie" },
-  { value: "documentary", label: "Documentary" },
-] as const;
-
-export interface ContentImportPanelProps {
+export interface CatalogImportPanelProps<R> {
+  /** e.g. "/api/admin/ai/content" — the panel calls `${apiBase}/search` and `${apiBase}/import`. */
+  apiBase: string;
   aiEnabled: boolean;
-  tmdbEnabled: boolean;
-  /** e.g. "Google Gemini" — shown so the admin knows which model drafts fields. */
-  providerLabel?: string;
-  onImported: (result: ContentImportResult) => void;
+  /** Which sources supply the facts, and which model drafts the rest. */
+  intro: ReactNode;
+  placeholder: string;
+  /** Options for the web-research fallback; the first should be the "any" value "". */
+  typeHints: readonly { value: string; label: string }[];
+  /** Extra line under the search box (e.g. a missing optional key). */
+  notice?: ReactNode;
+  /** Square artwork for music, tall posters for video. */
+  artwork?: "poster" | "square";
+  onImported: (result: R) => void;
 }
 
 /**
- * Search TMDB / AniList for a title, pick the right match, and let Claude draft
- * the catalog entry from the source facts. Falls back to web research.
+ * Search the metadata sources for a title, pick the right match, and let the AI
+ * provider draft the catalog entry from the source facts. Falls back to web research.
  */
-export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onImported }: ContentImportPanelProps) {
+export function CatalogImportPanel<R>({
+  apiBase,
+  aiEnabled,
+  intro,
+  placeholder,
+  typeHints,
+  notice,
+  artwork = "poster",
+  onImported,
+}: CatalogImportPanelProps<R>) {
   const [query, setQuery] = useState("");
-  const [typeHint, setTypeHint] = useState<(typeof TYPE_HINTS)[number]["value"]>("");
+  const [typeHint, setTypeHint] = useState("");
   const [candidates, setCandidates] = useState<CatalogCandidate[] | null>(null);
   const [searching, setSearching] = useState(false);
   const [importingKey, setImportingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const importTask = useAiTask<ContentImportResult>();
+  const importTask = useAiTask<R>();
+  const artworkClass = artwork === "square" ? "size-16" : "h-20 w-14";
 
   async function search() {
     if (query.trim().length < 2) return;
     setSearching(true);
     setError(null);
     try {
-      const response = await fetch("/api/admin/ai/content/search", {
+      const response = await fetch(`${apiBase}/search`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query }),
@@ -61,7 +70,7 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
     setImportingKey(key);
     setError(null);
     try {
-      const result = await importTask.run("/api/admin/ai/content/import", body);
+      const result = await importTask.run(`${apiBase}/import`, body);
       onImported(result);
       setCandidates(null);
     } catch (importError) {
@@ -81,10 +90,7 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
         </span>
         <div>
           <h2 className="text-sm font-semibold text-white">Import with AI</h2>
-          <p className="mt-1 text-xs text-white/55">
-            Search a title — facts come from {tmdbEnabled ? "TMDB (movies, shows, K-dramas) and " : ""}AniList (anime), and{" "}
-            {providerLabel ?? "the AI model"} drafts the editorial fields. You review everything before saving.
-          </p>
+          <p className="mt-1 text-xs text-white/55">{intro}</p>
         </div>
       </div>
 
@@ -96,7 +102,7 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
         </p>
       ) : (
         <>
-          {/* Not a <form>: this panel lives inside the content form, and nested forms are invalid HTML. */}
+          {/* Not a <form>: this panel lives inside the catalog form, and nested forms are invalid HTML. */}
           <div role="search" className="flex flex-col gap-2 sm:flex-row">
             <label className="relative flex flex-1 items-center">
               <Search className="pointer-events-none absolute left-3 size-4 text-white/40" aria-hidden />
@@ -104,13 +110,13 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={(event) => {
-                  // Enter searches instead of submitting the surrounding content form.
+                  // Enter searches instead of submitting the surrounding catalog form.
                   if (event.key === "Enter") {
                     event.preventDefault();
                     void search();
                   }
                 }}
-                placeholder="e.g. Frieren, Breaking Bad, Parasite"
+                placeholder={placeholder}
                 aria-label="Title to import"
                 className="h-11 w-full rounded-xl border border-white/15 bg-white/5 pl-9 pr-3 text-sm text-white placeholder:text-white/35 focus:border-brand-magenta focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
               />
@@ -125,11 +131,7 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
               Search
             </button>
           </div>
-          {!tmdbEnabled ? (
-            <p className="text-xs text-white/45">
-              Only anime sources are on. Add <code className="font-mono">TMDB_API_KEY</code> for movies, shows and K-dramas.
-            </p>
-          ) : null}
+          {notice ? <p className="text-xs text-white/45">{notice}</p> : null}
 
           {candidates ? (
             candidates.length === 0 ? (
@@ -158,9 +160,9 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
                       >
                         {candidate.imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={candidate.imageUrl} alt="" className="h-20 w-14 shrink-0 rounded-lg object-cover" />
+                          <img src={candidate.imageUrl} alt="" className={cn(artworkClass, "shrink-0 rounded-lg object-cover")} />
                         ) : (
-                          <span className="h-20 w-14 shrink-0 rounded-lg bg-white/10" />
+                          <span className={cn(artworkClass, "shrink-0 rounded-lg bg-white/10")} />
                         )}
                         <span className="flex min-w-0 flex-1 flex-col gap-1">
                           <span className="truncate text-sm font-semibold text-white">{candidate.title}</span>
@@ -187,11 +189,11 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
               <span className="text-xs text-white/55">Not listed or wrong?</span>
               <select
                 value={typeHint}
-                onChange={(event) => setTypeHint(event.target.value as typeof typeHint)}
+                onChange={(event) => setTypeHint(event.target.value)}
                 aria-label="Type hint for web search"
                 className="h-9 rounded-lg border border-white/15 bg-popover px-2 text-xs text-white"
               >
-                {TYPE_HINTS.map((hint) => (
+                {typeHints.map((hint) => (
                   <option key={hint.value} value={hint.value}>
                     {hint.label}
                   </option>

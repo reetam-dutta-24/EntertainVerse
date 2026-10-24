@@ -22,24 +22,32 @@ import {
 } from "@/components/admin/catalog-nested-fields";
 import { EnumMultiSelect, EnumSelect } from "@/components/admin/enum-selectors";
 import { ImageUploadInput } from "@/components/ui/image-upload-input";
-import { ContentImportPanel } from "@/components/admin/ai/content-import-panel";
+import { CatalogImportPanel } from "@/components/admin/ai/catalog-import-panel";
 import { ImportSummary } from "@/components/admin/ai/import-summary";
-import { ContentReviewPanel } from "@/components/admin/ai/content-review-panel";
+import { CatalogReviewPanel } from "@/components/admin/ai/catalog-review-panel";
 import { useConfirm } from "@/components/feedback/feedback-provider";
 import type { ContentImportResult } from "@/lib/catalog-import/types";
-import type { ReviewIssue } from "@/lib/ai/content-review";
+import type { AdminAiSettings } from "@/lib/ai/settings";
 
 export interface ContentFormProps {
   mode: "create" | "edit";
   contentId?: string;
   initial: ContentFormInput;
   /** Which AI helpers are configured on the server. */
-  ai?: { enabled: boolean; tmdbEnabled: boolean; providerLabel?: string };
+  ai?: AdminAiSettings;
 }
 
 const NUMBER_FIELDS = new Set<keyof ContentFormInput>(["rating", "year", "imdbRating", "malScore", "seasonCount", "episodeCount"]);
 const LIST_FIELDS = new Set<keyof ContentFormInput>(["genreLabels", "languages", "highlightTags", "featuredTrackSlugs", "relatedContentSlugs"]);
 /** Structured editors — the reviewer can flag them, but fixes are made by hand. */
+const IMPORT_TYPE_HINTS = [
+  { value: "", label: "Any type" },
+  { value: "anime", label: "Anime" },
+  { value: "show", label: "Show" },
+  { value: "kdrama", label: "K-Drama" },
+  { value: "movie", label: "Movie" },
+  { value: "documentary", label: "Documentary" },
+] as const;
 const MANUAL_FIELDS = new Set<string>(["seasons", "episodes", "characters", "catalogReviews", "general", "type"]);
 const ALLOWED_LIST_VALUES: Partial<Record<keyof ContentFormInput, Set<string>>> = {
   genreLabels: new Set(CONTENT_GENRE_OPTIONS.map((o) => o.value)),
@@ -199,11 +207,11 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
     setImportFacts(result.facts);
   }
 
-  function canApplySuggestion(field: ReviewIssue["field"]) {
+  function canApplySuggestion(field: string) {
     return !MANUAL_FIELDS.has(field);
   }
 
-  function applySuggestion(field: ReviewIssue["field"], value: string) {
+  function applySuggestion(field: string, value: string) {
     if (field === "general" || MANUAL_FIELDS.has(field)) return;
     const key = field as keyof ContentFormInput;
     if (NUMBER_FIELDS.has(key)) {
@@ -304,7 +312,26 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
   return (
     <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
       {mode === "create" ? (
-        <ContentImportPanel aiEnabled={ai.enabled} tmdbEnabled={ai.tmdbEnabled} providerLabel={ai.providerLabel} onImported={(result) => void handleImported(result)} />
+        <CatalogImportPanel<ContentImportResult>
+          apiBase="/api/admin/ai/content"
+          aiEnabled={ai.enabled}
+          intro={
+            <>
+              Search a title — facts come from {ai.tmdbEnabled ? "TMDB (movies, shows, K-dramas) and " : ""}AniList (anime), and{" "}
+              {ai.providerLabel ?? "the AI model"} drafts the editorial fields. You review everything before saving.
+            </>
+          }
+          placeholder="e.g. Frieren, Breaking Bad, Parasite"
+          typeHints={IMPORT_TYPE_HINTS}
+          notice={
+            ai.tmdbEnabled ? null : (
+              <>
+                Only anime sources are on. Add <code className="font-mono">TMDB_API_KEY</code> for movies, shows and K-dramas.
+              </>
+            )
+          }
+          onImported={(result) => void handleImported(result)}
+        />
       ) : null}
       {importResult ? <ImportSummary result={importResult} onDismiss={() => setImportResult(null)} /> : null}
       {draftRestored ? (
@@ -815,7 +842,8 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
         onChange={(catalogReviews) => update("catalogReviews", catalogReviews)}
       />
 
-      <ContentReviewPanel
+      <CatalogReviewPanel
+        endpoint="/api/admin/ai/content/review"
         form={form}
         facts={importFacts}
         aiEnabled={ai.enabled}

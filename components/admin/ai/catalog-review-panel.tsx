@@ -5,8 +5,7 @@ import { Check, CircleAlert, ExternalLink, Info, LoaderCircle, ShieldCheck, Tria
 import { AiProgress } from "@/components/admin/ai/ai-progress";
 import { fieldLabel } from "@/components/admin/ai/import-summary";
 import { useAiTask } from "@/hooks/use-ai-task";
-import type { ContentReviewResult, ReviewIssue, ReviewSeverity } from "@/lib/ai/content-review";
-import type { ContentFormInput } from "@/lib/validators/admin/content";
+import type { CatalogReviewResult, ReviewSeverity } from "@/lib/ai/catalog-review";
 import { cn } from "@/lib/utils";
 
 const SEVERITY: Record<ReviewSeverity, { icon: typeof Info; label: string; className: string }> = {
@@ -15,31 +14,33 @@ const SEVERITY: Record<ReviewSeverity, { icon: typeof Info; label: string; class
   suggestion: { icon: Info, label: "Tip", className: "border-white/15 text-white/75" },
 };
 
-export interface ContentReviewPanelProps {
-  form: ContentFormInput;
+export interface CatalogReviewPanelProps {
+  /** e.g. "/api/admin/ai/content/review". */
+  endpoint: string;
+  form: unknown;
   /** Facts from the last import — lets the reviewer check against the source. */
   facts?: Record<string, unknown>;
   aiEnabled: boolean;
   providerLabel?: string;
-  canApply: (field: ReviewIssue["field"]) => boolean;
-  onApply: (field: ReviewIssue["field"], value: string) => void;
+  canApply: (field: string) => boolean;
+  onApply: (field: string, value: string) => void;
 }
 
 /** "Review with AI": rule checks + the AI provider's review, with one-click fixes. */
-export function ContentReviewPanel({ form, facts, aiEnabled, providerLabel, canApply, onApply }: ContentReviewPanelProps) {
+export function CatalogReviewPanel({ endpoint, form, facts, aiEnabled, providerLabel, canApply, onApply }: CatalogReviewPanelProps) {
   const [verifyOnline, setVerifyOnline] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [review, setReview] = useState<ContentReviewResult | null>(null);
+  const [review, setReview] = useState<CatalogReviewResult | null>(null);
   const [applied, setApplied] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
-  const reviewTask = useAiTask<ContentReviewResult>();
+  const reviewTask = useAiTask<CatalogReviewResult>();
 
   async function runReview() {
     setLoading(true);
     setError(null);
     setApplied(new Set());
     try {
-      setReview(await reviewTask.run("/api/admin/ai/content/review", { form, facts, verifyOnline }));
+      setReview(await reviewTask.run(endpoint, { form, facts, verifyOnline }));
     } catch (reviewError) {
       setError(reviewError instanceof Error ? reviewError.message : "Review failed.");
     } finally {

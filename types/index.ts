@@ -1,5 +1,7 @@
 /** Shared domain types for the AniVerse application. */
 
+import type { ListenLink } from "@/lib/listen-links";
+
 export type MediaType =
   | "anime"
   | "show"
@@ -381,6 +383,9 @@ export interface ContentDetail {
   tmdbKind?: "movie" | "tv";
   /** Full-length audio URL for songs/OSTs. */
   audioUrl?: string;
+  /** Song detail — official 30s preview clip and legal listen links. */
+  previewUrl?: string;
+  listenLinks?: ListenLink[];
   matchScore?: number;
   /** Card accent — drives hero section inner-boundary glow. */
   accent?: AccentColor;

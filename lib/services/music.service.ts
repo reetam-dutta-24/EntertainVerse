@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { parseListenLinks } from "@/lib/listen-links";
 import { mapTrackToMusicTrack } from "@/lib/mappers/music.mapper";
 import { prismaMediaTypeToApp } from "@/lib/mappers/content.mapper";
 import type { MusicFormInput } from "@/lib/validators/admin/music";
@@ -109,6 +110,8 @@ async function toTrackData(input: MusicFormInput): Promise<Prisma.MusicTrackCrea
     imageUrl: emptyToNull(input.imageUrl),
     backdropUrl: emptyToNull(input.backdropUrl),
     audioUrl: emptyToNull(input.audioUrl),
+    previewUrl: emptyToNull(input.previewUrl),
+    listenLinks: input.listenLinks,
     accent: input.accent ?? null,
     trendingLabel: emptyToNull(input.trendingLabel),
     creditLabel: emptyToNull(input.creditLabel),
@@ -287,6 +290,8 @@ export function trackRecordToFormInput(row: TrackRecordFull): MusicFormInput {
     imageUrl: row.imageUrl ?? "",
     backdropUrl: row.backdropUrl ?? "",
     audioUrl: row.audioUrl ?? "",
+    previewUrl: row.previewUrl ?? "",
+    listenLinks: parseListenLinks(row.listenLinks),
     accent: (row.accent as MusicFormInput["accent"]) ?? undefined,
     trendingLabel: row.trendingLabel ?? "",
     creditLabel: row.creditLabel ?? "",

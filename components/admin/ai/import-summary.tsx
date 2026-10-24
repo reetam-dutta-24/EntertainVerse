@@ -1,5 +1,5 @@
 import { ExternalLink, Sparkles, X } from "lucide-react";
-import { SOURCE_LABELS, type ContentImportResult } from "@/lib/catalog-import/types";
+import { SOURCE_LABELS, type CatalogImportResult } from "@/lib/catalog-import/types";
 
 /** Humanised form field names for the provenance list. */
 const FIELD_LABELS: Record<string, string> = {
@@ -11,7 +11,14 @@ const FIELD_LABELS: Record<string, string> = {
   malScore: "MAL score", airedFrom: "Aired from", airedTo: "Aired to", broadcast: "Broadcast",
   episodeDuration: "Episode duration", airingDay: "Airing day", seasonLabel: "Season label", languages: "Languages",
   seasonCount: "Season count", episodeCount: "Episode count", genreLabels: "Genres", seasons: "Seasons",
-  episodes: "Episodes", characters: "Characters", accent: "Accent",
+  episodes: "Episodes", characters: "Characters", accent: "Accent", trailerUrl: "Trailer", tmdbId: "TMDB link",
+  tmdbKind: "TMDB type", videoUrl: "Video URL",
+  // Music + artists
+  artist: "Artist credit", artistSlug: "Linked artist", kind: "Kind", album: "Album", language: "Language",
+  durationLabel: "Duration", durationSeconds: "Duration (seconds)", audioUrl: "Audio URL", previewUrl: "Preview clip",
+  listenLinks: "Listen links", lyrics: "Lyrics", source: "Source show", trendingLabel: "Trending label",
+  featuredRank: "Featured rank", label: "Record label", debutYear: "Debut year", isGroup: "Group / solo",
+  members: "Members", primaryTags: "Tags", rankLeft: "Rank chip (left)", rankRight: "Rank chip (right)",
 };
 
 export function fieldLabel(field: string) {
@@ -19,7 +26,7 @@ export function fieldLabel(field: string) {
 }
 
 /** What the import filled in, and from where — so the admin knows what to double-check. */
-export function ImportSummary({ result, onDismiss }: { result: ContentImportResult; onDismiss: () => void }) {
+export function ImportSummary({ result, onDismiss }: { result: CatalogImportResult<Record<string, unknown>>; onDismiss: () => void }) {
   const fromSource = Object.entries(result.provenance).filter(([, origin]) => origin !== "ai").map(([field]) => field);
   const fromAi = Object.entries(result.provenance).filter(([, origin]) => origin === "ai").map(([field]) => field);
   const sourceLabel = SOURCE_LABELS[result.source];

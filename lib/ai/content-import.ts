@@ -3,6 +3,7 @@ import "server-only";
 import { z } from "zod";
 import { ACCENT_OPTIONS, CONTENT_GENRE_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/catalog-enums";
 import { activeProviderLabel, generateStructured, researchWithWeb } from "@/lib/ai/provider";
+import { recordProvenance, slugify } from "@/lib/ai/import-utils";
 import type { ProgressReporter } from "@/lib/ai/progress-types";
 import { contentMediaTypes, type ContentFormInput } from "@/lib/validators/admin/content";
 import { fetchAnilistFacts, searchAnilist } from "@/lib/catalog-import/sources/anilist";
@@ -95,10 +96,6 @@ export async function searchCatalogSources(query: string): Promise<CatalogCandid
   return merged.slice(0, 12);
 }
 
-function slugify(title: string) {
-  return title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 120);
-}
-
 function emptyForm(): ContentFormInput {
   return {
     title: "", nativeTitle: "", slug: "", type: "anime", description: "", synopsis: "", imageUrl: "",
@@ -149,17 +146,8 @@ export async function importFromSource(
   draft.slug = slugify(draft.title);
 
   const provenance: FieldProvenance = {};
-  for (const [key, value] of Object.entries(source.draft)) {
-    if (value !== undefined && value !== "" && !(Array.isArray(value) && value.length === 0)) {
-      provenance[key as keyof ContentFormInput] = source.source;
-    }
-  }
-  for (const key of Object.keys(editorial) as (keyof typeof editorial)[]) {
-    const value = editorial[key];
-    if (value !== "" && !(Array.isArray(value) && value.length === 0)) {
-      provenance[key as keyof ContentFormInput] ??= "ai";
-    }
-  }
+  recordProvenance(provenance, source.draft, source.source);
+  recordProvenance(provenance, editorial, "ai");
 
   return {
     draft,
@@ -212,12 +200,7 @@ export async function importFromWeb(
     characters: characters.map((c) => ({ ...c, imageUrl: "" })),
   } as ContentFormInput;
 
-  const provenance: FieldProvenance = {};
-  for (const [key, value] of Object.entries(draft)) {
-    if (value !== undefined && value !== "" && !(Array.isArray(value) && value.length === 0)) {
-      provenance[key as keyof ContentFormInput] = "web";
-    }
-  }
+  const provenance = recordProvenance<ContentFormInput>({}, draft, "web");
 
   return {
     draft,

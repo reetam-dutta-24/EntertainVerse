@@ -29,16 +29,21 @@ export function ComingSoonNotice({
 }
 
 /** Small inline label, e.g. next to a track that plays demo audio. */
-export function PreviewBadge({ className }: { className?: string }) {
+/** "demo": a placeholder track; "clip": the official 30-second preview. */
+export function PreviewBadge({ className, kind = "demo" }: { className?: string; kind?: "demo" | "clip" }) {
   return (
     <span
       className={cn(
         "inline-flex items-center rounded-full border border-white/20 bg-black/40 px-2 py-0.5 text-micro font-semibold uppercase tracking-wide text-white/80",
         className,
       )}
-      title="No full track is linked yet — playing a short demo preview"
+      title={
+        kind === "clip"
+          ? "Official 30-second preview — open a listen link for the full song"
+          : "No full track is linked yet — playing a short preview"
+      }
     >
-      Preview audio
+      {kind === "clip" ? "30s preview" : "Preview audio"}
     </span>
   );
 }

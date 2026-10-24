@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MusicForm } from "@/components/admin/music-form";
+import { adminAiSettings } from "@/lib/ai/settings";
 import { requireMusicAdmin } from "@/lib/auth-guards";
 import { getTrackRecordById, trackRecordToFormInput, trackRecordToLinkedSelections } from "@/lib/services/music.service";
 
@@ -28,6 +29,7 @@ export default async function AdminEditMusicPage({ params }: Props) {
         recordId={id}
         initial={trackRecordToFormInput(row)}
         initialLinked={trackRecordToLinkedSelections(row)}
+        ai={adminAiSettings()}
       />
     </div>
   );

@@ -10,6 +10,7 @@ import type {
 } from "@/types";
 import { buildSongReferenceUrl } from "@/lib/content-reference-url";
 import { roundRating } from "@/lib/format-rating";
+import { parseListenLinks } from "@/lib/listen-links";
 import { formatEngagementCount } from "@/lib/services/content.service";
 import { mapArtistToContentItem } from "@/lib/mappers/artist.mapper";
 import { mapContentToItem } from "@/lib/mappers/content.mapper";
@@ -126,6 +127,8 @@ export function mapTrackRecordToSongDetail(
     imageUrl: row.imageUrl ?? poster(slug),
     backdropUrl: row.backdropUrl ?? row.imageUrl ?? poster(slug),
     audioUrl: row.audioUrl ?? undefined,
+    previewUrl: row.previewUrl ?? undefined,
+    listenLinks: parseListenLinks(row.listenLinks),
     accent: (row.accent as AccentColor) ?? undefined,
     sourceContentSlug: row.sourceContent?.slug,
     durationSeconds: row.durationSeconds ?? undefined,

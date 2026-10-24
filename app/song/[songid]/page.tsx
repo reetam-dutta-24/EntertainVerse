@@ -7,6 +7,7 @@ import {
   ContentPageSection,
   InteractiveReviewSection,
 } from "@/components/content";
+import { ListenLinksSection } from "@/components/song/listen-links-section";
 import { SongRelatedCatalogSection } from "@/components/song/song-related-catalog-section";
 import { getCommunityMemberPreview } from "@/lib/data/community";
 import { getOptionalUser } from "@/lib/data/user";
@@ -68,6 +69,12 @@ export default async function SongDetailPage({ params }: SongPageProps) {
         content={song}
         initialFavorited={initialFavorited}
         initialOnWatchlist={initialOnWatchlist}
+      />
+
+      <ListenLinksSection
+        heading="🎧 Listen to the full song"
+        query={`${song.title} ${song.metadata.studio ?? ""}`.trim()}
+        links={song.listenLinks ?? []}
       />
 
       <SongRelatedCatalogSection

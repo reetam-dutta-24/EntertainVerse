@@ -22,6 +22,13 @@ import {
   CatalogSearchPicker,
   type CatalogPickerSelection,
 } from "@/components/forms/catalog-search-picker";
+import { CatalogImportPanel } from "@/components/admin/ai/catalog-import-panel";
+import { ImportSummary } from "@/components/admin/ai/import-summary";
+import { CatalogReviewPanel } from "@/components/admin/ai/catalog-review-panel";
+import { useConfirm } from "@/components/feedback/feedback-provider";
+import type { AdminAiSettings } from "@/lib/ai/settings";
+import type { MusicImportResult } from "@/lib/catalog-import/types";
+import { listenServiceFromUrl, type ListenLink } from "@/lib/listen-links";
 import type { MusicFormInput } from "@/lib/validators/admin/music";
 import type { TrackLinkedSelections } from "@/lib/services/music.service";
 
@@ -30,6 +37,7 @@ export interface MusicFormProps {
   recordId?: string;
   initial: MusicFormInput;
   initialLinked?: TrackLinkedSelections;
+  ai?: AdminAiSettings;
 }
 
 const ARTIST_SEARCH_TYPES = ["artist"] as const;
@@ -44,7 +52,30 @@ function slugify(title: string) {
 
 const kinds = ["song", "ost", "album"] as const;
 
-export function MusicForm({ mode, recordId, initial, initialLinked }: MusicFormProps) {
+const IMPORT_TYPE_HINTS = [
+  { value: "", label: "Any song" },
+  { value: "song", label: "Song" },
+  { value: "ost", label: "Anime / show OST" },
+] as const;
+
+/** Review suggestions for these fields need an editor, not a one-click replace. */
+const MANUAL_FIELDS = new Set<string>(["general", "catalogReviews", "listenLinks", "lyrics", "artistSlug", "contentSlug"]);
+const NUMBER_FIELDS = new Set<string>(["rating", "year", "durationSeconds", "featuredRank"]);
+const ENUM_VALUES: Record<string, Set<string>> = {
+  kind: new Set(kinds),
+  language: new Set(LANGUAGE_OPTIONS.map((o) => o.value)),
+  accent: new Set(ACCENT_OPTIONS.map((o) => o.value)),
+};
+const GENRE_VALUES = new Set<string>(SONG_GENRE_OPTIONS.map((o) => o.value));
+
+/** The textarea keeps blank lines while typing; drop them before saving or reviewing. */
+function cleanListenLinks(links: ListenLink[]): ListenLink[] {
+  return links
+    .map((link) => ({ service: listenServiceFromUrl(link.url.trim()), url: link.url.trim() }))
+    .filter((link) => link.url);
+}
+
+export function MusicForm({ mode, recordId, initial, initialLinked, ai = { enabled: false, tmdbEnabled: false } }: MusicFormProps) {
   const router = useAppRouter();
   const draftKey =
     mode === "create"
@@ -68,6 +99,10 @@ export function MusicForm({ mode, recordId, initial, initialLinked }: MusicFormP
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [slugTouched, setSlugTouched] = useState(mode === "edit");
+  const [importResult, setImportResult] = useState<MusicImportResult | null>(null);
+  const [importFacts, setImportFacts] = useState<Record<string, unknown> | undefined>();
+  const confirmAction = useConfirm();
+  const reviewForm = useMemo(() => ({ ...form, listenLinks: cleanListenLinks(form.listenLinks ?? []) }), [form]);
 
   const artistSearchTypes = useMemo(
     () => [...ARTIST_SEARCH_TYPES] as CatalogPickerSelection["type"][],
@@ -114,13 +149,60 @@ export function MusicForm({ mode, recordId, initial, initialLinked }: MusicFormP
     setForm((c) => ({ ...c, [key]: value }));
   }
 
+  async function handleImported(result: MusicImportResult) {
+    if (form.title.trim()) {
+      const replace = await confirmAction({
+        title: "Replace the current form?",
+        description: `The imported draft for "${result.draft.title}" will replace what you've entered so far.`,
+        confirmLabel: "Replace with import",
+      });
+      if (!replace) return;
+    }
+    setForm(result.draft);
+    setArtistSelection(
+      result.draft.artistSlug ? { id: result.draft.artistSlug, type: "artist", title: result.draft.artist } : null,
+    );
+    setSlugTouched(false);
+    setImportResult(result);
+    setImportFacts(result.facts);
+  }
+
+  function canApplySuggestion(field: string) {
+    return !MANUAL_FIELDS.has(field);
+  }
+
+  function applySuggestion(field: string, value: string) {
+    if (!canApplySuggestion(field)) return;
+    const key = field as keyof MusicFormInput;
+    if (NUMBER_FIELDS.has(field)) {
+      const number = Number(value);
+      update(key, (value.trim() === "" || Number.isNaN(number) ? undefined : number) as never);
+      return;
+    }
+    if (field === "genreLabels") {
+      const genres = value.split(",").map((item) => item.trim().toLowerCase()).filter((item) => GENRE_VALUES.has(item));
+      update("genreLabels", genres as MusicFormInput["genreLabels"]);
+      return;
+    }
+    const allowed = ENUM_VALUES[field];
+    if (allowed) {
+      const choice = value.trim().toLowerCase();
+      if (choice && !allowed.has(choice)) return;
+      if (!choice && field === "kind") return;
+      update(key, (choice || (field === "accent" ? undefined : "")) as never);
+      return;
+    }
+    if (key === "slug") setSlugTouched(true);
+    update(key, value as never);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setPending(true);
     try {
       const payload: MusicFormInput = {
-        ...form,
+        ...reviewForm,
         contentSlug: "",
       };
       const url = mode === "create" ? "/api/admin/music" : `/api/admin/music/${recordId}`;
@@ -146,6 +228,24 @@ export function MusicForm({ mode, recordId, initial, initialLinked }: MusicFormP
 
   return (
     <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+      {mode === "create" ? (
+        <CatalogImportPanel<MusicImportResult>
+          apiBase="/api/admin/ai/music"
+          aiEnabled={ai.enabled}
+          intro={
+            <>
+              Search a song — facts, cover art, the official 30-second preview and listen links come from Apple Music
+              (and Deezer where available), and {ai.providerLabel ?? "the AI model"} drafts the editorial fields.
+              Lyrics are never imported.
+            </>
+          }
+          placeholder="e.g. Idol YOASOBI, Gurenge, Blinding Lights"
+          typeHints={IMPORT_TYPE_HINTS}
+          artwork="square"
+          onImported={(result) => void handleImported(result)}
+        />
+      ) : null}
+      {importResult ? <ImportSummary result={importResult} onDismiss={() => setImportResult(null)} /> : null}
       {draftRestored ? (
         <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-xs text-amber-100/90">
           Restored your unsaved draft from this browser.
@@ -280,7 +380,7 @@ export function MusicForm({ mode, recordId, initial, initialLinked }: MusicFormP
           </Field>
           <Field
             label="Audio URL (MP3)"
-            hint="Direct link to the full song or OST file"
+            hint="Direct link to a full song file you have the rights to stream"
           >
             <input
               className={inputClass}
@@ -289,11 +389,41 @@ export function MusicForm({ mode, recordId, initial, initialLinked }: MusicFormP
               placeholder="https://example.com/tracks/title.mp3"
             />
           </Field>
+          <Field
+            label="Preview clip (30s)"
+            hint="Official Apple Music preview — plays when no full audio file is set"
+          >
+            <input
+              className={inputClass}
+              value={form.previewUrl ?? ""}
+              onChange={(e) => update("previewUrl", e.target.value)}
+              placeholder="https://audio-ssl.itunes.apple.com/…/preview.m4a"
+            />
+          </Field>
+          <Field
+            label="Listen links"
+            hint="One URL per line — Apple Music, Deezer, Spotify, YouTube Music, JioSaavn"
+          >
+            <textarea
+              className={`${inputClass} min-h-24 py-2 font-mono text-xs leading-relaxed`}
+              value={(form.listenLinks ?? []).map((link) => link.url).join("\n")}
+              onChange={(e) =>
+                update(
+                  "listenLinks",
+                  e.target.value.split("\n").map((url) => ({ service: listenServiceFromUrl(url.trim()), url })),
+                )
+              }
+              placeholder={"https://music.apple.com/…\nhttps://www.deezer.com/track/…"}
+            />
+          </Field>
         </div>
         <Field label="Description / synopsis">
           <textarea className={`${inputClass} min-h-32 py-2`} value={form.description ?? ""} onChange={(e) => update("description", e.target.value)} />
         </Field>
-        <Field label="Lyrics" hint="One line per lyric. Shown 4 lines at a time during playlist playback.">
+        <Field
+          label="Lyrics"
+          hint="One line per lyric. Only paste lyrics you're licensed to display — AI import never fills this."
+        >
           <textarea
             className={`${inputClass} min-h-40 py-2 font-mono text-xs leading-relaxed`}
             value={form.lyrics ?? ""}
@@ -304,6 +434,16 @@ export function MusicForm({ mode, recordId, initial, initialLinked }: MusicFormP
       </Section>
 
       <CatalogReviewsEditor reviews={form.catalogReviews} onChange={(catalogReviews) => update("catalogReviews", catalogReviews)} />
+
+      <CatalogReviewPanel
+        endpoint="/api/admin/ai/music/review"
+        form={reviewForm}
+        facts={importFacts}
+        aiEnabled={ai.enabled}
+        providerLabel={ai.providerLabel}
+        canApply={canApplySuggestion}
+        onApply={applySuggestion}
+      />
 
       {error ? <p className="text-sm text-red-400">{error}</p> : null}
       <div className="flex gap-3">

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { listenLinkSchema } from "@/lib/listen-links";
 import {
   accentEnum,
   catalogReviewInputSchema,
@@ -38,6 +39,10 @@ export const musicFormSchema = z.object({
   imageUrl: optionalString,
   backdropUrl: optionalString,
   audioUrl: optionalString,
+  /** Official 30-second clip (Apple Music) — plays when there is no full audio file. */
+  previewUrl: optionalString,
+  /** Deep links to legal streaming services. */
+  listenLinks: z.array(listenLinkSchema).max(8).default([]),
   accent: accentEnum.optional(),
   trendingLabel: optionalString,
   creditLabel: optionalString,

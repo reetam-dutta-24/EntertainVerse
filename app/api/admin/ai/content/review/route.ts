@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireContentAdminApi } from "@/lib/admin-auth";
 import { streamAiTask } from "@/lib/ai/progress-stream";
 import { isAiConfigured } from "@/lib/ai/provider";
+import { ruleOnlyReview } from "@/lib/ai/catalog-review";
 import { checkContentRules, reviewContentForm } from "@/lib/ai/content-review";
 import type { ContentFormInput } from "@/lib/validators/admin/content";
 
@@ -26,12 +27,7 @@ export async function POST(request: Request) {
 
   // Without an AI provider, still return the rule-based checks.
   if (!isAiConfigured()) {
-    return streamAiTask("admin ai review", async () => ({
-      summary: "Automatic checks only — add GEMINI_API_KEY (free) or ANTHROPIC_API_KEY to enable the AI review.",
-      issues: checkContentRules(form),
-      checkedOnline: false,
-      sources: [],
-    }));
+    return streamAiTask("admin ai review", async () => ruleOnlyReview(checkContentRules(form)));
   }
 
   const { facts, verifyOnline } = parsed.data;

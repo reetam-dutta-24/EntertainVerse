@@ -30,6 +30,8 @@ export interface SongHeroPosterPanelProps {
   resumeLabel?: string;
   durationSeconds?: number;
   audioUrl?: string;
+  /** Official 30s preview — plays when there is no full audio file. */
+  clipUrl?: string;
   lyrics?: string;
   accent?: AccentColor;
 }
@@ -43,6 +45,7 @@ export function SongHeroPosterPanel({
   durationSeconds,
   initialFavorited,
   audioUrl,
+  clipUrl,
   lyrics,
   accent,
 }: SongHeroPosterPanelProps) {
@@ -56,7 +59,7 @@ export function SongHeroPosterPanel({
 
   const theme = useMemo(() => getPlayAccentTheme(accent), [accent]);
   const fairyGlow = useMemo(() => getPlayFairyInnerGlow(accent), [accent]);
-  const previewUrl = getTrackPreviewUrl(songSlug, audioUrl);
+  const previewUrl = getTrackPreviewUrl(songSlug, audioUrl, clipUrl);
   const playLabel = resumeLabel ? `Continue from ${resumeLabel}` : "Play now";
   const progressMax = duration || durationSeconds || 1;
   const effectiveVolume = muted ? 0 : volume;
@@ -281,7 +284,7 @@ export function SongHeroPosterPanel({
             )}
             <span className="truncate">{isPlaying ? "Pause" : playLabel}</span>
           </button>
-          {!audioUrl?.trim() ? <PreviewBadge /> : null}
+          {!audioUrl?.trim() ? <PreviewBadge kind={clipUrl?.trim() ? "clip" : "demo"} /> : null}
         </div>
       </div>
 

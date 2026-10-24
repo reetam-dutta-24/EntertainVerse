@@ -100,7 +100,7 @@ export async function getCollectionPlayQueue(
           ),
           imageUrl: getTrackCoverUrl(track.slug, track.imageUrl, track.backdropUrl),
           backdropUrl: getTrackCoverUrl(track.slug, track.backdropUrl, track.imageUrl),
-          previewUrl: getTrackPreviewUrl(track.slug, track.audioUrl),
+          previewUrl: getTrackPreviewUrl(track.slug, track.audioUrl, track.previewUrl),
           isDemoPreview: !track.audioUrl?.trim(),
           lyrics: track.lyrics ?? undefined,
           language: track.language ?? undefined,

@@ -7,11 +7,14 @@ const DEMO_PREVIEW_URLS = [
   "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
 ];
 
+/** Full audio file first, then the official 30s preview clip, then a demo track. */
 export function getTrackPreviewUrl(
   slug: string,
   audioUrl?: string | null,
+  previewUrl?: string | null,
 ): string {
   if (audioUrl?.trim()) return audioUrl.trim();
+  if (previewUrl?.trim()) return previewUrl.trim();
   const hash = slug.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
   return DEMO_PREVIEW_URLS[hash % DEMO_PREVIEW_URLS.length]!;
 }
