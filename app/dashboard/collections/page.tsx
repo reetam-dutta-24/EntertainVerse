@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CollectionsDashboard } from "@/components/dashboard/collections-dashboard";
 import { getCurrentUser } from "@/lib/data/user";
+import { getSmartCollectionIdeas } from "@/lib/services/smart-collections.service";
 import {
   getAllCollections,
   getCollectionStats,
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 
 export default async function CollectionsPage() {
   const user = await getCurrentUser();
-  const [stats, genres, mostLiked, following, recentlyUsed, all, globalPublic] =
+  const [stats, genres, mostLiked, following, recentlyUsed, all, globalPublic, smartIdeas] =
     await Promise.all([
       getCollectionStats(user.id),
       getGenreFilters(),
@@ -28,6 +29,7 @@ export default async function CollectionsPage() {
       getRecentlyUsedCollections(user.id),
       getAllCollections(user.id),
       getGlobalPublicCollections(user.id),
+      getSmartCollectionIdeas(user.id).catch(() => []),
     ]);
 
   return (
@@ -40,6 +42,7 @@ export default async function CollectionsPage() {
       recentlyUsed={recentlyUsed}
       all={all}
       globalPublic={globalPublic}
+      smartIdeas={smartIdeas}
     />
   );
 }

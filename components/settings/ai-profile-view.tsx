@@ -139,7 +139,7 @@ export function AiProfileView({ initialProfile, insights }: AiProfileViewProps) 
     const confirmed = await confirmAction({
       title: "Wipe what the AI knows?",
       description:
-        "Your AI-mode answers and the learning setting are deleted, and recommendations start fresh from your favorites. Your watch history, favorites and collections are kept.",
+        "Your AI-mode answers, the learning setting and unsaved AI collection ideas are deleted; recommendations start fresh from your favorites. Your watch history, favorites, collections and roadmaps are kept.",
       confirmLabel: "Wipe AI profile",
       destructive: true,
     });

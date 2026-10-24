@@ -77,7 +77,11 @@ export async function saveAiProfile(userId: string, update: AiProfileUpdate): Pr
 
 /** Forget every AI-mode answer and setting. Watch/listen history itself is kept (it powers Continue Watching). */
 export async function wipeAiProfile(userId: string) {
-  await prisma.aiTasteProfile.deleteMany({ where: { userId } });
+  await prisma.$transaction([
+    prisma.aiTasteProfile.deleteMany({ where: { userId } }),
+    // Unsaved collection ideas were built from what it learned — forget them too.
+    prisma.aiCollectionSuggestion.deleteMany({ where: { userId, status: "PENDING" } }),
+  ]);
 }
 
 // ---- insights for the AI profile page ------------------------------------------------------

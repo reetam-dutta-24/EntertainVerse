@@ -12,6 +12,8 @@ import {
 } from "@/lib/collection-list-utils";
 import type { Collection } from "@/types";
 import type { CollectionStats } from "@/lib/data/collections";
+import { SmartCollectionIdeas } from "@/components/collections/smart-collection-ideas";
+import type { SmartCollectionIdea } from "@/lib/services/smart-collections.service";
 
 interface CollectionsDashboardProps {
   userName: string;
@@ -22,6 +24,8 @@ interface CollectionsDashboardProps {
   recentlyUsed: Collection[];
   all: Collection[];
   globalPublic: Collection[];
+  /** This week's AI collection ideas built from the user's behaviour. */
+  smartIdeas?: SmartCollectionIdea[];
 }
 
 function FilterChip({
@@ -65,6 +69,7 @@ export function CollectionsDashboard({
   recentlyUsed,
   all,
   globalPublic,
+  smartIdeas = [],
 }: CollectionsDashboardProps) {
   const [activeGenre, setActiveGenre] = useState("All");
   const [activeSort, setActiveSort] =
@@ -118,6 +123,8 @@ export function CollectionsDashboard({
           ))}
         </div>
       </section>
+
+      <SmartCollectionIdeas initialIdeas={smartIdeas} />
 
       <section className="flex flex-col gap-4 rounded-2xl bg-surface/40 px-4 py-5 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8">
