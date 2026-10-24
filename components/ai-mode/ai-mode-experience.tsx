@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { Headphones, LoaderCircle, MessageCircle, PencilLine, RefreshCw, Settings2, Sparkles, Tv, WandSparkles } from "lucide-react";
+import { Headphones, LoaderCircle, Map as MapIcon, MessageCircle, PencilLine, RefreshCw, Settings2, Sparkles, Tv, WandSparkles } from "lucide-react";
 import { TasteChat } from "@/components/ai-mode/taste-chat";
 import { TasteQuiz } from "@/components/ai-mode/taste-quiz";
 import { ContentCarouselSection, MusicCarouselSection } from "@/components/dashboard";
@@ -154,6 +154,12 @@ export function AiModeExperience({ initialMode, initialStart, initialWatch, init
                   </span>
                 </button>
               </div>
+              <Link
+                href={`/dashboard/ai-mode/roadmap?mode=${mode}`}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-brand-magenta/40 px-5 py-2.5 text-sm text-white/85 transition-colors hover:bg-brand-magenta/15 sm:w-auto sm:self-start"
+              >
+                <MapIcon className="size-4 text-brand-pink" aria-hidden /> My {mode === "watch" ? "watch" : "listening"} roadmap
+              </Link>
               {hasSaved ? (
                 <button
                   type="button"
@@ -202,7 +208,13 @@ export function AiModeExperience({ initialMode, initialStart, initialWatch, init
                       ))}
                     </ul>
                   </div>
-                  <div className="flex flex-col gap-2 sm:flex-row">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap lg:justify-end">
+                    <Link
+                      href={`/dashboard/ai-mode/roadmap?mode=${mode}&build=1`}
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-gradient-brand px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto"
+                    >
+                      <MapIcon className="size-4" aria-hidden /> Build my roadmap
+                    </Link>
                     <button
                       type="button"
                       onClick={() => setPhase("quiz")}

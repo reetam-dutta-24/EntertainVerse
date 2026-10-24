@@ -43,6 +43,7 @@ model User {
   accounts              Account[]
   tasteProfile          TasteProfile?
   aiTasteProfile        AiTasteProfile?
+  aiRoadmaps            AiRoadmap[]
   preferences           UserPreferences?
   watchlistItems        WatchlistItem[]
   collectionFavorites   CollectionFavorite[]
@@ -1009,4 +1010,63 @@ model CatalogEmbedding {
   updatedAt DateTime @updatedAt
 
   @@unique([kind, itemId])
+}
+
+/// AI roadmap: an ordered, time-budgeted plan of what to watch / listen to next,
+/// with the model's taste analysis. One ACTIVE roadmap per mode per user.
+model AiRoadmap {
+  id          String   @id @default(cuid())
+  userId      String
+  /// watch | listen
+  mode        String
+  /// ACTIVE | ARCHIVED
+  status      String   @default("ACTIVE")
+  title       String
+  /// { headline, paragraphs[], strengths[], tips[] } — the written taste analysis.
+  analysis    Json     @default("{}")
+  /// Hours per week the plan was scheduled for (null = default pace).
+  weeklyHours Int?
+  /// false when the plan was built without the AI model (quota / outage fallback).
+  aiWritten   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  steps AiRoadmapStep[]
+
+  @@index([userId, mode, status])
+}
+
+/// One step of a roadmap — a title, song or artist, in order, with progress.
+model AiRoadmapStep {
+  id              String    @id @default(cuid())
+  roadmapId       String
+  position        Int
+  /// Phase heading from the model, e.g. "Ease in".
+  phase           String
+  /// content | track | artist
+  kind            String
+  itemId          String
+  itemSlug        String
+  title           String
+  imageUrl        String?
+  /// What to watch of it, e.g. "Season 1 · 12 episodes".
+  focus           String    @default("")
+  /// Why this step, at this point in the plan (model-written, spoiler-free).
+  why             String    @db.Text
+  estMinutes      Int       @default(0)
+  /// Week of the plan this step is scheduled in (1-based).
+  week            Int       @default(1)
+  /// PENDING | IN_PROGRESS | DONE | DROPPED
+  status          String    @default("PENDING")
+  progressMinutes Int       @default(0)
+  /// Title this step replaced, if it was swapped in.
+  replacedTitle   String?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  lastActivityAt  DateTime?
+
+  roadmap AiRoadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+
+  @@index([roadmapId, position])
 }

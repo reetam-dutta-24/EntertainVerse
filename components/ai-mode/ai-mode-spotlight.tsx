@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Headphones, MessageCircle, Sparkles, Tv, WandSparkles } from "lucide-react";
+import { Headphones, Map as MapIcon, MessageCircle, Sparkles, Tv, WandSparkles } from "lucide-react";
 import { aiModeHref } from "@/components/ai-mode/ai-mode-launcher";
 import { HdImage } from "@/components/ui/hd-image";
 import { getContentDetailPath } from "@/lib/content-routes";
@@ -48,8 +48,24 @@ function TonightCard({
   );
 }
 
+export interface RoadmapTeaser {
+  title: string;
+  progressPercent: number;
+  doneSteps: number;
+  totalSteps: number;
+  next: { title: string; href: string } | null;
+}
+
 /** Home: the AI-mode front door — tonight's picks in one glance, quiz or chat in one tap. */
-export function AiModeSpotlight({ watch, listen }: { watch: ContentItem | null; listen: MusicTrack | null }) {
+export function AiModeSpotlight({
+  watch,
+  listen,
+  roadmap,
+}: {
+  watch: ContentItem | null;
+  listen: MusicTrack | null;
+  roadmap: RoadmapTeaser | null;
+}) {
   return (
     <section className="relative overflow-hidden rounded-3xl border border-brand-magenta/30 bg-gradient-to-br from-brand-purple/30 via-surface to-surface p-4 shadow-card-inner sm:p-6">
       <div className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full bg-brand-magenta/20 blur-3xl" aria-hidden />
@@ -82,6 +98,32 @@ export function AiModeSpotlight({ watch, listen }: { watch: ContentItem | null; 
               <Headphones className="size-4" aria-hidden /> Music mode
             </Link>
           </div>
+          <Link
+            href="/dashboard/ai-mode/roadmap?mode=watch"
+            className="flex flex-col gap-1.5 rounded-2xl border border-white/10 bg-black/25 p-3 transition-colors hover:border-brand-magenta/50"
+          >
+            <span className="flex items-center justify-between gap-2 text-xs">
+              <span className="inline-flex min-w-0 items-center gap-1.5 font-semibold text-white">
+                <MapIcon className="size-3.5 shrink-0 text-brand-pink" aria-hidden />
+                <span className="truncate">{roadmap ? roadmap.title : "Get a roadmap that fits your week"}</span>
+              </span>
+              {roadmap ? (
+                <span className="shrink-0 text-white/55">
+                  {roadmap.doneSteps}/{roadmap.totalSteps} done
+                </span>
+              ) : null}
+            </span>
+            {roadmap ? (
+              <>
+                <span className="h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <span className="block h-full rounded-full bg-gradient-brand" style={{ width: `${roadmap.progressPercent}%` }} />
+                </span>
+                {roadmap.next ? <span className="truncate text-caption text-white/60">Next: {roadmap.next.title}</span> : null}
+              </>
+            ) : (
+              <span className="text-caption text-white/55">An ordered plan with a written analysis of your taste →</span>
+            )}
+          </Link>
         </div>
 
         {watch || listen ? (
