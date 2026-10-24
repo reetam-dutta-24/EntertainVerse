@@ -106,6 +106,7 @@ export function GlobalSearch({
         )}
       >
         <input
+          role="combobox"
           type="search"
           value={query}
           autoFocus={autoFocus}
@@ -142,7 +143,7 @@ export function GlobalSearch({
               setActiveIndex((i) => Math.max(i - 1, -1));
             }
           }}
-          className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-muted/60 focus:outline-none"
+          className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-muted/60 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
         />
         <button
           type="button"

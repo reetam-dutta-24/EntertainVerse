@@ -122,7 +122,7 @@ function SearchAndSelected({
           value={query}
           onChange={(e) => onQuery(e.target.value)}
           placeholder={placeholder}
-          className="h-11 w-full rounded-full border border-white/20 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-muted/60 focus:border-brand-magenta focus:outline-none"
+          className="h-11 w-full rounded-full border border-white/20 bg-white/5 pl-10 pr-4 text-sm text-white placeholder:text-muted/60 focus:border-brand-magenta focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
         />
       </label>
       {selectedOptions.length ? (

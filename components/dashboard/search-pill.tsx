@@ -29,7 +29,7 @@ export function SearchPill({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
-        className="min-w-0 flex-1 bg-transparent text-xs text-white placeholder:text-white/80 focus:outline-none"
+        className="min-w-0 flex-1 bg-transparent text-xs text-white placeholder:text-white/80 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
       />
       <Search className="size-3.5 shrink-0 text-white" />
     </label>

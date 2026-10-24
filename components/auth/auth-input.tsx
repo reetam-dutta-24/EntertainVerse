@@ -30,7 +30,7 @@ export function AuthInput({
       <Icon className="size-4 shrink-0 text-muted/80" />
       <input
         type={isPassword && !visible ? "password" : "text"}
-        className="h-full min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-muted/60 focus:outline-none"
+        className="h-full min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-muted/60 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
         {...props}
       />
       {isPassword ? (

@@ -28,7 +28,8 @@ export function PaginationDots({
           aria-current={i === current ? "page" : undefined}
           onClick={() => onChange(i)}
           className={cn(
-            "size-2 cursor-pointer rounded-full transition-all duration-200",
+            // Invisible ::before pad gives each 8px dot a 40px touch target.
+            "relative size-2 cursor-pointer rounded-full transition-all duration-200 before:absolute before:-inset-4 before:content-['']",
             i === current
               ? "w-5 bg-brand-magenta shadow-glow-pink-soft"
               : "bg-white/25 hover:bg-white/45",

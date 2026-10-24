@@ -62,7 +62,7 @@ export function ContentEpisodeSection({
           value={seasonId}
           onChange={(e) => setSeasonId(e.target.value)}
           aria-label="Select season"
-          className="cursor-pointer appearance-none rounded-full bg-brand-purple py-2 pe-9 ps-4 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-brand-magenta"
+          className="cursor-pointer appearance-none rounded-full bg-brand-purple py-2 pe-9 ps-4 text-sm font-semibold text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink focus:ring-2 focus:ring-brand-magenta"
         >
           {effectiveSeasons.map((season) => (
             <option key={season.id} value={season.id} className="bg-surface">

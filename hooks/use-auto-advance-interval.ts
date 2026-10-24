@@ -20,6 +20,8 @@ export function useAutoAdvanceInterval({
 }: UseAutoAdvanceIntervalOptions) {
   useEffect(() => {
     if (!intervalMs || !enabled || paused) return;
+    // Carousels never move on their own for reduced-motion users.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const id = window.setInterval(onAdvance, intervalMs);
     return () => window.clearInterval(id);
   }, [intervalMs, enabled, paused, onAdvance]);

@@ -294,6 +294,7 @@ export function DashboardMessagesPanel() {
                   <button
                     type="button"
                     onClick={() => setActiveId(entry.id)}
+                    aria-current={entry.id === activeId ? "true" : undefined}
                     className={`flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left transition ${
                       isActive ? "bg-white/15" : "hover:bg-white/8"
                     } ${unread > 0 && !isActive ? "border border-brand-magenta/30" : ""}`}
@@ -462,7 +463,7 @@ export function DashboardMessagesPanel() {
                   : "Select or start a conversation"
               }
               disabled={!activeConversation && !targetHandle}
-              className="min-w-0 flex-1 rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none"
+              className="min-w-0 flex-1 rounded-xl border border-white/15 bg-black/40 px-3 py-2 text-sm text-white outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
             />
             <button
               type="submit"

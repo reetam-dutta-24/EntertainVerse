@@ -239,7 +239,7 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
           </Link>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-1" aria-live="polite">
           <h1 className="text-xl font-bold text-white sm:text-2xl">{displayTitle}</h1>
           {!isMovie && activeEpisode ? (
             <p className="text-sm text-white/60">
@@ -379,7 +379,7 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
                     type="button"
                     onClick={() => setMuted((current) => !current)}
                     aria-label={muted ? "Unmute" : "Mute"}
-                    className="cursor-pointer rounded-full p-2 text-white transition-colors hover:bg-white/10"
+                    className="cursor-pointer rounded-full p-2.5 text-white transition-colors hover:bg-white/10"
                   >
                     {muted ? (
                       <VolumeX className="size-5" />
@@ -406,7 +406,7 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
                     type="button"
                     onClick={() => void toggleFullscreen()}
                     aria-label="Fullscreen"
-                    className="cursor-pointer rounded-full p-2 text-white transition-colors hover:bg-white/10"
+                    className="cursor-pointer rounded-full p-2.5 text-white transition-colors hover:bg-white/10"
                   >
                     <Maximize className="size-5" />
                   </button>

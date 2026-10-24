@@ -279,8 +279,43 @@
 /* Global styles */
 /* ------------- */
 
-html {
-  scroll-behavior: smooth;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Keyboard focus — one on-brand ring for every interactive element. */
+:where(
+    a[href],
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [role="button"],
+    [role="link"],
+    [role="tab"],
+    [role="option"],
+    [role="menuitem"],
+    [role="switch"],
+    [role="checkbox"],
+    [tabindex]:not([tabindex="-1"])
+  ):focus-visible {
+  outline: 2px solid var(--color-brand-pink);
+  outline-offset: 2px;
+}
+
+/* Respect reduced motion everywhere: reveals, hover lifts, ambient backdrops. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {

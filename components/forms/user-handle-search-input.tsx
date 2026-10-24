@@ -111,7 +111,7 @@ export function UserHandleSearchInput({
           aria-expanded={open}
           aria-controls={listId}
           aria-autocomplete="list"
-          className="w-full rounded-lg border border-white/15 bg-white/5 py-2 pl-9 pr-3 text-xs text-white outline-none placeholder:text-white/35 focus:border-brand-pink/50"
+          className="w-full rounded-lg border border-white/15 bg-white/5 py-2 pl-9 pr-3 text-xs text-white outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink placeholder:text-white/35 focus:border-brand-pink/50"
         />
       </div>
 

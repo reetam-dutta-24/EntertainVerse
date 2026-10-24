@@ -14,7 +14,7 @@ import type {
 } from "@/lib/validators/admin/catalog-shared";
 
 export const inputClass =
-  "h-11 rounded-xl border border-white/15 bg-white/5 px-3 text-sm text-white placeholder:text-white/35 focus:border-brand-magenta focus:outline-none";
+  "h-11 rounded-xl border border-white/15 bg-white/5 px-3 text-sm text-white placeholder:text-white/35 focus:border-brand-magenta focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink";
 
 export function Field({
   label,

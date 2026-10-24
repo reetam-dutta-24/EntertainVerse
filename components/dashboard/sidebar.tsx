@@ -76,12 +76,13 @@ export function DashboardSidebar({
               key={item.href}
               href={item.href}
               onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
               className={cn(
                 "flex items-center gap-3 rounded-full px-4 py-2.5 text-small font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white",
-                active && "bg-white/15 text-white",
+                active && "bg-brand-magenta/15 text-white shadow-glow-pink-soft ring-1 ring-inset ring-brand-magenta/50",
               )}
             >
-              <item.icon className="size-4 shrink-0" />
+              <item.icon className={cn("size-4 shrink-0", active && "text-brand-pink")} />
               <span className="min-w-0 flex-1 truncate">{item.label}</span>
               {item.href === "/dashboard/messages" ? <MessagesNavBadge /> : null}
             </Link>

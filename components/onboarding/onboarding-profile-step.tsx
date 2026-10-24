@@ -80,7 +80,7 @@ export function OnboardingProfileStep({
             rows={3}
             maxLength={500}
             placeholder="Tell the community what you're into…"
-            className="w-full resize-none rounded-xl border border-white/20 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-muted/60 focus:border-brand-magenta focus:outline-none"
+            className="w-full resize-none rounded-xl border border-white/20 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-muted/60 focus:border-brand-magenta focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
           />
         </div>
 

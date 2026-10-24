@@ -373,7 +373,7 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
                 setPreferences((c) => ({ ...c, language: value }));
                 void patchSetting("preferences", "language", value);
               }}
-              className="h-11 w-full cursor-pointer appearance-none rounded-xl border border-white/20 bg-white/5 pl-10 pr-4 text-sm text-white focus:border-brand-magenta focus:outline-none"
+              className="h-11 w-full cursor-pointer appearance-none rounded-xl border border-white/20 bg-white/5 pl-10 pr-4 text-sm text-white focus:border-brand-magenta focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
             >
               {languageOptions.map((lang) => (
                 <option key={lang} value={lang} className="bg-background">

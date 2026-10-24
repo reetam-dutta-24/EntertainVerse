@@ -303,6 +303,7 @@ function CatalogSearchInput({
       <label className="flex items-center gap-2 rounded-xl border border-white/15 bg-popover px-3 py-2.5 transition focus-within:border-brand-magenta/60 focus-within:ring-1 focus-within:ring-brand-magenta/30">
         <Search className="size-4 shrink-0 text-white/45" />
         <input
+          role="combobox"
           ref={inputRef}
           type="text"
           value={query}
@@ -332,7 +333,7 @@ function CatalogSearchInput({
               pickResult(results[activeIndex]);
             }
           }}
-          className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/40 outline-none"
+          className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/40 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
         />
       </label>
 

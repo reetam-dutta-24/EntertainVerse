@@ -137,7 +137,7 @@ function PlayNowPlayingCover({
         </div>
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-4">
+      <div className="absolute inset-x-0 bottom-0 p-4" aria-live="polite">
         <p className="truncate text-lg font-bold text-white">{title}</p>
         {subtitle ? (
           <p className="truncate text-sm capitalize text-white/70">{subtitle}</p>

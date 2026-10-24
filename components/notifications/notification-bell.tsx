@@ -48,7 +48,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "relative cursor-pointer rounded-lg p-1.5 text-white transition-colors hover:bg-white/10 hover:text-brand-pink",
+          "relative cursor-pointer rounded-lg p-2.5 text-white transition-colors hover:bg-white/10 hover:text-brand-pink",
           open && "bg-white/10 text-brand-pink",
         )}
       >

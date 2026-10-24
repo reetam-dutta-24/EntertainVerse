@@ -126,6 +126,22 @@ export function MusicCard({
         setHovered(false);
         onHoverChange?.(false);
       }}
+      // Keyboard users get the same quick-actions panel as hover.
+      tabIndex={0}
+      role="group"
+      aria-label={track.title}
+      onFocus={() => {
+        setHovered(true);
+        onHoverChange?.(true);
+      }}
+      onBlur={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget as Node)) return;
+        setHovered(false);
+        onHoverChange?.(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && event.target === event.currentTarget) handleViewDetails();
+      }}
     >
       <div
         className={cn(

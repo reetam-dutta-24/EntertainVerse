@@ -62,7 +62,7 @@ export function ChatMessageRow({
           onChange={(event) => setDraft(event.target.value)}
           maxLength={2000}
           rows={3}
-          className="w-full resize-none rounded-2xl border px-4 py-3 text-sm text-white outline-none"
+          className="w-full resize-none rounded-2xl border px-4 py-3 text-sm text-white outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
           style={{
             borderColor: theme?.accent.border,
             background: "rgba(14,11,24,0.82)",

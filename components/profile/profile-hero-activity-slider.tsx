@@ -122,7 +122,7 @@ export function ProfileHeroActivitySlider({
             type="button"
             onClick={() => goTo(safeIndex - 1)}
             aria-label="Previous activity"
-            className="absolute -left-1 top-1/2 z-20 -translate-y-1/2 cursor-pointer p-1 text-brand-magenta transition-colors hover:text-brand-pink sm:left-0"
+            className="absolute -left-1 top-1/2 z-20 -translate-y-1/2 cursor-pointer p-2 text-brand-magenta transition-colors hover:text-brand-pink sm:left-0"
           >
             <ChevronLeft className="size-7" strokeWidth={3} />
           </button>
@@ -182,7 +182,7 @@ export function ProfileHeroActivitySlider({
             type="button"
             onClick={() => goTo(safeIndex + 1)}
             aria-label="Next activity"
-            className="absolute -right-1 top-1/2 z-20 -translate-y-1/2 cursor-pointer p-1 text-brand-magenta transition-colors hover:text-brand-pink sm:right-0"
+            className="absolute -right-1 top-1/2 z-20 -translate-y-1/2 cursor-pointer p-2 text-brand-magenta transition-colors hover:text-brand-pink sm:right-0"
           >
             <ChevronRight className="size-7" strokeWidth={3} />
           </button>

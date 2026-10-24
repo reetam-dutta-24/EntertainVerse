@@ -59,7 +59,7 @@ export function AdminCatalogSearchBar({
         value={query}
         placeholder={placeholder}
         onChange={(event) => setQuery(event.target.value)}
-        className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/40 outline-none"
+        className="min-w-0 flex-1 bg-transparent text-sm text-white placeholder:text-white/40 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
         aria-label="Search catalog"
       />
       {query ? (

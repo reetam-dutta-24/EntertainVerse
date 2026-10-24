@@ -53,7 +53,7 @@ export function DashboardTopbar({
             type="button"
             aria-label="Open navigation menu"
             onClick={onMenuClick}
-            className="cursor-pointer rounded-lg p-1.5 text-white transition-colors hover:bg-white/10 lg:hidden"
+            className="cursor-pointer rounded-lg p-2.5 text-white transition-colors hover:bg-white/10 lg:hidden"
           >
             <Menu className="size-5" />
           </button>
@@ -73,7 +73,7 @@ export function DashboardTopbar({
               type="button"
               aria-label={mobileSearchOpen ? "Close search" : "Open search"}
               onClick={() => setMobileSearchOpen((open) => !open)}
-              className="cursor-pointer rounded-lg p-1.5 text-white transition-colors hover:bg-white/10 md:hidden"
+              className="cursor-pointer rounded-lg p-2.5 text-white transition-colors hover:bg-white/10 md:hidden"
             >
               {mobileSearchOpen ? (
                 <X className="size-5" />

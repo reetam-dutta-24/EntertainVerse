@@ -293,7 +293,7 @@ export function ChatInput({
           onChange={(e) => setValue(e.target.value)}
           placeholder={placeholder}
           disabled={disabled || uploading}
-          className="h-full flex-1 bg-transparent text-sm font-medium placeholder:text-white/55 focus:outline-none"
+          className="h-full flex-1 bg-transparent text-sm font-medium placeholder:text-white/55 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
           style={{
             color: theme?.bodyText ?? "white",
           }}

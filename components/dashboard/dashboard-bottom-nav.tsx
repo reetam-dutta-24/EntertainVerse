@@ -41,6 +41,7 @@ export function DashboardBottomNav() {
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-caption font-medium transition-colors",
                   active
