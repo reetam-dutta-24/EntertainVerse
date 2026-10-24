@@ -55,6 +55,7 @@ export function CollectionCard({
       accent={collection.accent ?? "blue"}
       stats={stats}
       visibility={collection.visibility === "private" ? "private" : "public"}
+      reason={collection.reason}
       description={
         collection.description ||
         (collection.updatedAt ? `Updated ${collection.updatedAt}` : `${collection.category} collection`)

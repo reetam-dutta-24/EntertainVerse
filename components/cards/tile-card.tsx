@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Globe, Lock, type LucideIcon } from "lucide-react";
+import { Globe, Lock, Sparkles, type LucideIcon } from "lucide-react";
 import { CardHeaderImage } from "@/components/cards/card-header-image";
 import { COLLECTION_CARD_H } from "@/lib/card-dimensions";
 import { getAccentStyle } from "@/lib/accents";
@@ -33,6 +33,8 @@ export interface TileCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   visibility?: "public" | "private";
   /** Two-line description, or a fallback line (e.g. "Updated 2d ago"). */
   description?: string;
+  /** Recommender "why this" — shown instead of the description when present. */
+  reason?: string;
   /** Primary action (omitted for landing demos). */
   cta?: React.ReactNode;
   /** Owner actions — Edit / Delete. */
@@ -51,6 +53,7 @@ export function TileCard({
   stats,
   visibility,
   description,
+  reason,
   cta,
   manage,
   className,
@@ -105,9 +108,17 @@ export function TileCard({
             ) : null}
           </div>
 
-          <p className="line-clamp-2 h-8 text-center text-caption leading-4 text-white/60">
-            {description}
-          </p>
+          {reason ? (
+            <p className="line-clamp-2 h-8 text-center text-caption leading-4 text-brand-pink" title={`Why this? ${reason}`}>
+              <Sparkles className="me-1 inline size-3 -translate-y-px" aria-hidden />
+              <span className="sr-only">Why this: </span>
+              {reason}
+            </p>
+          ) : (
+            <p className="line-clamp-2 h-8 text-center text-caption leading-4 text-white/60">
+              {description}
+            </p>
+          )}
 
           {cta || manage ? (
             <div className="mt-auto flex flex-col gap-1.5">

@@ -79,6 +79,7 @@ export function CommunityCard({
         { icon: MessageSquare, label: "Posts", value: community.postCount },
       ]}
       visibility={community.visibility === "private" ? "private" : "public"}
+      reason={community.reason}
       description={
         community.description ||
         `${community.category} · ${activityLabels[community.activityLevel]}${lastActive}`

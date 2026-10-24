@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { rankCommunitiesForUser } from "@/lib/recommender/social";
 import { prisma } from "@/lib/prisma";
 import {
   mapCommunityPost,
@@ -166,9 +167,19 @@ export async function listRecommendedCommunities(
     },
     include: communityInclude,
     orderBy: [{ memberCount: "desc" }, { postCount: "desc" }],
-    take: limit,
+    take: 60,
   });
-  return rows.map((row) => mapCommunityToCardWithMembers(row));
+  // Ranked by the recommender: taste fit + members who love what the viewer loves.
+  const picks = await rankCommunitiesForUser(userId, rows).catch((error) => {
+    // Ranking is a bonus — fall back to popularity order rather than failing the page.
+    console.error("[recommender] communities", error);
+    return new Map();
+  });
+  return rows
+    .map((row) => ({ row, pick: picks.get(row.id) }))
+    .sort((a, b) => (b.pick?.score ?? 0) - (a.pick?.score ?? 0))
+    .slice(0, limit)
+    .map(({ row, pick }) => ({ ...mapCommunityToCardWithMembers(row), reason: pick?.reason }));
 }
 
 export async function listMostActiveCommunities(

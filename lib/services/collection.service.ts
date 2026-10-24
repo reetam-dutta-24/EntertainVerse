@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { rankCollectionsForUser } from "@/lib/recommender/social";
 import {
   mapCollectionItemToContent,
   mapCollectionToCard,
@@ -92,7 +93,10 @@ export async function listPublicCollections(limit = 24): Promise<Collection[]> {
   return rows.map(mapCollectionToCard);
 }
 
-/** Public collections the viewer does not own and has not favorited. */
+/**
+ * Public collections the viewer does not own and has not favorited, ranked by
+ * the recommender (taste fit + titles they love), each with a "why this".
+ */
 export async function listDiscoverablePublicCollections(
   userId: string,
   limit = 15,
@@ -104,10 +108,19 @@ export async function listDiscoverablePublicCollections(
       favorites: { none: { userId } },
     },
     orderBy: [{ favoriteCount: "desc" }, { updatedAt: "desc" }],
-    take: limit,
+    take: 60,
     include: collectionCardInclude,
   });
-  return rows.map(mapCollectionToCard);
+  const picks = await rankCollectionsForUser(userId, rows).catch((error) => {
+    // Ranking is a bonus — fall back to popularity order rather than failing the page.
+    console.error("[recommender] collections", error);
+    return new Map();
+  });
+  return rows
+    .map((row) => ({ row, pick: picks.get(row.id) }))
+    .sort((a, b) => (b.pick?.score ?? 0) - (a.pick?.score ?? 0))
+    .slice(0, limit)
+    .map(({ row, pick }) => ({ ...mapCollectionToCard(row), reason: pick?.reason }));
 }
 
 export async function listMostLikedCollections(

@@ -8,10 +8,7 @@ import {
   MusicGridSection,
 } from "@/components/dashboard";
 import { SearchTopResult } from "@/components/search/search-top-result";
-import { getCommunityMemberPreview } from "@/lib/data/community";
 import type { SearchPageData } from "@/lib/search/types";
-import { useEffect, useState } from "react";
-import type { UserSummary } from "@/types";
 import Link from "next/link";
 import { getProfilePath } from "@/lib/profile-routes";
 
@@ -69,11 +66,6 @@ function ProfileResultsRow({
 
 /** Full `/search?q=` results layout — variant sections per primary type. */
 export function SearchResultsView({ data }: SearchResultsViewProps) {
-  const [members, setMembers] = useState<UserSummary[]>([]);
-
-  useEffect(() => {
-    getCommunityMemberPreview().then(setMembers);
-  }, []);
 
   const queryLabel = data.query;
 

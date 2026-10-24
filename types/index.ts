@@ -91,6 +91,8 @@ export interface Community {
   memberLimit?: number;
   createdAtTime?: number;
   updatedAtTime?: number;
+  /** Recommender "why this", on recommended communities. */
+  reason?: string;
 }
 
 export interface Collection {
@@ -111,6 +113,8 @@ export interface Collection {
   updatedAtTime?: number;
   accent?: AccentColor;
   imageUrl?: string;
+  /** Recommender "why this", on recommended public collections. */
+  reason?: string;
 }
 
 /** Featured in-progress item shown in the collection hero (right panel). */
