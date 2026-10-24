@@ -16,13 +16,13 @@ export interface ArtistDetailHeroProps {
 }
 
 const DETAIL_CHIP =
-  "h-7 shrink-0 px-3 text-[11px] font-medium sm:h-8 sm:px-3.5 sm:text-xs";
+  "h-7 shrink-0 px-3 text-caption font-medium sm:h-8 sm:px-3.5 sm:text-xs";
 
 const CHIP_ROW =
   "flex shrink-0 flex-nowrap items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
 
 const TITLE_CLASS =
-  "text-2xl font-bold leading-tight text-white sm:text-[30px] lg:text-[34px]";
+  "text-2xl font-bold leading-tight text-white sm:text-title lg:text-title";
 
 /** Figma artist hero — bio + trending slider left; banner player right. */
 export function ArtistDetailHero({ artist }: ArtistDetailHeroProps) {

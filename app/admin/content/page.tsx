@@ -43,7 +43,7 @@ export default async function AdminContentPage({ searchParams }: AdminContentPag
         </div>
         <Link
           href="/admin/content/new"
-          className="rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-white shadow-glow-pink-soft"
+          className="rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-white"
         >
           + New content
         </Link>

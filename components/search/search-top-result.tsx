@@ -70,7 +70,7 @@ export function SearchTopResult({ data }: SearchTopResultProps) {
         <h2 className="w-full text-lg font-bold text-white sm:text-heading">
           🔍 Top Results For {label}
         </h2>
-        <div className="flex w-full max-w-[420px] flex-col items-center gap-4 rounded-[24px] border border-white/10 bg-glass-purple p-6 text-center shadow-card-inner">
+        <div className="flex w-full max-w-[420px] flex-col items-center gap-4 rounded-3xl border border-white/10 bg-glass-purple p-6 text-center shadow-card-inner">
           <span
             className="flex size-20 items-center justify-center overflow-hidden rounded-full text-2xl font-bold text-black"
             style={{ backgroundColor: profile.avatarColor }}

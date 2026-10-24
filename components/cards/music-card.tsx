@@ -129,14 +129,14 @@ export function MusicCard({
     >
       <div
         className={cn(
-          "absolute left-1/2 top-1/2 z-10 flex flex-col overflow-hidden rounded-[18px] shadow-card-inner transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          hovered && "z-30 rounded-[20px]",
+          "absolute left-1/2 top-1/2 z-10 flex flex-col overflow-hidden rounded-card shadow-card-inner transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          hovered && "z-30 rounded-card",
         )}
         style={{
           width: hovered ? HOVER_W : CARD_W,
           height: hovered ? HOVER_H : CARD_H,
           transform: "translate(-50%, -50%)",
-          backgroundColor: hovered ? "#000000" : tint.glass,
+          backgroundColor: hovered ? "var(--color-surface)" : tint.glass,
         }}
       >
         <div className="relative h-full w-full">
@@ -178,7 +178,7 @@ export function MusicCard({
               <Chip musicKind={track.kind}>{kindLabel(track.kind)}</Chip>
             </div>
 
-            <div className="mx-auto mt-1 h-[108px] w-[124px] shrink-0 overflow-hidden rounded-[14px]">
+            <div className="mx-auto mt-1 h-[108px] w-[124px] shrink-0 overflow-hidden rounded-xl">
               {track.imageUrl ? (
                 <HdImage
                   src={track.imageUrl}
@@ -195,7 +195,7 @@ export function MusicCard({
                 <p className="line-clamp-1 text-sm font-semibold text-white">
                   {track.title}
                 </p>
-                <p className="text-[11px] font-normal text-muted">
+                <p className="text-caption font-normal text-muted">
                   {track.artist}
                 </p>
               </div>
@@ -231,12 +231,12 @@ export function MusicCard({
                 <p className="line-clamp-2 text-sm font-semibold leading-tight text-white">
                   {track.title}
                 </p>
-                <p className="line-clamp-1 text-[11px] font-normal text-muted">
+                <p className="line-clamp-1 text-caption font-normal text-muted">
                   {track.artist}
                 </p>
               </div>
 
-              <p className="h-[36px] w-full overflow-hidden text-center text-[10px] font-normal leading-[12px] text-white/80 line-clamp-3">
+              <p className="h-8 w-full overflow-hidden text-center text-caption font-normal leading-4 text-white/80 line-clamp-2">
                 {trackDescription(track)}
               </p>
 
@@ -245,7 +245,7 @@ export function MusicCard({
                   <button
                     type="button"
                     onClick={handleListenNow}
-                    className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-[10px] font-normal text-white transition-colors hover:bg-brand-magenta/15"
+                    className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                   >
                     <Headphones className="size-3.5 text-brand-magenta" />
                     Listen Now
@@ -253,7 +253,7 @@ export function MusicCard({
                   <button
                     type="button"
                     onClick={handleViewDetails}
-                    className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-[10px] font-normal text-white transition-colors hover:bg-brand-magenta/15"
+                    className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                   >
                     <PlayCircle className="size-3.5 text-brand-magenta" />
                     View Details

@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-export const glowCardVariants = cva("relative overflow-hidden rounded-poster", {
+export const glowCardVariants = cva("relative overflow-hidden rounded-card", {
   variants: {
     glow: {
       pink: "shadow-glow-pink",

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getProfilePath } from "@/lib/profile-routes";
 import { DmUserAvatar } from "@/components/messages/dm-user-avatar";
 import type { UserSummary } from "@/types";
+import { DEFAULT_AVATAR_COLOR } from "@/lib/brand-colors";
 
 export interface ProfileFriendsSectionProps {
   title: string;
@@ -31,11 +32,11 @@ export function ProfileFriendsSection({
             <Link
               key={friend.id}
               href={getProfilePath(friend.handle ?? friend.id)}
-              className="flex items-center gap-3 rounded-[14px] border border-white/[0.07] bg-black/35 px-3 py-3 shadow-card-inner backdrop-blur-sm transition-colors hover:border-white/15 hover:bg-white/[0.04]"
+              className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-black/35 px-3 py-3 shadow-card-inner backdrop-blur-sm transition-colors hover:border-white/15 hover:bg-white/[0.04]"
             >
               <DmUserAvatar
                 name={friend.name}
-                avatarColor={friend.avatarColor ?? "#ff00cc"}
+                avatarColor={friend.avatarColor ?? DEFAULT_AVATAR_COLOR}
                 avatarUrl={friend.avatarUrl}
                 size="md"
               />

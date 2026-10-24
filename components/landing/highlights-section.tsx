@@ -115,7 +115,7 @@ export function HighlightsSection() {
         <ScrollFadeIn direction="left">
           <CollectionCard
             collection={collection}
-            className="rounded-card-xl shadow-glow-blue"
+            className="rounded-card shadow-glow-blue"
             demo
           />
         </ScrollFadeIn>

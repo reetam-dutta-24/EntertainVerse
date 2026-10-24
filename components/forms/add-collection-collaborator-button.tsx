@@ -99,7 +99,7 @@ export function AddCollectionCollaboratorButton({
         </form>
       ) : null}
       {message ? (
-        <p className="mt-1 text-center text-[10px] text-white/70">{message}</p>
+        <p className="mt-1 text-center text-caption text-white/70">{message}</p>
       ) : null}
     </div>
   );

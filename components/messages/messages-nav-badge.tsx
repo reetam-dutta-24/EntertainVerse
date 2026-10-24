@@ -10,7 +10,7 @@ export function MessagesNavBadge({ className }: { className?: string }) {
     <span
       className={
         className ??
-        "ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-magenta px-1 text-[9px] font-bold leading-none text-white shadow-glow-pink-soft"
+        "ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-magenta px-1 text-micro font-bold leading-none text-white"
       }
     >
       {unreadChatCount > 99 ? "99+" : unreadChatCount}

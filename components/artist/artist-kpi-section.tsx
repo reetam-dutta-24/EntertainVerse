@@ -56,7 +56,7 @@ export function ArtistKpiSection({ stats }: ArtistKpiSectionProps) {
               className="bg-gradient-brand flex w-[128px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-center sm:w-[148px] sm:py-3 lg:w-[160px]"
             >
               <StatIcon stat={stat} />
-              <span className="text-[10px] font-medium leading-tight text-white/95 sm:text-[11px]">
+              <span className="text-caption font-medium leading-tight text-white/95 sm:text-caption">
                 {stat.label}
               </span>
               <span className="text-sm font-bold text-white sm:text-base lg:text-lg">

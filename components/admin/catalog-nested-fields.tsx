@@ -157,6 +157,7 @@ export function TagListEditor({
 }
 
 import { ACCENT_OPTIONS } from "@/lib/catalog-enums";
+import { DEFAULT_AVATAR_COLOR } from "@/lib/brand-colors";
 
 export function SeasonsEditor({
   seasons,
@@ -402,9 +403,9 @@ export function CharactersEditor({
                 })
               }
             >
-              <option value="" className="bg-[#1a0d2e]">None</option>
+              <option value="" className="bg-popover">None</option>
               {ACCENT_OPTIONS.map((a) => (
-                <option key={a.value} value={a.value} className="bg-[#1a0d2e]">{a.label}</option>
+                <option key={a.value} value={a.value} className="bg-popover">{a.label}</option>
               ))}
             </select>
           </Field>
@@ -510,7 +511,7 @@ export function CatalogReviewsEditor({
             ...reviews,
             {
               authorName: "",
-              authorAvatarColor: "#ff00cc",
+              authorAvatarColor: DEFAULT_AVATAR_COLOR,
               rating: 9,
               headline: "",
               body: "",

@@ -68,7 +68,7 @@ export function ChipPickGrid({ step, picked, onToggle }: PickGridProps) {
             </span>
             <span className="text-sm font-semibold text-white">{option.label}</span>
             {option.hint ? (
-              <span className="text-[11px] text-muted">{option.hint}</span>
+              <span className="text-caption text-muted">{option.hint}</span>
             ) : null}
           </button>
         );
@@ -194,7 +194,7 @@ export function PosterPickGrid({ step, picked, relevanceTags, onToggle }: PickGr
                 aria-pressed={selected}
                 disabled={atMax}
                 className={cn(
-                  "group relative aspect-[2/3] w-full cursor-pointer overflow-hidden rounded-[14px] border text-left transition-all duration-300",
+                  "group relative aspect-[2/3] w-full cursor-pointer overflow-hidden rounded-xl border text-left transition-all duration-300",
                   selected
                     ? "border-brand-magenta shadow-glow-pink-soft"
                     : "border-white/10 hover:border-white/40",
@@ -209,11 +209,11 @@ export function PosterPickGrid({ step, picked, relevanceTags, onToggle }: PickGr
                   </span>
                 )}
                 <span className="absolute inset-x-0 bottom-0 flex flex-col gap-0.5 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-2 pb-2 pt-8">
-                  <span className="line-clamp-2 text-[11px] font-semibold leading-tight text-white sm:text-xs">
+                  <span className="line-clamp-2 text-caption font-semibold leading-tight text-white sm:text-xs">
                     {option.label}
                   </span>
                   {option.hint ? (
-                    <span className="line-clamp-1 text-[10px] text-white/60">{option.hint}</span>
+                    <span className="line-clamp-1 text-caption text-white/60">{option.hint}</span>
                   ) : null}
                 </span>
                 {selected ? (
@@ -297,7 +297,7 @@ export function ArtistPickGrid({ step, picked, relevanceTags, onToggle }: PickGr
                   {option.label}
                 </span>
                 {option.hint ? (
-                  <span className="line-clamp-1 text-[10px] text-muted sm:text-[11px]">{option.hint}</span>
+                  <span className="line-clamp-1 text-caption text-muted sm:text-caption">{option.hint}</span>
                 ) : null}
               </button>
             );

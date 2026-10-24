@@ -19,13 +19,13 @@ export function AdminShell({
   const navItems = getVisibleAdminNavItems(role);
 
   return (
-    <div className="flex min-h-dvh bg-[#0a0416] text-white">
-      <aside className="flex w-60 shrink-0 flex-col border-r border-white/10 bg-[#120820] px-4 py-6">
+    <div className="flex min-h-dvh bg-night text-white">
+      <aside className="flex w-60 shrink-0 flex-col border-r border-white/10 bg-popover-deep px-4 py-6">
         <div className="flex items-center gap-2 px-2">
           <Shield className="size-5 text-brand-pink" />
           <div>
             <p className="text-sm font-semibold">AniVerse Admin</p>
-            <p className="text-[11px] text-white/50">Catalog CMS</p>
+            <p className="text-caption text-white/50">Catalog CMS</p>
           </div>
         </div>
 

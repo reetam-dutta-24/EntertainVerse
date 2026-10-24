@@ -102,7 +102,7 @@ export function CommunitySettingsDangerZone({
   if (!canLeave && !canDelete) return null;
 
   return (
-    <div className="mt-6 rounded-[16px] border border-red-500/25 bg-red-500/5 p-4">
+    <div className="mt-6 rounded-2xl border border-red-500/25 bg-red-500/5 p-4">
       <h3 className="text-sm font-bold text-red-300">Danger zone</h3>
       <p className="mt-1 text-xs text-white/55">
         Leave this community or permanently delete it. These actions cannot be undone.

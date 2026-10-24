@@ -195,7 +195,7 @@ export function SongHeroPosterPanel({
               className="space-y-2 rounded-xl border bg-black/50 px-3 py-2.5 backdrop-blur-sm"
               style={{ borderColor: theme.border, boxShadow: theme.glow }}
             >
-              <div className="flex items-center justify-between gap-2 text-[10px] text-white/60">
+              <div className="flex items-center justify-between gap-2 text-caption text-white/60">
                 <span className="truncate font-medium text-white/90">{title}</span>
                 <span className="shrink-0">{artist}</span>
               </div>
@@ -210,7 +210,7 @@ export function SongHeroPosterPanel({
                 style={{ accentColor: theme.slider }}
                 aria-label="Playback progress"
               />
-              <div className="flex justify-between text-[10px] text-white/50">
+              <div className="flex justify-between text-caption text-white/50">
                 <span>{formatTime(progress)}</span>
                 <span>{formatTime(progressMax)}</span>
               </div>

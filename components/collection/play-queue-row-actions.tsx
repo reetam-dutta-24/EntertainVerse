@@ -51,7 +51,7 @@ export function PlayQueueRowActions({
           title="Add to queue"
           disabled={addDisabled}
           onClick={onAddToQueue}
-          className="rounded-md p-1.5 text-white/45 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
+          className="rounded-lg p-1.5 text-white/45 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
         >
           <ListPlus className="size-4" />
           <span className="sr-only">Add to queue</span>
@@ -62,7 +62,7 @@ export function PlayQueueRowActions({
             title="Remove from collection"
             disabled={deleteLoading}
             onClick={() => setConfirmOpen(true)}
-            className="rounded-md p-1.5 text-white/45 transition hover:bg-red-500/20 hover:text-red-300 disabled:opacity-30"
+            className="rounded-lg p-1.5 text-white/45 transition hover:bg-red-500/20 hover:text-red-300 disabled:opacity-30"
           >
             <Trash2 className="size-4" />
             <span className="sr-only">Remove from collection</span>

@@ -182,7 +182,7 @@ export function CollectionForm({ mode, recordId, initial }: CollectionFormProps)
               }
             >
               {collectionKinds.map((kind) => (
-                <option key={kind} value={kind} className="bg-[#1a0d2e]">
+                <option key={kind} value={kind} className="bg-popover">
                   {kind === "music" ? "Music playlist" : "Shows & movies"}
                 </option>
               ))}
@@ -197,7 +197,7 @@ export function CollectionForm({ mode, recordId, initial }: CollectionFormProps)
               }
             >
               {collectionCategories.map((category) => (
-                <option key={category} value={category} className="bg-[#1a0d2e]">
+                <option key={category} value={category} className="bg-popover">
                   {category}
                 </option>
               ))}

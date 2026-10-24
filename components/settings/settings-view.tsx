@@ -283,7 +283,7 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
       <SettingsSection title="🧠 Taste & AI" subtitle="Your personalized match engine">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-full bg-gradient-brand shadow-glow-pink-soft">
+            <span className="flex size-12 items-center justify-center rounded-full bg-gradient-brand">
               <Sparkles className="size-5 text-white" />
             </span>
             <div>
@@ -373,10 +373,10 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
                 setPreferences((c) => ({ ...c, language: value }));
                 void patchSetting("preferences", "language", value);
               }}
-              className="h-11 w-full cursor-pointer appearance-none rounded-[10px] border border-white/20 bg-white/5 pl-10 pr-4 text-sm text-white focus:border-brand-magenta focus:outline-none"
+              className="h-11 w-full cursor-pointer appearance-none rounded-xl border border-white/20 bg-white/5 pl-10 pr-4 text-sm text-white focus:border-brand-magenta focus:outline-none"
             >
               {languageOptions.map((lang) => (
-                <option key={lang} value={lang} className="bg-[#120826]">
+                <option key={lang} value={lang} className="bg-background">
                   {lang}
                 </option>
               ))}

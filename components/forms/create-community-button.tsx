@@ -135,7 +135,7 @@ export function CreateCommunityButton() {
               <p className="mt-2 font-mono text-lg font-bold tracking-wide text-white">
                 {issuedJoinCode}
               </p>
-              <p className="mt-2 text-[11px] text-white/55">
+              <p className="mt-2 text-caption text-white/55">
                 Limit: {memberLimit} members · shown once
               </p>
             </div>

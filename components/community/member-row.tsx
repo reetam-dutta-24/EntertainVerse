@@ -28,7 +28,7 @@ export function MemberRow({
   return (
     <div
       className={cn(
-        "flex h-16 items-center gap-3 rounded-btn bg-glass-purple px-4 transition-colors hover:bg-glass-magenta",
+        "flex h-16 items-center gap-3 rounded-xl bg-glass-purple px-4 transition-colors hover:bg-glass-magenta",
         className,
       )}
       {...props}
@@ -36,7 +36,7 @@ export function MemberRow({
       <div className="relative">
         <AvatarStack users={[member]} />
         {member.online ? (
-          <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-surface bg-[#00ff8c]" />
+          <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-surface bg-online" />
         ) : null}
       </div>
       <div className="flex min-w-0 flex-col">

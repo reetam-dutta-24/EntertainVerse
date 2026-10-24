@@ -35,7 +35,7 @@ function ProfileResultsRow({
           <Link
             key={profile.id}
             href={getProfilePath(profile.id)}
-            className="flex items-center gap-3 rounded-[16px] border border-white/8 bg-glass-purple p-3 transition-colors hover:bg-glass-magenta"
+            className="flex items-center gap-3 rounded-2xl border border-white/8 bg-glass-purple p-3 transition-colors hover:bg-glass-magenta"
           >
             <span
               className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-sm font-bold text-black"

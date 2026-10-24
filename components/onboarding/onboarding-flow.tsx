@@ -450,7 +450,7 @@ export function OnboardingFlow({
           {recommendations.starterWatchlist.map((item) => (
             <div key={item.id} className="relative shrink-0">
               <PosterCard item={item} tintSeed={tintSeed} />
-              <span className="absolute -right-1 -top-1 flex size-6 items-center justify-center rounded-full bg-gradient-brand text-[10px] font-bold text-white shadow-glow-pink-soft">
+              <span className="absolute -right-1 -top-1 flex size-6 items-center justify-center rounded-full bg-gradient-brand text-micro font-bold text-white shadow-glow-pink-soft">
                 <Clapperboard className="size-3" />
               </span>
             </div>
@@ -588,7 +588,7 @@ export function OnboardingFlow({
         </p>
       ) : null}
 
-      <div className="sticky bottom-0 z-10 flex w-full justify-center bg-gradient-to-t from-[#0a0416] via-[#0a0416]/95 to-transparent pb-4 pt-6">
+      <div className="sticky bottom-0 z-10 flex w-full justify-center bg-gradient-to-t from-night via-night/95 to-transparent pb-4 pt-6">
       <div className="flex w-full max-w-[420px] items-center gap-3">
         {stepIndex > 0 ? (
           <button

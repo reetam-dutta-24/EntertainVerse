@@ -96,7 +96,7 @@ export function CommunityWallpaperPanel({
                 overflowLabel={overflowLabel}
               />
               {memberSummary ? (
-                <p className="text-[11px] font-medium text-white/85 sm:text-xs">
+                <p className="text-caption font-medium text-white/85 sm:text-xs">
                   {memberSummary}
                 </p>
               ) : null}
@@ -105,17 +105,17 @@ export function CommunityWallpaperPanel({
 
           <div className="flex flex-wrap items-center justify-center gap-2">
             {collectionCount != null ? (
-              <Chip variant="indigo" className="h-6 px-3 text-[10px]">
+              <Chip variant="indigo" className="h-6 px-3 text-caption">
                 {collectionCount} items in collections
               </Chip>
             ) : null}
             {popularityLabel ? (
-              <Chip chipKey="action" className="h-6 px-3 text-[10px]">
+              <Chip chipKey="action" className="h-6 px-3 text-caption">
                 {popularityLabel}
               </Chip>
             ) : null}
             {globalRankLabel ? (
-              <Chip variant="brand" className="h-6 px-3 text-[10px]">
+              <Chip variant="brand" className="h-6 px-3 text-caption">
                 {globalRankLabel}
               </Chip>
             ) : null}

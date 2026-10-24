@@ -37,7 +37,7 @@ function DashboardBottomTeaser({ className }: { className?: string }) {
         className,
       )}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-[#060810]/90 via-[#060810]/45 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/45 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/20 via-cyan-950/8 to-transparent" />
       <div className="absolute inset-0 backdrop-blur-[10px] [mask-image:linear-gradient(to_top,black_0%,black_40%,transparent_100%)]" />
     </div>
@@ -97,7 +97,7 @@ export function CommunityDashboardPreview({
         🏠 Community Dashboard
       </h2>
 
-      <div className="relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-black/50 shadow-section-dim backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-black/50 shadow-section-dim backdrop-blur-xl">
         <div className="relative grid min-h-[560px] grid-cols-1 lg:grid-cols-[200px_minmax(0,1fr)_240px]">
           <nav className="relative z-10 hidden flex-col gap-1 border-r border-white/[0.06] bg-sidebar/90 px-3 py-5 backdrop-blur-md lg:flex">
             {navItems.map((item) => {
@@ -109,7 +109,7 @@ export function CommunityDashboardPreview({
                   type="button"
                   onClick={() => setActiveNav(item.id)}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-[12px] px-3 py-2.5 text-left text-sm font-medium transition-colors",
+                    "flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors",
                     isActive
                       ? "bg-white/[0.07] text-white/95"
                       : "text-white/55 hover:bg-white/[0.04] hover:text-white/80",

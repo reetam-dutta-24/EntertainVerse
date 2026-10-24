@@ -14,11 +14,11 @@ export const buttonVariants = cva(
         ghost: "bg-transparent text-white/90 hover:bg-white/10 hover:text-white",
       },
       size: {
-        sm: "h-8 rounded-btn-sm px-3.5 text-xs",
-        md: "h-10 rounded-btn px-5 text-sm",
-        lg: "h-11 rounded-btn px-6 text-sm",
+        sm: "h-8 rounded-lg px-3.5 text-xs",
+        md: "h-10 rounded-xl px-5 text-sm",
+        lg: "h-11 rounded-xl px-6 text-sm",
         /** Hero CTAs only. */
-        xl: "h-[52px] rounded-btn px-7 text-base",
+        xl: "h-[52px] rounded-xl px-7 text-base",
       },
     },
     defaultVariants: {

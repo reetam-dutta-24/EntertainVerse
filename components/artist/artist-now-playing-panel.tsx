@@ -19,7 +19,7 @@ import { ToggleArtistFollowButton } from "@/components/forms/toggle-artist-follo
 import type { UserSummary } from "@/types";
 
 const PANEL_BTN =
-  "h-8 w-[128px] px-2 text-[10px] sm:h-8 sm:w-[132px] sm:text-[10px]";
+  "h-8 w-[128px] px-2 text-caption sm:h-8 sm:w-[132px] sm:text-caption";
 
 export interface ArtistNowPlayingPanelProps {
   artistSlug: string;
@@ -90,7 +90,7 @@ export function ArtistNowPlayingPanel({
       </div>
 
       <div className="flex shrink-0 flex-col gap-2.5 px-4 pb-4 pt-2.5 sm:px-5 sm:pb-4">
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-white/55">
+        <p className="text-micro font-semibold uppercase tracking-wide text-white/55">
           {followerLabel}
         </p>
 
@@ -106,13 +106,13 @@ export function ArtistNowPlayingPanel({
               />
             ) : null}
             {connectionSummary ? (
-              <p className="min-w-0 flex-1 text-left text-[10px] leading-relaxed text-white/80 sm:text-[11px]">
+              <p className="min-w-0 flex-1 text-left text-caption leading-relaxed text-white/80 sm:text-caption">
                 {connectionSummary}
               </p>
             ) : null}
           </div>
         ) : (
-          <p className="text-[10px] leading-relaxed text-white/55 sm:text-[11px]">
+          <p className="text-caption leading-relaxed text-white/55 sm:text-caption">
             No followers yet. Be the first to follow {artistName}.
           </p>
         )}
@@ -120,7 +120,7 @@ export function ArtistNowPlayingPanel({
         {statusMessage ? (
           <p
             role="status"
-            className="rounded-lg border border-brand-magenta/30 bg-brand-magenta/10 px-2.5 py-1.5 text-center text-[10px] font-medium text-brand-pink"
+            className="rounded-lg border border-brand-magenta/30 bg-brand-magenta/10 px-2.5 py-1.5 text-center text-caption font-medium text-brand-pink"
           >
             {statusMessage}
           </p>
@@ -148,8 +148,8 @@ export function ArtistNowPlayingPanel({
                 ),
               )}
             >
-              <span className="text-[9px] font-semibold leading-none">+ Add To</span>
-              <span className="text-[9px] font-semibold leading-none">Collection</span>
+              <span className="text-micro font-semibold leading-none">+ Add To</span>
+              <span className="text-micro font-semibold leading-none">Collection</span>
             </button>
 
             <Link

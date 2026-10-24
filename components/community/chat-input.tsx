@@ -262,7 +262,7 @@ export function ChatInput({
               {attachment.name}
             </p>
             <p
-              className="text-[10px] font-medium uppercase tracking-wide"
+              className="text-micro font-medium uppercase tracking-wide"
               style={{ color: theme?.mutedText ?? "rgba(255,255,255,0.6)" }}
             >
               {attachment.kind === "image" ? "Image attached" : "File attached"}

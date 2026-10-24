@@ -9,7 +9,7 @@ export const DETAIL_HERO_BTN_WIDTH = "w-[138px]";
 export function detailHeroBtnBase(...classNames: (string | undefined)[]) {
   return cn(
     DETAIL_HERO_BTN_WIDTH,
-    "inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-2.5 text-[10px] font-semibold leading-tight sm:h-10 sm:px-3 sm:text-[11px]",
+    "inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-2.5 text-micro font-semibold leading-tight sm:h-10 sm:px-3 sm:text-micro",
     ...classNames,
   );
 }
@@ -25,7 +25,7 @@ export const DETAIL_HERO_BTN_ACCENT_SOLID = cn(
 
 /** Compact watch/play CTA on poster overlay. */
 export const DETAIL_HERO_BTN_WATCH = cn(
-  "h-8 w-[118px] px-2 text-[9px] font-semibold sm:h-8 sm:w-[122px] sm:text-[10px]",
+  "h-8 w-[118px] px-2 text-micro font-semibold sm:h-8 sm:w-[122px] sm:text-caption",
 );
 
 /** Filled hero CTA with play/watch hover — used on content & artist primary actions. */

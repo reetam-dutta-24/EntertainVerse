@@ -32,12 +32,12 @@ export function EnumSelect({
         onChange={(e) => onChange(e.target.value)}
       >
         {allowEmpty ? (
-          <option value="" className="bg-[#1a0d2e] text-white">
+          <option value="" className="bg-popover text-white">
             {emptyLabel}
           </option>
         ) : null}
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value} className="bg-[#1a0d2e] text-white">
+          <option key={opt.value} value={opt.value} className="bg-popover text-white">
             {opt.label}
           </option>
         ))}
@@ -72,11 +72,11 @@ export function EnumMultiSelect({
             if (v && !values.includes(v)) onChange([...values, v]);
           }}
         >
-          <option value="" className="bg-[#1a0d2e] text-white">
+          <option value="" className="bg-popover text-white">
             Select…
           </option>
           {available.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-[#1a0d2e] text-white">
+            <option key={opt.value} value={opt.value} className="bg-popover text-white">
               {opt.label}
             </option>
           ))}

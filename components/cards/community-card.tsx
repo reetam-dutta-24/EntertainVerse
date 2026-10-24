@@ -81,7 +81,7 @@ export function CommunityCard({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-[180px] rounded-[20px] transition-shadow duration-500 ease-out",
+        "mx-auto w-full max-w-[180px] rounded-card transition-shadow duration-500 ease-out",
         hovered && accent.glow,
         className,
       )}
@@ -90,7 +90,7 @@ export function CommunityCard({
       {...props}
     >
       <div
-        className="flex flex-col items-center overflow-hidden rounded-[20px] bg-glass-purple"
+        className="flex flex-col items-center overflow-hidden rounded-card bg-glass-purple"
         style={{
           height: showManage
             ? COLLECTION_CARD_H + 28
@@ -111,17 +111,17 @@ export function CommunityCard({
             </h3>
 
             <div className="flex flex-wrap items-center justify-center gap-1.5 px-1">
-              <Chip variant="blue" className="h-5 text-[10px]">
+              <Chip variant="blue" className="h-5 text-caption">
                 {formatCount(community.memberCount)} Members
               </Chip>
-              <Chip variant="indigo" className="h-5 text-[10px]">
+              <Chip variant="indigo" className="h-5 text-caption">
                 {community.category}
               </Chip>
             </div>
 
             {(community.createdAt || community.lastActiveAt) ? (
               <div className="px-2 py-1">
-                <Chip variant="brand" className="h-5 text-[10px]">
+                <Chip variant="brand" className="h-5 text-caption">
                   {community.lastActiveAt
                     ? `Last Active ${community.lastActiveAt}`
                     : `Created on ${community.createdAt}`}
@@ -130,16 +130,16 @@ export function CommunityCard({
             ) : null}
 
             {community.description ? (
-              <p className="w-[165px] px-1 text-center text-[10px] font-normal text-white/90 line-clamp-2">
+              <p className="w-[165px] px-1 text-center text-caption font-normal text-white/90 line-clamp-2">
                 {community.description}
               </p>
             ) : (
-              <p className="w-[165px] px-1 text-center text-[10px] font-normal text-white/75 line-clamp-2">
+              <p className="w-[165px] px-1 text-center text-caption font-normal text-white/75 line-clamp-2">
                 {activityLabels[community.activityLevel]}
               </p>
             )}
 
-            <p className="flex w-[165px] justify-between px-1.5 py-1 text-[10px] font-normal text-white/90">
+            <p className="flex w-[165px] justify-between px-1.5 py-1 text-caption font-normal text-white/90">
               <span className="truncate">
                 {community.postCount.toLocaleString()} Posts
               </span>
@@ -158,7 +158,7 @@ export function CommunityCard({
               <Button
                 variant="gradient"
                 size="sm"
-                className="h-6 w-[100px] shrink-0 rounded-full px-2 text-[9px] font-normal"
+                className="h-6 w-[100px] shrink-0 rounded-full px-2 text-micro font-normal"
                 onClick={handleAction}
               >
                 {ctaLabel}

@@ -34,7 +34,7 @@ export function ChatMessage({
       <div
         className={cn(
           "flex max-w-[min(75%,28rem)] flex-col gap-1.5 rounded-2xl px-4 py-3 ring-1 ring-white/[0.04]",
-          own ? "rounded-tr-md" : "rounded-tl-md",
+          own ? "rounded-tr-lg" : "rounded-tl-lg",
         )}
         style={own ? theme?.bubbleOwn : theme?.bubbleOther}
       >
@@ -55,7 +55,7 @@ export function ChatMessage({
           </p>
           {message.sentAt ? (
             <p
-              className="text-[10px] font-medium"
+              className="text-caption font-medium"
               style={{ color: theme?.mutedText ?? "rgba(255,255,255,0.6)" }}
             >
               {message.sentAt}
@@ -63,7 +63,7 @@ export function ChatMessage({
             </p>
           ) : message.edited ? (
             <p
-              className="text-[10px] font-medium italic"
+              className="text-caption font-medium italic"
               style={{ color: theme?.mutedText ?? "rgba(255,255,255,0.6)" }}
             >
               edited
@@ -108,7 +108,7 @@ export function ChatMessage({
                 {message.attachment.name}
               </span>
               <span
-                className="text-[10px] font-medium uppercase tracking-wide"
+                className="text-micro font-medium uppercase tracking-wide"
                 style={{ color: theme?.mutedText ?? "rgba(255,255,255,0.6)" }}
               >
                 Download file

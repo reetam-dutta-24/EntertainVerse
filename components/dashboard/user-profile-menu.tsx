@@ -173,7 +173,7 @@ export function UserProfileMenu({
       {open ? (
         <div
           className={cn(
-            "absolute z-50 w-[min(260px,calc(100vw-32px))] overflow-hidden rounded-[16px] border border-white/10 bg-[#1a0d2e]/95 shadow-[0_16px_48px_rgba(0,0,0,0.55)] backdrop-blur-xl",
+            "absolute z-50 w-[min(260px,calc(100vw-32px))] overflow-hidden rounded-2xl border border-white/10 bg-popover/95 shadow-[0_16px_48px_rgba(0,0,0,0.55)] backdrop-blur-xl",
             isSidebar
               ? "bottom-[calc(100%+8px)] left-0"
               : "right-0 top-[calc(100%+10px)]",
@@ -188,7 +188,7 @@ export function UserProfileMenu({
                 </p>
                 <p className="truncate text-xs text-white/55">@{user.handle}</p>
                 {user.email ? (
-                  <p className="truncate text-[11px] text-white/45">{user.email}</p>
+                  <p className="truncate text-caption text-white/45">{user.email}</p>
                 ) : null}
               </div>
             </div>

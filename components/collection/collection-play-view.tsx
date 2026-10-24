@@ -184,14 +184,14 @@ function CollectionPlayHeader({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-2.5 sm:gap-3">
-        <p className="text-[11px] font-semibold uppercase tracking-widest text-white/55 sm:text-xs">
+        <p className="text-micro font-semibold uppercase tracking-widest text-white/55 sm:text-xs">
           {label}
         </p>
         <h1 className="text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
           {name}
         </h1>
         {description ? (
-          <p className="text-sm leading-relaxed text-white/60 sm:text-[15px]">
+          <p className="text-sm leading-relaxed text-white/60 sm:text-body">
             {description}
           </p>
         ) : null}
@@ -232,7 +232,7 @@ function SynopsisPanel({
         backgroundColor: theme.panelBg,
       }}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-white/40">
+      <p className="text-micro font-semibold uppercase tracking-widest text-white/40">
         About this title
       </p>
       <div className="flex min-h-[7rem] flex-col justify-center gap-2">
@@ -496,7 +496,7 @@ function MusicPlayQueue({
           }
         />
 
-        <div className="mb-2 hidden grid-cols-[40px_60px_minmax(0,1fr)_72px_80px] gap-3 border-b border-white/[0.08] px-2 pb-2 text-[10px] font-medium uppercase tracking-wide text-white/40 sm:grid">
+        <div className="mb-2 hidden grid-cols-[40px_60px_minmax(0,1fr)_72px_80px] gap-3 border-b border-white/[0.08] px-2 pb-2 text-micro font-medium uppercase tracking-wide text-white/40 sm:grid">
           <span>#</span>
           <span>Cover</span>
           <span>Title</span>
@@ -648,7 +648,7 @@ function MusicPlayQueue({
                 style={{ accentColor: theme.slider }}
                 aria-label="Playback progress"
               />
-              <div className="flex justify-between text-[10px] text-white/45">
+              <div className="flex justify-between text-caption text-white/45">
                 <span>{formatTime(progress)}</span>
                 <span>{formatTime(progressMax)}</span>
               </div>
@@ -825,7 +825,7 @@ function ContentPlayQueue({
           theme={theme}
         />
 
-        <div className="mb-2 hidden grid-cols-[40px_60px_minmax(0,1fr)_120px] gap-3 border-b border-white/[0.08] px-2 pb-2 text-[10px] font-medium uppercase tracking-wide text-white/40 sm:grid">
+        <div className="mb-2 hidden grid-cols-[40px_60px_minmax(0,1fr)_120px] gap-3 border-b border-white/[0.08] px-2 pb-2 text-micro font-medium uppercase tracking-wide text-white/40 sm:grid">
           <span>#</span>
           <span>Cover</span>
           <span>Title</span>
@@ -989,7 +989,7 @@ function ContentPlayQueue({
               </button>
             </div>
 
-            <p className="mt-3 text-center text-[10px] text-white/40">
+            <p className="mt-3 text-center text-caption text-white/40">
               {activeIndex + 1} of {items.length} in queue
             </p>
 

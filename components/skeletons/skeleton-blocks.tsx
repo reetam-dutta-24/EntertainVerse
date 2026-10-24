@@ -50,14 +50,14 @@ export function SkeletonSectionHeader({
 export function SkeletonMediaCard({ round = false }: { round?: boolean }) {
   return (
     <div
-      className="mx-auto flex w-full flex-col gap-2.5 rounded-[20px] border border-white/[0.06] bg-glass-purple/60 p-3"
+      className="mx-auto flex w-full flex-col gap-2.5 rounded-card border border-white/[0.06] bg-glass-purple/60 p-3"
       style={{ maxWidth: SLOT_W, height: POSTER_SLOT_H - 8 }}
     >
       <Skeleton className="h-5 w-16 rounded-full" />
       <Skeleton
         className={cn(
           "mx-auto mt-1 shrink-0",
-          round ? "size-[104px] rounded-full" : "h-[100px] w-full rounded-[14px]",
+          round ? "size-[104px] rounded-full" : "h-[100px] w-full rounded-xl",
         )}
       />
       <div className="mt-auto flex flex-col items-center gap-2">
@@ -103,7 +103,7 @@ export function SkeletonCarouselSection({
 export function SkeletonTileCard() {
   return (
     <div
-      className="flex w-full flex-col overflow-hidden rounded-[20px] border border-white/[0.06] bg-glass-purple/60"
+      className="flex w-full flex-col overflow-hidden rounded-card border border-white/[0.06] bg-glass-purple/60"
       style={{ height: COLLECTION_CARD_H }}
     >
       <Skeleton className="h-[72px] w-full rounded-none" />
@@ -313,13 +313,13 @@ export function SkeletonForm({ fields = 6 }: { fields?: number }) {
         {Array.from({ length: fields }, (_, i) => (
           <div key={i} className="flex flex-col gap-2">
             <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-10 w-full rounded-[10px]" />
+            <Skeleton className="h-10 w-full rounded-xl" />
           </div>
         ))}
       </div>
       <div className="flex flex-col gap-2">
         <Skeleton className="h-3 w-28" />
-        <Skeleton className="h-28 w-full rounded-[10px]" />
+        <Skeleton className="h-28 w-full rounded-xl" />
       </div>
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
         <Skeleton className="h-10 w-full rounded-full sm:w-28" />

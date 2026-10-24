@@ -23,7 +23,7 @@ export function AuthInput({
   return (
     <div
       className={cn(
-        "flex h-11 w-full items-center gap-2.5 rounded-[10px] border border-white/20 bg-white/5 px-3.5 transition-colors focus-within:border-brand-magenta",
+        "flex h-11 w-full items-center gap-2.5 rounded-xl border border-white/20 bg-white/5 px-3.5 transition-colors focus-within:border-brand-magenta",
         className,
       )}
     >

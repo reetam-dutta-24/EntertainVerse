@@ -107,13 +107,13 @@ export function ContentCharacterCard({
                 "text-white/85 transition-all duration-300",
                 isHovered
                   ? "mt-1 max-h-8 text-xs opacity-100"
-                  : "max-h-0 overflow-hidden text-[10px] opacity-0",
+                  : "max-h-0 overflow-hidden text-caption opacity-0",
               )}
             >
               {subtitle}
             </p>
           ) : subtitle ? (
-            <p className="mt-0.5 text-[10px] text-white/70">{subtitle}</p>
+            <p className="mt-0.5 text-caption text-white/70">{subtitle}</p>
           ) : null}
         </div>
       </div>

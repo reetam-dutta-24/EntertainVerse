@@ -10,7 +10,7 @@ export function Skeleton({ className }: SkeletonProps) {
     <div
       aria-hidden
       className={cn(
-        "skeleton-shimmer relative overflow-hidden rounded-md bg-white/[0.07]",
+        "skeleton-shimmer relative overflow-hidden rounded-lg bg-white/[0.07]",
         className,
       )}
     />

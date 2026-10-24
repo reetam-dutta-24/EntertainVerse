@@ -37,7 +37,7 @@ export function ContentDescription({
     <div className={className}>
       <p
         ref={ref}
-        className="overflow-hidden text-sm leading-relaxed text-white/85 sm:text-[15px] sm:leading-7"
+        className="overflow-hidden text-sm leading-relaxed text-white/85 sm:text-body sm:leading-7"
         style={{ maxHeight: CONTENT_DESCRIPTION_MAX_HEIGHT_PX }}
       >
         {text}

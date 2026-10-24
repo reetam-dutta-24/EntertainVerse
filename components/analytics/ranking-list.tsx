@@ -31,7 +31,7 @@ export function RankingList({ items }: RankingListProps) {
               </span>
             </div>
             {item.subtitle ? (
-              <p className="truncate text-[11px] text-muted">{item.subtitle}</p>
+              <p className="truncate text-caption text-muted">{item.subtitle}</p>
             ) : null}
             <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
               <div

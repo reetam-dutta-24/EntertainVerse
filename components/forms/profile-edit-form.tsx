@@ -126,7 +126,7 @@ export function ProfileEditForm({
             rows={4}
             maxLength={500}
             disabled={saving}
-            className="w-full resize-none rounded-[10px] border border-white/20 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-muted/60 focus:border-brand-magenta focus:outline-none"
+            className="w-full resize-none rounded-xl border border-white/20 bg-white/5 px-3.5 py-2.5 text-sm text-white placeholder:text-muted/60 focus:border-brand-magenta focus:outline-none"
           />
         </div>
 

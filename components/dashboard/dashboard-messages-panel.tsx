@@ -45,7 +45,7 @@ interface DmMessage {
 function UnreadBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
-    <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-brand-magenta px-1.5 text-[10px] font-bold text-white shadow-glow-pink-soft">
+    <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-brand-magenta px-1.5 text-micro font-bold text-white">
       {count > 99 ? "99+" : count}
     </span>
   );
@@ -275,7 +275,7 @@ export function DashboardMessagesPanel() {
         <div className="mb-3 flex items-center justify-between px-2">
           <h2 className="text-sm font-semibold text-white">Conversations</h2>
           {totalUnreadChats > 0 ? (
-            <span className="rounded-full bg-brand-magenta/20 px-2 py-0.5 text-[10px] font-semibold text-brand-pink">
+            <span className="rounded-full bg-brand-magenta/20 px-2 py-0.5 text-micro font-semibold text-brand-pink">
               {totalUnreadChats} unread
             </span>
           ) : null}
@@ -315,11 +315,11 @@ export function DashboardMessagesPanel() {
                         </p>
                         <UnreadBadge count={unread} />
                       </div>
-                      <p className="truncate text-[11px] text-white/55">
+                      <p className="truncate text-caption text-white/55">
                         @{entry.peer.handle}
                       </p>
                       {entry.lastMessage ? (
-                        <p className="mt-0.5 truncate text-[11px] text-white/45">
+                        <p className="mt-0.5 truncate text-caption text-white/45">
                           {entry.lastMessage.content}
                         </p>
                       ) : null}
@@ -348,7 +348,7 @@ export function DashboardMessagesPanel() {
                 (targetHandle ? `@${targetHandle}` : "Select a conversation")}
             </h2>
             {activeConversation ? (
-              <p className="truncate text-[11px] text-white/55">
+              <p className="truncate text-caption text-white/55">
                 @{activeConversation.peer.handle}
               </p>
             ) : null}
@@ -378,7 +378,7 @@ export function DashboardMessagesPanel() {
                 }`}
               >
                 {message.warnNonFriend && !message.isOwn ? (
-                  <p className="rounded-full bg-amber-500/20 px-3 py-1 text-[10px] font-medium text-amber-200">
+                  <p className="rounded-full bg-amber-500/20 px-3 py-1 text-micro font-medium text-amber-200">
                     This person is not your friend
                   </p>
                 ) : null}
@@ -416,7 +416,7 @@ export function DashboardMessagesPanel() {
                   >
                     {message.content}
                     {message.editedAt ? (
-                      <span className="mt-1 block text-[10px] text-white/45">
+                      <span className="mt-1 block text-caption text-white/45">
                         edited
                       </span>
                     ) : null}

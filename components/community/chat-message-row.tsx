@@ -127,7 +127,7 @@ export function ChatMessageRow({
                   setEditing(true);
                   setError(undefined);
                 }}
-                className="rounded-md p-1.5 text-white/45 transition hover:bg-white/10 hover:text-white"
+                className="rounded-lg p-1.5 text-white/45 transition hover:bg-white/10 hover:text-white"
               >
                 <Pencil className="size-3.5" />
               </button>
@@ -137,7 +137,7 @@ export function ChatMessageRow({
                 type="button"
                 title="Delete message"
                 onClick={() => setDeleteOpen(true)}
-                className="rounded-md p-1.5 text-white/45 transition hover:bg-red-500/20 hover:text-red-300"
+                className="rounded-lg p-1.5 text-white/45 transition hover:bg-red-500/20 hover:text-red-300"
               >
                 <Trash2 className="size-3.5" />
               </button>

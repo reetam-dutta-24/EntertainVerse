@@ -58,7 +58,7 @@ export function DashboardTopbar({
             <Menu className="size-5" />
           </button>
 
-          <h1 className="text-gradient-brand min-w-0 shrink-0 text-xl font-bold sm:text-[26px]">
+          <h1 className="text-gradient-brand min-w-0 shrink-0 text-xl font-bold sm:text-heading">
             {title}
           </h1>
 

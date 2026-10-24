@@ -13,13 +13,13 @@ export interface ProfileDetailHeroProps {
 }
 
 const DETAIL_CHIP =
-  "h-7 shrink-0 px-3 text-[11px] font-medium sm:h-8 sm:px-3.5 sm:text-xs";
+  "h-7 shrink-0 px-3 text-caption font-medium sm:h-8 sm:px-3.5 sm:text-xs";
 
 const CHIP_ROW =
   "flex flex-nowrap items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
 
 const TITLE_CLASS =
-  "text-2xl font-bold leading-tight text-white sm:text-[28px] lg:text-[30px]";
+  "text-2xl font-bold leading-tight text-white sm:text-heading lg:text-title";
 
 function ProfileAvatar({
   name,
@@ -102,7 +102,7 @@ export function ProfileDetailHero({ profile, isOwner }: ProfileDetailHeroProps) 
                 <h1 className={cn(TITLE_CLASS, "min-w-0")}>{profile.name}</h1>
                 <PresenceIndicator online={profile.online} />
               </div>
-              <p className="text-sm text-white/75 sm:text-[15px]">
+              <p className="text-sm text-white/75 sm:text-body">
                 Username:{" "}
                 <span className="font-medium text-white/90">{profile.handle}</span>
               </p>
@@ -125,7 +125,7 @@ export function ProfileDetailHero({ profile, isOwner }: ProfileDetailHeroProps) 
 
           <div className="flex shrink-0 flex-col gap-1">
             <h2 className="text-sm font-bold text-white sm:text-base">📝 Bio</h2>
-            <p className="line-clamp-3 max-w-3xl text-sm leading-relaxed text-white/85 sm:text-[15px] sm:leading-6 lg:line-clamp-4">
+            <p className="line-clamp-3 max-w-3xl text-sm leading-relaxed text-white/85 sm:text-body sm:leading-6 lg:line-clamp-4">
               {profile.bio}
             </p>
           </div>

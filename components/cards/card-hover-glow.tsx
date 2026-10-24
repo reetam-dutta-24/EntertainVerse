@@ -34,7 +34,7 @@ export function CardHoverGlow({
       }}
     >
       <div
-        className="absolute -inset-5 rounded-[24px] blur-2xl transition-[opacity,transform] duration-500 ease-out"
+        className="absolute -inset-5 rounded-3xl blur-2xl transition-[opacity,transform] duration-500 ease-out"
         style={{
           background:
             glow?.radial ??

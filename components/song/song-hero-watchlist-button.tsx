@@ -132,7 +132,7 @@ export function SongHeroWatchlistButton({
           <span className="truncate">{label}</span>
         </button>
         {error ? (
-          <p className="mt-1 text-[10px] text-red-400">{error}</p>
+          <p className="mt-1 text-caption text-red-400">{error}</p>
         ) : null}
       </div>
 

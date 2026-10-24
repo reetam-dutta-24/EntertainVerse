@@ -135,7 +135,7 @@ export function CreateWatchChannelButton({
           </FormField>
 
           <FormField label="Search content or music" hint="Type at least 2 characters">
-            <label className="flex items-center gap-2 rounded-xl border border-white/15 bg-[#1a0f2e] px-3 py-2.5">
+            <label className="flex items-center gap-2 rounded-xl border border-white/15 bg-popover px-3 py-2.5">
               <Search className="size-4 shrink-0 text-white/45" />
               <TextInput
                 value={searchQuery}
@@ -168,7 +168,7 @@ export function CreateWatchChannelButton({
                         : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06]",
                     )}
                   >
-                    <span className="size-10 shrink-0 overflow-hidden rounded-md bg-black/40">
+                    <span className="size-10 shrink-0 overflow-hidden rounded-lg bg-black/40">
                       {result.imageUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={result.imageUrl} alt="" className="size-full object-cover" />

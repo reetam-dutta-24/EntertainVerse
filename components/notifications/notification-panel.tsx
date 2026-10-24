@@ -18,7 +18,7 @@ export function NotificationPanel({
   const preview = notifications.slice(0, previewCount);
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-[18px] border border-white/10 bg-[#120826]/95 shadow-[0_18px_60px_rgba(0,0,0,0.85)] backdrop-blur-md">
+    <div className="flex flex-col overflow-hidden rounded-card border border-white/10 bg-background/95 shadow-[0_18px_60px_rgba(0,0,0,0.85)] backdrop-blur-md">
       <p className="px-4 pb-2 pt-4 text-center text-base font-bold text-white">
         Notifications
       </p>

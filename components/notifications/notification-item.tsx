@@ -68,7 +68,7 @@ function FriendRequestActions({
             event.stopPropagation();
             void respond("accept");
           }}
-          className="flex items-center gap-1 rounded-full border border-brand-magenta bg-brand-magenta/15 px-3 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-brand-magenta/25 disabled:opacity-50"
+          className="flex items-center gap-1 rounded-full border border-brand-magenta bg-brand-magenta/15 px-3 py-1 text-micro font-semibold text-white transition-colors hover:bg-brand-magenta/25 disabled:opacity-50"
         >
           <Check className="size-3.5 text-brand-magenta" />
           Accept
@@ -80,13 +80,13 @@ function FriendRequestActions({
             event.stopPropagation();
             void respond("reject");
           }}
-          className="flex items-center gap-1 rounded-full border border-white/20 px-3 py-1 text-[11px] font-semibold text-white/85 transition-colors hover:bg-white/10 disabled:opacity-50"
+          className="flex items-center gap-1 rounded-full border border-white/20 px-3 py-1 text-micro font-semibold text-white/85 transition-colors hover:bg-white/10 disabled:opacity-50"
         >
           <X className="size-3.5" />
           Decline
         </button>
       </div>
-      {error ? <p className="text-[11px] text-red-400">{error}</p> : null}
+      {error ? <p className="text-caption text-red-400">{error}</p> : null}
     </div>
   );
 }
@@ -104,9 +104,9 @@ export function NotificationItem({
     notification.actionType === "friend_request" && notification.actionRefId;
 
   const containerClass = cn(
-    "flex w-full overflow-hidden rounded-[14px] bg-glass-purple text-left shadow-card-inner transition-shadow duration-300",
+    "flex w-full overflow-hidden rounded-xl bg-glass-purple text-left shadow-card-inner transition-shadow duration-300",
     unread
-      ? "border border-brand-magenta/80 shadow-glow-pink-soft hover:shadow-glow-pink"
+      ? "border border-brand-magenta/80 hover:shadow-glow-pink-soft"
       : "border border-white/10 hover:shadow-glow-pink-soft",
     className,
   );
@@ -120,7 +120,7 @@ export function NotificationItem({
     >
       {unread ? (
         <span
-          className="size-1.5 shrink-0 rounded-full bg-brand-magenta shadow-glow-pink-soft"
+          className="size-1.5 shrink-0 rounded-full bg-brand-magenta"
           aria-hidden
         />
       ) : null}
@@ -129,7 +129,7 @@ export function NotificationItem({
   );
 
   const timestamp = notification.createdAt ? (
-    <p className="flex items-center gap-1 text-[11px] text-muted/80">
+    <p className="flex items-center gap-1 text-caption text-muted/80">
       <Clock className="size-3 shrink-0" />
       {notification.createdAt}
     </p>
@@ -173,7 +173,7 @@ export function NotificationItem({
           ) : null}
           <p
             className={cn(
-              "text-[11px] font-semibold italic",
+              "text-caption font-semibold italic",
               unread ? "text-brand-magenta" : "text-muted/70",
             )}
           >
@@ -194,7 +194,7 @@ export function NotificationItem({
         <div className="flex flex-wrap items-center gap-2">
           {title}
           {notification.category ? (
-            <Chip variant="brand" className="h-5 shrink-0 text-[10px]">
+            <Chip variant="brand" className="h-5 shrink-0 text-caption">
               {notification.category}
             </Chip>
           ) : null}
@@ -214,7 +214,7 @@ export function NotificationItem({
         <div className="mt-1 flex flex-wrap items-center justify-between gap-2">
           <p
             className={cn(
-              "text-[11px] font-semibold italic",
+              "text-caption font-semibold italic",
               unread ? "text-brand-magenta" : "text-muted/70",
             )}
           >
@@ -224,7 +224,7 @@ export function NotificationItem({
             <Link
               href={notification.href}
               onClick={() => void markNotificationRead(notification.id)}
-              className="flex items-center gap-1 rounded-full border border-brand-magenta px-3 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-brand-magenta/15"
+              className="flex items-center gap-1 rounded-full border border-brand-magenta px-3 py-1 text-micro font-semibold text-white transition-colors hover:bg-brand-magenta/15"
             >
               View Profile
               <ArrowRight className="size-3.5 text-brand-magenta" />

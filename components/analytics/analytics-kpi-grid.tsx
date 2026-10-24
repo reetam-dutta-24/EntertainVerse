@@ -15,7 +15,7 @@ export function AnalyticsKpiGrid({ kpis }: AnalyticsKpiGridProps) {
           key={kpi.id}
           className="flex flex-col gap-1 rounded-xl bg-glass-magenta px-3 py-3 shadow-[0_0_14px_2px_rgba(255,0,204,0.4)] transition-shadow duration-300 hover:shadow-[0_0_18px_3px_rgba(255,0,204,0.55)] sm:px-4 sm:py-4"
         >
-          <span className="text-[10px] font-semibold text-white sm:text-xs">
+          <span className="text-caption font-semibold text-white sm:text-xs">
             {kpi.emoji} {kpi.label}
           </span>
           <span className="text-xl font-bold text-white sm:text-2xl">
@@ -24,7 +24,7 @@ export function AnalyticsKpiGrid({ kpis }: AnalyticsKpiGridProps) {
           {kpi.delta ? (
             <span
               className={cn(
-                "flex items-center gap-1 text-[10px] font-medium",
+                "flex items-center gap-1 text-caption font-medium",
                 kpi.deltaUp ? "text-white/90" : "text-white/70",
               )}
             >

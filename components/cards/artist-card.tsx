@@ -74,14 +74,14 @@ export function ArtistCard({
     >
       <div
         className={cn(
-          "absolute left-1/2 top-1/2 z-10 flex flex-col overflow-hidden rounded-[18px] shadow-card-inner transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          hovered && "z-30 rounded-[20px]",
+          "absolute left-1/2 top-1/2 z-10 flex flex-col overflow-hidden rounded-card shadow-card-inner transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          hovered && "z-30 rounded-card",
         )}
         style={{
           width: hovered ? HOVER_W : CARD_W,
           height: hovered ? HOVER_H : CARD_H,
           transform: "translate(-50%, -50%)",
-          backgroundColor: hovered ? "#000000" : tint.glass,
+          backgroundColor: hovered ? "var(--color-surface)" : tint.glass,
         }}
       >
         <div className="relative h-full w-full">
@@ -120,7 +120,7 @@ export function ArtistCard({
                 <p className="line-clamp-1 text-sm font-semibold text-white">
                   {item.title}
                 </p>
-                <p className="text-[11px] font-normal text-muted">
+                <p className="text-caption font-normal text-muted">
                   {item.meta ?? "Artist"}
                 </p>
               </div>
@@ -163,7 +163,7 @@ export function ArtistCard({
               <p className="line-clamp-1 w-full text-center text-sm font-semibold text-white">
                 {item.title}
               </p>
-              <p className="line-clamp-1 text-[11px] font-normal text-muted">
+              <p className="line-clamp-1 text-caption font-normal text-muted">
                 {item.meta ?? "Artist"}
               </p>
 
@@ -183,14 +183,14 @@ export function ArtistCard({
                 <button
                   type="button"
                   onClick={handleViewDetails}
-                  className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-[10px] font-normal text-white transition-colors hover:bg-brand-magenta/15"
+                  className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                 >
                   <MicVocal className="size-3.5 text-brand-magenta" />
                   View Artist
                 </button>
               </div>
 
-              <p className="h-[34px] w-full overflow-hidden text-left text-[10px] font-normal leading-[11px] text-white/85 line-clamp-3">
+              <p className="h-8 w-full overflow-hidden text-left text-caption font-normal leading-4 text-white/85 line-clamp-2">
                 {artistDescription(item)}
               </p>
             </div>

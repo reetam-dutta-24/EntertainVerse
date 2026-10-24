@@ -256,14 +256,14 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
             <>
               <div
                 aria-hidden
-                className="pointer-events-none absolute -inset-3 z-0 rounded-[1.35rem] opacity-100 transition-opacity duration-700"
+                className="pointer-events-none absolute -inset-3 z-0 rounded-card opacity-100 transition-opacity duration-700"
                 style={{
                   boxShadow: theme.fairyInnerShadow,
                 }}
               />
               <div
                 aria-hidden
-                className="pointer-events-none absolute -inset-2 z-0 animate-pulse rounded-[1.25rem] opacity-100 transition-opacity duration-700"
+                className="pointer-events-none absolute -inset-2 z-0 animate-pulse rounded-card opacity-100 transition-opacity duration-700"
                 style={{
                   background: `${fairyGlow.radialWash}, ${fairyGlow.edgeSparkle}`,
                   animationDuration: "4s",
@@ -271,7 +271,7 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
               />
               <div
                 aria-hidden
-                className="pointer-events-none absolute -inset-1 z-0 rounded-[1.15rem] opacity-100 transition-opacity duration-500"
+                className="pointer-events-none absolute -inset-1 z-0 rounded-card opacity-100 transition-opacity duration-500"
                 style={{
                   background: `linear-gradient(to top, rgba(${theme.rgb[0]},${theme.rgb[1]},${theme.rgb[2]},0.38) 0%, rgba(${theme.rgb[0]},${theme.rgb[1]},${theme.rgb[2]},0.12) 40%, transparent 78%)`,
                 }}
@@ -428,18 +428,18 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
 
             <div className="mb-4 flex flex-wrap items-center gap-2">
               {!isMovie ? (
-                <Chip chipKey="show" className="h-6 gap-1 text-[11px]">
+                <Chip chipKey="show" className="h-6 gap-1 text-caption">
                   S{activeEpisode!.seasonNumber ?? 1} · E{activeEpisode!.number}
                 </Chip>
               ) : null}
               {activeEpisode!.duration ? (
-                <Chip chipKey="ost" className="h-6 gap-1 text-[11px]">
+                <Chip chipKey="ost" className="h-6 gap-1 text-caption">
                   <Clock className="size-3" />
                   {activeEpisode!.duration}
                 </Chip>
               ) : null}
               {activeEpisode!.rating != null ? (
-                <Chip chipKey="rating" className="h-6 gap-1 text-[11px]">
+                <Chip chipKey="rating" className="h-6 gap-1 text-caption">
                   <Star className="size-3 fill-yellow-400 text-yellow-400" />
                   {formatRating(activeEpisode!.rating)}/10
                 </Chip>
@@ -447,14 +447,14 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
               {activeEpisode!.language ? (
                 <Chip
                   language={activeEpisode!.language.toLowerCase()}
-                  className="h-6 gap-1 text-[11px]"
+                  className="h-6 gap-1 text-caption"
                 >
                   <Globe className="size-3" />
                   {activeEpisode!.language}
                 </Chip>
               ) : null}
               {activeEpisode!.releaseDate ? (
-                <Chip chipKey="default" className="h-6 gap-1 text-[11px]">
+                <Chip chipKey="default" className="h-6 gap-1 text-caption">
                   <Calendar className="size-3" />
                   {activeEpisode!.releaseDate}
                 </Chip>

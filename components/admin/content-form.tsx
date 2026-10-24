@@ -303,7 +303,7 @@ export function ContentForm({ mode, contentId, initial }: ContentFormProps) {
               }
             >
               {contentMediaTypes.map((type) => (
-                <option key={type} value={type} className="bg-[#1a0d2e]">
+                <option key={type} value={type} className="bg-popover">
                   {type}
                 </option>
               ))}

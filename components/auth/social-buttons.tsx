@@ -64,7 +64,7 @@ export function SocialButtons({
   }
 
   const buttonClass =
-    "flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-white/20 bg-white/5 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60";
+    "flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60";
 
   return (
     <div className="flex flex-col gap-4">

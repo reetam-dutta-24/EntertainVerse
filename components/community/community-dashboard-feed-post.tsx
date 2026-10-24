@@ -10,6 +10,7 @@ import {
   DeleteCommunityPostButton,
   EditCommunityPostButton,
 } from "@/components/forms/community-post-form";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 
 const ROLE_LABELS: Record<MemberRole, string> = {
   owner: "Admin",
@@ -73,7 +74,7 @@ export function CommunityDashboardFeedPost({
   return (
     <article
       className={cn(
-        "mx-auto flex w-full max-w-[460px] flex-col gap-2 rounded-[16px] border border-cyan-400/15 bg-glass-cyan/18 p-3 shadow-[inset_0_0_32px_rgba(0,200,190,0.06)] backdrop-blur-md sm:max-w-[480px] sm:p-3.5",
+        "mx-auto flex w-full max-w-[460px] flex-col gap-2 rounded-2xl border border-cyan-400/15 bg-glass-cyan/18 p-3 shadow-[inset_0_0_32px_rgba(0,200,190,0.06)] backdrop-blur-md sm:max-w-[480px] sm:p-3.5",
         className,
       )}
     >
@@ -81,7 +82,7 @@ export function CommunityDashboardFeedPost({
         <span
           className="flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-black"
           style={{
-            backgroundColor: post.author.avatarColor ?? "#ffd000",
+            backgroundColor: post.author.avatarColor ?? BRAND_COLORS.gold,
           }}
         >
           {post.author.avatarUrl ? (
@@ -98,8 +99,8 @@ export function CommunityDashboardFeedPost({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             <p className="text-xs font-semibold text-white/90">{post.author.name}</p>
-            <span className="text-[10px] font-medium text-brand-pink/80">{role}</span>
-            <span className="inline-flex items-center gap-1 text-[10px] italic text-white/50">
+            <span className="text-caption font-medium text-brand-pink/80">{role}</span>
+            <span className="inline-flex items-center gap-1 text-caption italic text-white/50">
               <span
                 aria-hidden
                 className="size-1.5 rounded-full bg-emerald-500/70"
@@ -108,13 +109,13 @@ export function CommunityDashboardFeedPost({
             </span>
           </div>
           {post.createdAt ? (
-            <p className="text-[10px] text-white/55">{post.createdAt}</p>
+            <p className="text-caption text-white/55">{post.createdAt}</p>
           ) : null}
         </div>
       </div>
 
       {post.imageUrl ? (
-        <div className="relative h-[180px] w-full overflow-hidden rounded-[12px] sm:h-[200px]">
+        <div className="relative h-[180px] w-full overflow-hidden rounded-xl sm:h-[200px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={post.imageUrl}
@@ -130,7 +131,7 @@ export function CommunityDashboardFeedPost({
         <p className="text-xs leading-relaxed text-white/65">{post.content}</p>
       ) : null}
 
-      <div className="flex items-center gap-3 text-[11px] font-semibold text-white/55">
+      <div className="flex items-center gap-3 text-caption font-semibold text-white/55">
         <button
           type="button"
           disabled={likeLoading}

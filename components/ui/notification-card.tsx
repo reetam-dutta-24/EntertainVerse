@@ -18,7 +18,7 @@ export function NotificationCard({
   return (
     <div
       className={cn(
-        "relative flex w-full max-w-[472px] items-center gap-4 rounded-btn bg-glass-purple p-5 shadow-card-inner transition-colors hover:bg-glass-magenta",
+        "relative flex w-full max-w-[472px] items-center gap-4 rounded-xl bg-glass-purple p-5 shadow-card-inner transition-colors hover:bg-glass-magenta",
         className,
       )}
       {...props}
@@ -40,7 +40,7 @@ export function NotificationCard({
         ) : null}
       </div>
       {!notification.read ? (
-        <span className="absolute right-4 top-4 size-2.5 rounded-full bg-brand-magenta shadow-glow-pink-soft" />
+        <span className="absolute right-4 top-4 size-2.5 rounded-full bg-brand-magenta" />
       ) : null}
     </div>
   );

@@ -54,7 +54,7 @@ export function CollectionCard({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-[180px] rounded-[20px] transition-shadow duration-500 ease-out",
+        "mx-auto w-full max-w-[180px] rounded-card transition-shadow duration-500 ease-out",
         hovered && accent.glow,
         className,
       )}
@@ -63,7 +63,7 @@ export function CollectionCard({
       {...props}
     >
       <div
-        className="flex flex-col items-center overflow-hidden rounded-[20px] bg-glass-purple"
+        className="flex flex-col items-center overflow-hidden rounded-card bg-glass-purple"
         style={{ height: editable ? COLLECTION_CARD_H + 28 : demo ? COLLECTION_CARD_H - 28 : COLLECTION_CARD_H }}
       >
         <CardHeaderImage
@@ -76,31 +76,31 @@ export function CollectionCard({
               {collection.name}
             </h3>
             <div className="flex flex-wrap items-center justify-center gap-1.5 px-1">
-              <Chip variant="blue" className="h-5 text-[10px]">
+              <Chip variant="blue" className="h-5 text-caption">
                 {itemLabel}
               </Chip>
-              <Chip variant="indigo" className="h-5 text-[10px]">
+              <Chip variant="indigo" className="h-5 text-caption">
                 {collection.favoriteCount} Favts
               </Chip>
               {collection.visibility === "public" ? (
-                <Chip variant="cyan" className="h-5 text-[10px]">
+                <Chip variant="cyan" className="h-5 text-caption">
                   {collection.followerCount ?? 0} Followers
                 </Chip>
               ) : null}
             </div>
             {collection.createdAt ? (
               <div className="px-2 py-1">
-                <Chip variant="brand" className="h-5 text-[10px]">
+                <Chip variant="brand" className="h-5 text-caption">
                   Created at {collection.createdAt}
                 </Chip>
               </div>
             ) : null}
             {collection.description ? (
-              <p className="w-[165px] px-1 text-center text-[10px] font-normal text-white/90 line-clamp-2">
+              <p className="w-[165px] px-1 text-center text-caption font-normal text-white/90 line-clamp-2">
                 {collection.description}
               </p>
             ) : null}
-            <p className="flex w-[165px] justify-between px-1.5 py-1 text-[10px] font-normal text-white/90">
+            <p className="flex w-[165px] justify-between px-1.5 py-1 text-caption font-normal text-white/90">
               <span className="truncate">
                 {collection.updatedAt
                   ? `Last Updated ${collection.updatedAt}`
@@ -120,7 +120,7 @@ export function CollectionCard({
               <Button
                 variant="gradient"
                 size="sm"
-                className="h-6 w-[100px] shrink-0 rounded-full px-2 text-[9px] font-normal"
+                className="h-6 w-[100px] shrink-0 rounded-full px-2 text-micro font-normal"
                 onClick={handleView}
               >
                 View Collection

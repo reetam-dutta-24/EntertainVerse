@@ -60,7 +60,7 @@ export function SongLyricsPanel({
         boxShadow: variant === "overlay" ? theme.glow : undefined,
       }}
     >
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-white/40">
+      <p className="text-micro font-semibold uppercase tracking-widest text-white/40">
         Lyrics
       </p>
       <div

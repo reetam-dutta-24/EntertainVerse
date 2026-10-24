@@ -37,9 +37,9 @@ export interface ChipProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const chipBase =
-  "inline-flex h-5 items-center justify-center whitespace-nowrap rounded-chip px-2 text-[10px] font-normal";
+  "inline-flex h-5 items-center justify-center whitespace-nowrap rounded-full px-2 text-micro font-medium";
 
-/** Small pill — genre-colored gradients, 10px regular weight per Figma. */
+/** Small pill — genre-colored gradients, 11px medium micro label. */
 export function Chip({
   className,
   chipKey,

@@ -41,7 +41,7 @@ export function AniPieChart({
             nameKey="name"
             innerRadius={innerRadius}
             outerRadius="80%"
-            stroke="#120826"
+            stroke="var(--color-background)"
             strokeWidth={2}
             label={({ name, percent }) =>
               `${name} ${Math.round((percent ?? 0) * 100)}%`

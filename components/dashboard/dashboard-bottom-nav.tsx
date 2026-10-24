@@ -42,7 +42,7 @@ export function DashboardBottomNav() {
               <Link
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-[10px] font-medium transition-colors",
+                  "flex flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-caption font-medium transition-colors",
                   active
                     ? "text-brand-pink"
                     : "text-white/70 hover:text-white",

@@ -60,7 +60,7 @@ export function ProfileHeroKpiGrid({ stats }: ProfileHeroKpiGridProps) {
               className="bg-gradient-brand flex min-h-[84px] cursor-pointer flex-col items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-center transition-transform hover:scale-[1.03] active:scale-[0.98] sm:min-h-[88px] sm:py-3"
             >
               <StatIcon stat={stat} />
-              <span className="text-[9px] font-medium leading-tight text-white/95 sm:text-[10px]">
+              <span className="text-micro font-medium leading-tight text-white/95 sm:text-caption">
                 {stat.label}
               </span>
               <span className="text-sm font-bold text-white sm:text-base">

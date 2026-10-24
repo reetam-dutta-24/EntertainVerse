@@ -2,6 +2,7 @@ import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { requireCompletedOnboarding } from "@/lib/auth-guards";
 import { isPlatformAdmin } from "@/lib/platform-roles";
 import { getUserById } from "@/lib/services/user.service";
+import { DEFAULT_AVATAR_COLOR } from "@/lib/brand-colors";
 
 export default async function DashboardLayout({
   children,
@@ -13,7 +14,7 @@ export default async function DashboardLayout({
     name: user?.name ?? "User",
     handle: user?.handle ?? "user",
     email: user?.email ?? "",
-    avatarColor: user?.avatarColor ?? "#ff00cc",
+    avatarColor: user?.avatarColor ?? DEFAULT_AVATAR_COLOR,
     avatarUrl: user?.avatarUrl ?? undefined,
     isAdmin: user ? isPlatformAdmin(user.role) : false,
   };

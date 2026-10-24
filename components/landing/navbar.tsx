@@ -23,7 +23,7 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full bg-background/90 shadow-[0_10px_40px_rgba(0,0,0,0.8)] backdrop-blur-md">
       <div className="relative mx-auto flex h-14 w-full items-center justify-between px-4 sm:h-[72px] sm:px-8 lg:px-12">
         <Link href="/" className="p-1 sm:p-2">
-          <span className="text-gradient-brand text-xl font-semibold leading-none sm:text-[26px]">
+          <span className="text-gradient-brand text-xl font-semibold leading-none sm:text-heading">
             AniVerse
           </span>
         </Link>

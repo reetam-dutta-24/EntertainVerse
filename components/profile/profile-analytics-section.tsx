@@ -7,6 +7,7 @@ import {
   AniPieChart,
 } from "@/components/charts";
 import type { AnalyticsData } from "@/lib/data/analytics";
+import { chartPalette } from "@/components/charts/chart-theme";
 
 export interface ProfileAnalyticsSectionProps {
   userName: string;
@@ -53,8 +54,8 @@ export function ProfileAnalyticsSection({
             data={data.weeklyActivity}
             xKey="day"
             series={[
-              { key: "watching", label: "Watching (h)", color: "#ff00cc" },
-              { key: "listening", label: "Listening (h)", color: "#2563eb" },
+              { key: "watching", label: "Watching (h)", color: chartPalette.magenta },
+              { key: "listening", label: "Listening (h)", color: chartPalette.blue },
             ]}
             height={280}
           />

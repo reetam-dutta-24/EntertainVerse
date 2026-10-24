@@ -5,9 +5,9 @@
 /* ---------------------------------- */
 
 @theme {
-  /* Fonts — Figma uses Segoe UI; fall back to Geist and system fonts */
+  /* Fonts — Geist everywhere (loaded via next/font), system fallbacks only */
   --font-sans:
-    "Segoe UI", var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+    var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   /* Colors */
@@ -23,44 +23,68 @@
   --color-brand-pink: #fab7ff;
   --color-glow-violet: #8a38f5;
 
+  /* Surfaces */
+  --color-night: #0a0416; /* deepest page background (auth, onboarding, admin) */
+  --color-popover: #1a0f2e; /* menus, dropdowns, dialog inputs */
+  --color-popover-deep: #12091f; /* dialog panels */
+  --color-ink: #060810; /* media letterboxing */
+
+  /* Status */
+  --color-online: #00ff8c;
+  --color-gold: #ffd000;
+  --color-teal: #4fd1c5;
+  --color-teal-soft: #6ee7d8;
+
   /* Translucent card fills */
   --color-glass-magenta: rgba(216, 2, 220, 0.18);
   --color-glass-cyan: rgba(0, 251, 255, 0.18);
   --color-glass-purple: rgba(128, 0, 255, 0.18);
 
-  /* Border radius */
-  --radius-btn: 10px; /* primary/outline buttons — mild modern rounding */
-  --radius-btn-sm: 8px; /* in-card/small buttons */
-  --radius-card: 24px; /* step/music cards */
-  --radius-card-md: 25px; /* feature cards */
-  --radius-poster: 26.4px; /* poster/community cards */
-  --radius-card-xl: 32px; /* collection cards */
-  --radius-chip: 25px; /* pills/chips */
+  /*
+   * Radius scale — one step per component size, nothing in between:
+   *   lg 8 (small controls) · xl 12 (inputs, buttons, inner art)
+   *   2xl 16 (panels) · card 20 (every card) · 3xl 24 (dialogs, shells)
+   *   full (pills, chips, avatars)
+   * lg/xl/2xl/3xl are Tailwind defaults; `card` is the one custom step.
+   */
+  --radius-card: 20px;
 
   /* Shadows and glows */
-  --shadow-glow-pink: 0 0 25px 5px #ff00cc;
-  --shadow-glow-purple: 0 0 20px 15px #8a38f5;
-  --shadow-glow-cyan: 0 0 20px 10px rgba(0, 255, 230, 0.9);
-  --shadow-glow-blue: 0 0 20px 10px rgba(0, 26, 255, 0.9);
-  --shadow-glow-green: 0 0 20px 10px rgba(0, 255, 94, 0.8);
-  --shadow-glow-yellow: 0 0 20px 10px rgba(255, 208, 0, 0.8);
-  --shadow-glow-pink-soft: 0 0 18px 2px rgba(255, 0, 204, 0.55);
+  /*
+   * Glow budget: only the primary CTA, the active nav item, the now-playing
+   * state and card hover glow. One soft halo, no spread — cheap to paint.
+   */
+  --shadow-glow-pink: 0 0 32px rgba(255, 0, 204, 0.35);
+  --shadow-glow-purple: 0 0 32px rgba(138, 56, 245, 0.35);
+  --shadow-glow-cyan: 0 0 32px rgba(0, 255, 230, 0.3);
+  --shadow-glow-blue: 0 0 32px rgba(37, 99, 235, 0.35);
+  --shadow-glow-green: 0 0 32px rgba(0, 255, 94, 0.3);
+  --shadow-glow-yellow: 0 0 32px rgba(255, 208, 0, 0.3);
+  --shadow-glow-pink-soft: 0 0 20px rgba(255, 0, 204, 0.3);
   --shadow-card-inner: inset -1px 1px 50px 0 rgba(0, 0, 0, 0.5);
   --shadow-section-dim: 0 16px 48px -12px rgba(0, 0, 0, 0.65),
     0 8px 24px -4px rgba(0, 0, 0, 0.45);
   --shadow-card-lift: 0 12px 36px rgba(0, 0, 0, 0.5),
     0 4px 14px rgba(0, 0, 0, 0.35);
   --shadow-panel: 0 11px 114.9px 4px rgba(0, 0, 0, 0.8);
-  --shadow-hover-card: 0 0 250px 300px rgba(138, 56, 245, 0.25);
+  --shadow-hover-card: 0 0 32px rgba(138, 56, 245, 0.35);
 
   /*
-   * Type scale. `display` (64px) is reserved for the hero headline only.
-   * The rest is intentionally smaller than the Figma desktop frame for a
-   * cleaner, more spacious modern feel:
-   *   title   — section headings (was 42px)
-   *   heading — sub-section/card headings (was 32px)
-   *   subtitle — section subtitles / lead text
+   * Type scale — minimum readable size is 12px (caption).
+   *   micro 11 — chip/badge labels only, never sentences
+   *   caption 12 · small 13 · body 15 · subtitle 16 · lead 18
+   *   heading 24 · title 32 · display 64 (landing hero only)
    */
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.25rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+  --text-lead: 1.125rem;
+  --text-lead--line-height: 1.6;
   --text-display: 4rem;
   --text-display--line-height: 0.93;
   --text-title: 2rem;
@@ -89,32 +113,32 @@
   --gradient-chip-comedy: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
   --gradient-chip-crime: linear-gradient(90deg, #dc2626 0%, #991b1b 100%);
   --gradient-chip-drama: linear-gradient(90deg, #10b981 0%, #2dd4bf 100%);
-  --gradient-chip-fantasy: linear-gradient(90deg, #c084fc 0%, #7c3aed 100%);
-  --gradient-chip-horror: linear-gradient(90deg, #ea580c 0%, #b91c1c 100%);
-  --gradient-chip-mystery: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 100%);
+  --gradient-chip-fantasy: linear-gradient(90deg, #9333ea 0%, #7c3aed 100%);
+  --gradient-chip-horror: linear-gradient(90deg, #c2410c 0%, #b91c1c 100%);
+  --gradient-chip-mystery: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
   --gradient-chip-adventure: linear-gradient(90deg, #a3e635 0%, #eab308 100%);
-  --gradient-chip-supernatural: linear-gradient(90deg, #14b8a6 0%, #6366f1 100%);
-  --gradient-chip-psychological: linear-gradient(90deg, #e879f9 0%, #be185d 100%);
+  --gradient-chip-supernatural: linear-gradient(90deg, #0f766e 0%, #4f46e5 100%);
+  --gradient-chip-psychological: linear-gradient(90deg, #c026d3 0%, #be185d 100%);
   --gradient-chip-slice: linear-gradient(90deg, #fb7185 0%, #f97316 100%);
   --gradient-chip-jazz: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
-  --gradient-chip-romance: linear-gradient(90deg, #f472b6 0%, #ec4899 100%);
+  --gradient-chip-romance: linear-gradient(90deg, #db2777 0%, #be185d 100%);
   --gradient-chip-scific: linear-gradient(90deg, #22d3ee 0%, #06b6d4 100%);
   --gradient-chip-thriller: linear-gradient(90deg, #6b21a8 0%, #4c1d95 100%);
-  --gradient-chip-sports: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
-  --gradient-chip-anime: linear-gradient(90deg, #c026d3 0%, #9333ea 100%);
-  --gradient-chip-show: linear-gradient(90deg, #d946ef 0%, #a855f7 100%);
-  --gradient-chip-movie: linear-gradient(90deg, #ff00cc 0%, #d500dd 100%);
+  --gradient-chip-sports: linear-gradient(90deg, #c2410c 0%, #9a3412 100%);
+  --gradient-chip-anime: linear-gradient(90deg, #a21caf 0%, #7e22ce 100%);
+  --gradient-chip-show: linear-gradient(90deg, #c026d3 0%, #9333ea 100%);
+  --gradient-chip-movie: linear-gradient(90deg, #c026d3 0%, #a21caf 100%);
   --gradient-chip-documentary: linear-gradient(90deg, #7c3aed 0%, #5b21b6 100%);
-  --gradient-chip-kdrama: linear-gradient(90deg, #f43f5e 0%, #e11d48 100%);
-  --gradient-chip-song: linear-gradient(90deg, #ec4899 0%, #db2777 100%);
-  --gradient-chip-album: linear-gradient(90deg, #a855f7 0%, #7e22ce 100%);
+  --gradient-chip-kdrama: linear-gradient(90deg, #e11d48 0%, #be123c 100%);
+  --gradient-chip-song: linear-gradient(90deg, #db2777 0%, #be185d 100%);
+  --gradient-chip-album: linear-gradient(90deg, #9333ea 0%, #7e22ce 100%);
   --gradient-chip-ost: linear-gradient(90deg, #9333ea 0%, #7c3aed 100%);
-  --gradient-chip-music: linear-gradient(90deg, #d500dd 0%, #ff00cc 100%);
+  --gradient-chip-music: linear-gradient(90deg, #a21caf 0%, #c026d3 100%);
   --gradient-chip-jpop: linear-gradient(90deg, #34d399 0%, #10b981 100%);
-  --gradient-chip-kpop: linear-gradient(90deg, #f472b6 0%, #a855f7 100%);
-  --gradient-chip-aimatch: linear-gradient(90deg, #ff00cc 0%, #ae00ff 100%);
-  --gradient-chip-rating: linear-gradient(90deg, #9333ea 0%, #ff00cc 100%);
-  --gradient-chip-default: linear-gradient(90deg, #ff00cc 0%, #7c3aed 50%, #00d4ff 100%);
+  --gradient-chip-kpop: linear-gradient(90deg, #db2777 0%, #9333ea 100%);
+  --gradient-chip-aimatch: linear-gradient(90deg, #c026d3 0%, #9333ea 100%);
+  --gradient-chip-rating: linear-gradient(90deg, #9333ea 0%, #c026d3 100%);
+  --gradient-chip-default: linear-gradient(90deg, #c026d3 0%, #7c3aed 50%, #0e7490 100%);
 }
 
 /* ------------------- */

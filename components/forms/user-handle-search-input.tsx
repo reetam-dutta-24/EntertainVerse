@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 
 interface UserSearchResult {
   id: string;
@@ -118,7 +119,7 @@ export function UserHandleSearchInput({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-40 mt-1 max-h-52 w-full overflow-y-auto rounded-xl border border-white/10 bg-[#120818] py-1 shadow-xl"
+          className="absolute z-40 mt-1 max-h-52 w-full overflow-y-auto rounded-xl border border-white/10 bg-popover-deep py-1 shadow-xl"
         >
           {loading ? (
             <li className="px-3 py-2 text-xs text-white/50">Searching users…</li>
@@ -139,8 +140,8 @@ export function UserHandleSearchInput({
                   )}
                 >
                   <span
-                    className="flex size-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                    style={{ backgroundColor: user.avatarColor ?? "#ae00ff" }}
+                    className="flex size-7 shrink-0 items-center justify-center rounded-full text-micro font-bold text-white"
+                    style={{ backgroundColor: user.avatarColor ?? BRAND_COLORS.purple }}
                   >
                     {user.name.charAt(0)}
                   </span>
@@ -148,7 +149,7 @@ export function UserHandleSearchInput({
                     <span className="block truncate text-xs font-semibold text-white">
                       {user.name}
                     </span>
-                    <span className="block truncate text-[10px] text-white/55">
+                    <span className="block truncate text-caption text-white/55">
                       @{user.handle}
                     </span>
                   </span>

@@ -53,20 +53,20 @@ export function ErrorState({
         variant === "page" ? "min-h-dvh bg-background py-16" : "min-h-[60dvh] py-12",
       )}
     >
-      <div className="relative w-full max-w-[460px] overflow-hidden rounded-[24px] border border-white/10 bg-gradient-to-b from-[rgba(216,2,220,0.14)] via-[rgba(128,0,255,0.08)] to-[rgba(216,2,220,0.16)] px-6 py-9 shadow-[0_20px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:px-8">
+      <div className="relative w-full max-w-[460px] overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[rgba(216,2,220,0.14)] via-[rgba(128,0,255,0.08)] to-[rgba(216,2,220,0.16)] px-6 py-9 shadow-[0_20px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:px-8">
         <div
           className="pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-brand-magenta/40 blur-3xl"
           aria-hidden
         />
         <div className="relative flex flex-col items-center gap-4">
-          <span className="flex size-14 items-center justify-center rounded-full border border-brand-magenta/50 bg-glass-magenta shadow-glow-pink-soft">
+          <span className="flex size-14 items-center justify-center rounded-full border border-brand-magenta/50 bg-glass-magenta">
             <TriangleAlert className="size-7 text-brand-pink" aria-hidden />
           </span>
           <h1 className="text-xl font-bold text-white sm:text-2xl">{title}</h1>
           <p className="text-sm text-white/75">{description}</p>
 
           {error.digest ? (
-            <p className="rounded-full bg-white/5 px-3 py-1 font-mono text-[11px] text-white/45">
+            <p className="rounded-full bg-white/5 px-3 py-1 font-mono text-micro text-white/45">
               Error ID: {error.digest}
             </p>
           ) : null}

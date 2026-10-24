@@ -73,7 +73,7 @@ export function WatchlistItemActions({ item }: { item: ContentItem }) {
           value={status}
           disabled={statusLoading}
           onChange={(event) => handleStatusChange(event.target.value)}
-          className="h-8 py-1.5 text-[10px]"
+          className="h-8 py-1.5 text-caption"
         >
           {statusOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -89,7 +89,7 @@ export function WatchlistItemActions({ item }: { item: ContentItem }) {
           <Trash2 className="size-3" />
           Remove
         </button>
-        {error ? <p className="text-center text-[10px] text-red-400">{error}</p> : null}
+        {error ? <p className="text-center text-caption text-red-400">{error}</p> : null}
       </div>
 
       <FormShell

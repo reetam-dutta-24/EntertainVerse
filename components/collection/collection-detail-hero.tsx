@@ -30,13 +30,13 @@ export interface CollectionDetailHeroProps {
 }
 
 const DETAIL_CHIP =
-  "h-7 shrink-0 px-3 text-[11px] font-medium sm:h-8 sm:px-3.5 sm:text-xs";
+  "h-7 shrink-0 px-3 text-caption font-medium sm:h-8 sm:px-3.5 sm:text-xs";
 
 const CHIP_ROW =
   "flex flex-nowrap items-center gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
 
 const TITLE_CLASS =
-  "text-2xl font-bold leading-tight text-white sm:text-[30px] lg:text-[34px]";
+  "text-2xl font-bold leading-tight text-white sm:text-title lg:text-title";
 
 /** Collection detail hero — Figma main visual: info + spotlight slider + activity panel. */
 export function CollectionDetailHero({
@@ -108,7 +108,7 @@ export function CollectionDetailHero({
             ) : null}
           </div>
 
-          <p className="line-clamp-4 max-w-3xl text-sm leading-relaxed text-white/85 sm:text-[15px] sm:leading-7">
+          <p className="line-clamp-4 max-w-3xl text-sm leading-relaxed text-white/85 sm:text-body sm:leading-7">
             {collection.description}
           </p>
 

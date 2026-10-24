@@ -46,7 +46,7 @@ export function HowItWorksSection() {
         {steps.map((step) => (
           <ScrollFadeItem key={step.number}>
           <div
-            className="flex h-auto min-h-[220px] w-[230px] shrink-0 flex-col items-center gap-3 rounded-card bg-glass-magenta px-4 py-7 shadow-glow-pink-soft transition-shadow duration-300 hover:shadow-glow-pink lg:w-[250px]"
+            className="flex h-auto min-h-[220px] w-[230px] shrink-0 flex-col items-center gap-3 rounded-card bg-glass-magenta px-4 py-7 transition-shadow duration-300 hover:shadow-glow-pink lg:w-[250px]"
           >
             <div className="flex w-full items-center justify-center gap-5">
               <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-gradient-brand text-lg font-black text-white">

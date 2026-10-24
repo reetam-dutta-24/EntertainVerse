@@ -231,7 +231,7 @@ function CatalogSearchInput({
           width: panelRect.width,
           zIndex: 9999,
         }}
-        className="max-h-80 overflow-y-auto rounded-xl border border-white/10 bg-[#12091f] p-1.5 shadow-2xl"
+        className="max-h-80 overflow-y-auto rounded-xl border border-white/10 bg-popover-deep p-1.5 shadow-2xl"
       >
         {loading ? (
           <p className="px-3 py-4 text-sm text-white/55">Searching…</p>
@@ -248,7 +248,7 @@ function CatalogSearchInput({
         ) : (
           <ul className="flex flex-col gap-0.5">
             {canBrowse && !loading ? (
-              <li className="px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-white/40">
+              <li className="px-3 py-2 text-micro font-medium uppercase tracking-wide text-white/40">
                 Catalog artists
               </li>
             ) : null}
@@ -300,7 +300,7 @@ function CatalogSearchInput({
 
   return (
     <div ref={rootRef} className="relative">
-      <label className="flex items-center gap-2 rounded-xl border border-white/15 bg-[#1a0f2e] px-3 py-2.5 transition focus-within:border-brand-magenta/60 focus-within:ring-1 focus-within:ring-brand-magenta/30">
+      <label className="flex items-center gap-2 rounded-xl border border-white/15 bg-popover px-3 py-2.5 transition focus-within:border-brand-magenta/60 focus-within:ring-1 focus-within:ring-brand-magenta/30">
         <Search className="size-4 shrink-0 text-white/45" />
         <input
           ref={inputRef}
@@ -377,7 +377,7 @@ function SelectionCard({
   onClear: () => void;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-[#1a0f2e] p-3">
+    <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-popover p-3">
       <span className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-black/40">
         {selection.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -570,7 +570,7 @@ export function CatalogMultiSearchPicker({
             const meta = labels[slug] ?? resolveSelection(slug, labels);
             return (
               <li key={slug}>
-                <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-[#1a0f2e] p-2.5">
+                <div className="flex items-center gap-3 rounded-xl border border-white/15 bg-popover p-2.5">
                   <span className="relative size-10 shrink-0 overflow-hidden rounded-lg bg-black/40">
                     {meta?.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element

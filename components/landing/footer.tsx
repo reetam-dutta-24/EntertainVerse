@@ -54,7 +54,7 @@ export function Footer() {
       <div className="flex w-full max-w-[1200px] flex-col items-center gap-8 lg:flex-row lg:items-start lg:gap-20">
         <ScrollFadeIn direction="up">
         <div className="flex w-[260px] flex-col items-center gap-5 px-6 py-4">
-          <p className="text-gradient-brand text-center text-[26px] font-semibold leading-none">
+          <p className="text-gradient-brand text-center text-heading font-semibold leading-none">
             AniVerse
           </p>
           <p className="text-center text-sm text-muted">

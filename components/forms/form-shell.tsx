@@ -55,7 +55,7 @@ export function FormShell({
       />
       <div
         className={cn(
-          "relative z-10 flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#12091f] shadow-2xl",
+          "relative z-10 flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-white/10 bg-popover-deep shadow-2xl",
           className,
         )}
       >
@@ -102,15 +102,15 @@ function Field({
 }
 
 const inputClass =
-  "rounded-xl border border-white/15 bg-[#1a0f2e] px-3 py-2.5 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-brand-magenta/60 focus:ring-1 focus:ring-brand-magenta/30";
+  "rounded-xl border border-white/15 bg-popover px-3 py-2.5 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-brand-magenta/60 focus:ring-1 focus:ring-brand-magenta/30";
 
 const selectClass =
-  "w-full cursor-pointer appearance-none rounded-xl border border-white/15 bg-[#1a0f2e] bg-[length:16px] bg-[position:right_12px_center] bg-no-repeat px-3 py-2.5 pe-10 text-sm text-white outline-none transition focus:border-brand-magenta/60 focus:ring-1 focus:ring-brand-magenta/30 [color-scheme:dark]";
+  "w-full cursor-pointer appearance-none rounded-xl border border-white/15 bg-popover bg-[length:16px] bg-[position:right_12px_center] bg-no-repeat px-3 py-2.5 pe-10 text-sm text-white outline-none transition focus:border-brand-magenta/60 focus:ring-1 focus:ring-brand-magenta/30 [color-scheme:dark]";
 
 const selectChevron =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")";
 
-const optionClass = "bg-[#1a0f2e] text-white";
+const optionClass = "bg-popover text-white";
 
 export function FormField({
   label,

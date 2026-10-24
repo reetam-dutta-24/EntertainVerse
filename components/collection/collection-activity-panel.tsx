@@ -67,7 +67,7 @@ export function CollectionActivityPanel({
         ) : (
           <div
             aria-hidden
-            className="size-full bg-gradient-to-br from-brand-purple/30 via-[#1a0d2e] to-black"
+            className="size-full bg-gradient-to-br from-brand-purple/30 via-popover to-black"
           />
         )}
         <div
@@ -122,7 +122,7 @@ export function CollectionActivityPanel({
           <div className="flex items-center gap-3 py-1">
             <AvatarStack users={contributors} max={3} size="md" />
             {contributorSummary ? (
-              <p className="min-w-0 flex-1 text-left text-[11px] leading-relaxed text-white/80 sm:text-xs">
+              <p className="min-w-0 flex-1 text-left text-caption leading-relaxed text-white/80 sm:text-xs">
                 {contributorSummary}
               </p>
             ) : null}

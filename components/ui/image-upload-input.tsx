@@ -6,7 +6,7 @@ import { ImagePlus, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const defaultInputClass =
-  "rounded-xl border border-white/15 bg-[#1a0f2e] px-3 py-2.5 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-brand-magenta/60 focus:ring-1 focus:ring-brand-magenta/30";
+  "rounded-xl border border-white/15 bg-popover px-3 py-2.5 text-sm text-white placeholder:text-white/40 outline-none transition focus:border-brand-magenta/60 focus:ring-1 focus:ring-brand-magenta/30";
 
 interface ImageUploadInputProps {
   value: string;

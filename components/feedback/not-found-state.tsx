@@ -42,7 +42,7 @@ export function NotFoundState({
       />
 
       <div className="relative flex w-full max-w-[520px] flex-col items-center gap-5">
-        <span className="flex size-16 items-center justify-center rounded-full border border-brand-magenta/50 bg-glass-magenta shadow-glow-pink-soft">
+        <span className="flex size-16 items-center justify-center rounded-full border border-brand-magenta/50 bg-glass-magenta">
           <Icon className="size-8 text-brand-pink" aria-hidden />
         </span>
         <p className="text-gradient-brand text-6xl font-extrabold leading-none tracking-tight sm:text-7xl">

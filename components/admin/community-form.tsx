@@ -126,7 +126,7 @@ export function CommunityForm({ mode, recordId, initial }: CommunityFormProps) {
               }
             >
               {communityCategories.map((category) => (
-                <option key={category} value={category} className="bg-[#1a0d2e]">
+                <option key={category} value={category} className="bg-popover">
                   {category}
                 </option>
               ))}

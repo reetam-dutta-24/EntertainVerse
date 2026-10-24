@@ -58,7 +58,7 @@ export function CommunityDashboardShell({
         ✨🌏⛩️ {communityName}
       </h1>
 
-      <div className="overflow-hidden rounded-[24px] border border-white/[0.08] bg-black/50 shadow-section-dim backdrop-blur-xl">
+      <div className="overflow-hidden rounded-3xl border border-white/[0.08] bg-black/50 shadow-section-dim backdrop-blur-xl">
         <div className="grid min-h-[calc(100dvh-12rem)] grid-cols-1 lg:grid-cols-[200px_minmax(0,1fr)_240px]">
           <nav className="hidden flex-col gap-1 border-r border-white/[0.06] bg-sidebar/90 px-3 py-5 backdrop-blur-md lg:flex">
             {navItems.map((item) => {
@@ -75,7 +75,7 @@ export function CommunityDashboardShell({
                   key={item.id}
                   href={href}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-[12px] px-3 py-2.5 text-left text-sm font-medium transition-colors",
+                    "flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors",
                     isActive
                       ? "bg-white/[0.07] text-white/95"
                       : "text-white/55 hover:bg-white/[0.04] hover:text-white/80",

@@ -16,6 +16,7 @@ import {
 import { WelcomeBanner } from "@/components/dashboard";
 import { getAnalyticsData } from "@/lib/data/analytics";
 import { getCurrentUser } from "@/lib/data/user";
+import { chartPalette } from "@/components/charts/chart-theme";
 
 export const metadata: Metadata = {
   title: "Analytics — AniVerse",
@@ -50,8 +51,8 @@ export default async function AnalyticsPage() {
             data={data.timeTrend}
             xKey="month"
             series={[
-              { key: "watching", label: "Watching (h)", color: "#ff00cc" },
-              { key: "listening", label: "Listening (h)", color: "#2dd4bf" },
+              { key: "watching", label: "Watching (h)", color: chartPalette.magenta },
+              { key: "listening", label: "Listening (h)", color: chartPalette.teal },
             ]}
             height={300}
           />
@@ -90,8 +91,8 @@ export default async function AnalyticsPage() {
             data={data.weeklyActivity}
             xKey="day"
             series={[
-              { key: "watching", label: "Watching (h)", color: "#ff00cc" },
-              { key: "listening", label: "Listening (h)", color: "#2563eb" },
+              { key: "watching", label: "Watching (h)", color: chartPalette.magenta },
+              { key: "listening", label: "Listening (h)", color: chartPalette.blue },
             ]}
             height={280}
           />
@@ -121,7 +122,7 @@ export default async function AnalyticsPage() {
           <AniLineChart
             data={data.matchAccuracy}
             xKey="month"
-            series={[{ key: "accuracy", label: "Accuracy %", color: "#00ff8c" }]}
+            series={[{ key: "accuracy", label: "Accuracy %", color: chartPalette.green }]}
             height={280}
           />
         </ChartPanel>
@@ -165,9 +166,9 @@ export default async function AnalyticsPage() {
           data={data.communityEngagement}
           xKey="month"
           series={[
-            { key: "posts", label: "Posts", color: "#ff00cc" },
-            { key: "likes", label: "Likes", color: "#ae00ff" },
-            { key: "chats", label: "Chats", color: "#2dd4bf" },
+            { key: "posts", label: "Posts", color: chartPalette.magenta },
+            { key: "likes", label: "Likes", color: chartPalette.purple },
+            { key: "chats", label: "Chats", color: chartPalette.teal },
           ]}
           height={300}
         />

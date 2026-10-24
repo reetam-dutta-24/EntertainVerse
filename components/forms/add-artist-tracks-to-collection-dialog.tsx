@@ -215,7 +215,7 @@ export function AddArtistTracksToCollectionDialog({
               label="Search playlists"
               hint="Only your music playlists are listed."
             >
-              <label className="flex items-center gap-2 rounded-xl border border-white/15 bg-[#1a0f2e] px-3 py-2.5 transition focus-within:border-brand-magenta/60 focus-within:ring-1 focus-within:ring-brand-magenta/30">
+              <label className="flex items-center gap-2 rounded-xl border border-white/15 bg-popover px-3 py-2.5 transition focus-within:border-brand-magenta/60 focus-within:ring-1 focus-within:ring-brand-magenta/30">
                 <Search className="size-4 shrink-0 text-white/45" />
                 <TextInput
                   value={searchQuery}

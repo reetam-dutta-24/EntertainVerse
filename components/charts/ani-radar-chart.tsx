@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { chartAxis, chartGrid, chartTooltipStyle } from "./chart-theme";
+import { chartAxis, chartGrid, chartTooltipStyle, chartPalette } from "./chart-theme";
 
 export interface AniRadarChartDatum {
   axis: string;
@@ -30,7 +30,7 @@ export interface AniRadarChartProps {
 export function AniRadarChart({
   data,
   name = "Score",
-  color = "#ff00cc",
+  color = chartPalette.magenta,
   maxValue = 100,
   height = 320,
   className,

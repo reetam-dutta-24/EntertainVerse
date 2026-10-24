@@ -67,7 +67,7 @@ export default async function WatchlistPage() {
               key={tile.label}
               className="bg-gradient-brand flex flex-col items-center gap-1.5 rounded-xl px-3 py-3 text-center shadow-[0_2px_10px_rgba(255,0,204,0.12)] sm:px-4 sm:py-4"
             >
-              <span className="text-[10px] font-semibold text-white sm:text-xs">
+              <span className="text-caption font-semibold text-white sm:text-xs">
                 {tile.emoji} {tile.label}
               </span>
               <span className="text-xl font-bold text-white sm:text-2xl">{tile.value}</span>

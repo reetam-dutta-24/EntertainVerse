@@ -38,7 +38,7 @@ export function MonthComparisonPanel({ rows }: MonthComparisonPanelProps) {
               <span
                 className={cn(
                   "flex w-[52px] items-center justify-end gap-0.5 text-xs font-semibold",
-                  up ? "text-[#00ff8c]" : "text-brand-pink",
+                  up ? "text-online" : "text-brand-pink",
                 )}
               >
                 {up ? (

@@ -99,7 +99,7 @@ export function ContentEpisodeCard({
               <p className="line-clamp-2 text-xs font-semibold text-white sm:text-sm">
                 S{season} | Episode {episode.number} · {displayTitle}
               </p>
-              <span className="inline-flex shrink-0 items-center gap-1 text-[10px] text-white/80">
+              <span className="inline-flex shrink-0 items-center gap-1 text-caption text-white/80">
                 <Clock className="size-3" />
                 {durationLabel}
               </span>
@@ -116,14 +116,14 @@ export function ContentEpisodeCard({
               href={watchHref}
               contentSlug={contentId}
               onClick={onPlay}
-              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-brand-magenta bg-black/80 px-3 py-1 text-[10px] font-medium text-white transition-colors hover:bg-brand-magenta/20"
+              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-brand-magenta bg-black/80 px-3 py-1 text-micro font-medium text-white transition-colors hover:bg-brand-magenta/20"
             >
               <PlayCircle className="size-3.5 text-brand-magenta" />
               Watch Now
             </ContentWatchNowLink>
             <div className="flex items-center gap-2">
               {episode.rating != null ? (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-white">
+                <span className="inline-flex items-center gap-0.5 text-caption font-semibold text-white">
                   <Star className="size-3 fill-yellow-400 text-yellow-400" />
                   {formatRating(episode.rating)}
                 </span>
@@ -133,7 +133,7 @@ export function ContentEpisodeCard({
                 type="button"
                 disabled={watchlistLoading}
                 onClick={() => void handleWatchlistAdd()}
-                className="h-6 rounded-full px-2.5 text-[9px] transition-opacity hover:opacity-90 disabled:opacity-60"
+                className="h-6 rounded-full px-2.5 text-micro transition-opacity hover:opacity-90 disabled:opacity-60"
               >
                 <Plus className="size-3" />
                 Watchlist
@@ -153,22 +153,22 @@ export function ContentEpisodeCard({
           </p>
           <div className="flex flex-wrap items-center gap-1.5">
             {episode.language ? (
-              <Chip language={episode.language.toLowerCase()} className="h-5 text-[10px]">
+              <Chip language={episode.language.toLowerCase()} className="h-5 text-caption">
                 {episode.language}
               </Chip>
             ) : null}
-            <Chip chipKey="ost" className="h-5 gap-1 text-[10px]">
+            <Chip chipKey="ost" className="h-5 gap-1 text-caption">
               <Clock className="size-3" />
               {durationLabel}
             </Chip>
             {episode.views ? (
-              <Chip chipKey="show" className="h-5 gap-1 text-[10px]">
+              <Chip chipKey="show" className="h-5 gap-1 text-caption">
                 <Eye className="size-3" />
                 {episode.views}
               </Chip>
             ) : null}
             {episode.likes ? (
-              <Chip chipKey="romance" className="h-5 gap-1 text-[10px]">
+              <Chip chipKey="romance" className="h-5 gap-1 text-caption">
                 <Heart className="size-3" />
                 {episode.likes}
               </Chip>

@@ -19,7 +19,7 @@ import { Chip } from "@/components/ui/chip";
 import type { UserProfileDetail } from "@/types";
 
 const ACCENT_LINK =
-  "font-semibold text-[#4FD1C5] underline decoration-[#4FD1C5]/80 underline-offset-2 transition-colors hover:text-[#6ee7d8]";
+  "font-semibold text-teal underline decoration-teal/80 underline-offset-2 transition-colors hover:text-teal-soft";
 
 const GENRE_CHIP_KEYS = {
   Thriller: "mystery",
@@ -41,7 +41,7 @@ function PreferenceRow({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="w-[104px] shrink-0 text-left text-[11px] font-medium text-white sm:text-xs">
+      <span className="w-[104px] shrink-0 text-left text-caption font-medium text-white sm:text-xs">
         {label}
       </span>
       <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-1.5">
@@ -113,7 +113,7 @@ export function ProfileListeningPanel({
             <div className="space-y-0.5 text-center">
               {nowListening ? (
                 <>
-                  <p className="text-sm text-white sm:text-[15px]">
+                  <p className="text-sm text-white sm:text-body">
                     Currently Listening To{" "}
                     {nowListening.songId ? (
                       <Link
@@ -126,7 +126,7 @@ export function ProfileListeningPanel({
                       <span className={ACCENT_LINK}>{nowListening.title}</span>
                     )}
                   </p>
-                  <p className="text-sm text-white sm:text-[15px]">
+                  <p className="text-sm text-white sm:text-body">
                     By{" "}
                     {nowListening.artistId ? (
                       <Link
@@ -146,7 +146,7 @@ export function ProfileListeningPanel({
 
               {currentlyWatching ? (
                 <>
-                  <p className="text-sm text-white sm:text-[15px]">
+                  <p className="text-sm text-white sm:text-body">
                     {currentlyWatching.isActive ? "And Watching " : "Last Watched "}
                     <Link
                       href={getContentDetailPath(currentlyWatching.contentId)}
@@ -156,7 +156,7 @@ export function ProfileListeningPanel({
                     </Link>
                   </p>
                   {currentlyWatching.genres && currentlyWatching.genres.length > 0 ? (
-                    <p className="text-sm text-white sm:text-[15px]">
+                    <p className="text-sm text-white sm:text-body">
                       {currentlyWatching.genres.map((genre, index) => (
                         <span key={genre.id}>
                           {index > 0 ? ", " : null}
@@ -196,7 +196,7 @@ export function ProfileListeningPanel({
                       : undefined
                   }
                 />
-                <p className="min-w-0 flex-1 text-left text-[11px] leading-snug text-white/80 sm:text-xs">
+                <p className="min-w-0 flex-1 text-left text-caption leading-snug text-white/80 sm:text-xs">
                   {friendText}
                 </p>
               </div>
@@ -208,7 +208,7 @@ export function ProfileListeningPanel({
                   <Chip
                     key={type}
                     chipKey="movie"
-                    className="h-5 px-2.5 text-[10px] font-medium"
+                    className="h-5 px-2.5 text-caption font-medium"
                   >
                     {type}
                   </Chip>
@@ -223,7 +223,7 @@ export function ProfileListeningPanel({
                       GENRE_CHIP_KEYS[genre as keyof typeof GENRE_CHIP_KEYS] ??
                       "default"
                     }
-                    className="h-5 px-2.5 text-[10px] font-medium"
+                    className="h-5 px-2.5 text-caption font-medium"
                   >
                     {genre}
                   </Chip>

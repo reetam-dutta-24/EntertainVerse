@@ -4,6 +4,7 @@ import { formatRating } from "@/lib/format-rating";
 import type { Review } from "@/types";
 import { AvatarStack } from "@/components/ui/avatar-stack";
 import { Chip } from "@/components/ui/chip";
+import { BRAND_COLORS } from "@/lib/brand-colors";
 
 export interface ContentReviewCardProps {
   review: Review;
@@ -11,7 +12,7 @@ export interface ContentReviewCardProps {
 
 /** Review card — compact, glow matches author avatar color. */
 export function ContentReviewCard({ review }: ContentReviewCardProps) {
-  const avatarColor = review.author.avatarColor ?? "#ae00ff";
+  const avatarColor = review.author.avatarColor ?? BRAND_COLORS.purple;
 
   return (
     <article
@@ -35,10 +36,10 @@ export function ContentReviewCard({ review }: ContentReviewCardProps) {
             {review.author.name}
           </p>
           {review.createdAt ? (
-            <p className="text-[10px] text-muted sm:text-xs">{review.createdAt}</p>
+            <p className="text-caption text-muted sm:text-xs">{review.createdAt}</p>
           ) : null}
         </div>
-        <Chip variant="brand" className="h-5 shrink-0 gap-0.5 text-[10px]">
+        <Chip variant="brand" className="h-5 shrink-0 gap-0.5 text-caption">
           <Star className="size-3 fill-current" />
           {formatRating(review.rating)}/10
         </Chip>

@@ -163,7 +163,7 @@ export function ToggleUserFriendButton({
           </button>
         </div>
         {error ? (
-          <p className="mt-1 text-center text-[10px] text-red-400">{error}</p>
+          <p className="mt-1 text-center text-caption text-red-400">{error}</p>
         ) : null}
       </div>
     );
@@ -199,7 +199,7 @@ export function ToggleUserFriendButton({
         </span>
       </button>
       {error ? (
-        <p className="mt-1 text-center text-[10px] text-red-400">{error}</p>
+        <p className="mt-1 text-center text-caption text-red-400">{error}</p>
       ) : null}
     </div>
   );

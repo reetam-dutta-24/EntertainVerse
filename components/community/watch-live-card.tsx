@@ -24,7 +24,7 @@ export function WatchLiveCard({
   return (
     <div
       className={cn(
-        "flex w-full max-w-[982px] flex-col overflow-hidden rounded-poster bg-glass-purple transition-shadow duration-300 sm:h-[348px] sm:flex-row",
+        "flex w-full max-w-[982px] flex-col overflow-hidden rounded-card bg-glass-purple transition-shadow duration-300 sm:h-[348px] sm:flex-row",
         accent.hoverGlow,
         className,
       )}
@@ -37,7 +37,7 @@ export function WatchLiveCard({
         )}
       >
         {party.live ? (
-          <span className="absolute left-4 top-4 flex items-center gap-1.5 rounded-chip bg-brand-magenta px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-white">
+          <span className="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-brand-magenta px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-white">
             <Radio className="size-3.5" />
             Live
           </span>

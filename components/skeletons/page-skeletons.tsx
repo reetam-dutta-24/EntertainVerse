@@ -225,8 +225,8 @@ export function PlayerSkeleton({ audio = false }: { audio?: boolean }) {
           <Skeleton className="h-4 w-1/3" />
         </div>
         {audio ? (
-          <div className="flex flex-col items-center gap-6 rounded-[24px] bg-surface/40 p-6 sm:flex-row sm:p-8">
-            <Skeleton className="aspect-square w-full max-w-[260px] rounded-[20px]" />
+          <div className="flex flex-col items-center gap-6 rounded-3xl bg-surface/40 p-6 sm:flex-row sm:p-8">
+            <Skeleton className="aspect-square w-full max-w-[260px] rounded-card" />
             <div className="flex w-full flex-1 flex-col gap-4">
               <Skeleton className="h-6 w-1/2" />
               <Skeleton className="h-4 w-1/3" />
@@ -239,7 +239,7 @@ export function PlayerSkeleton({ audio = false }: { audio?: boolean }) {
             </div>
           </div>
         ) : (
-          <Skeleton className="aspect-video w-full rounded-[20px]" />
+          <Skeleton className="aspect-video w-full rounded-card" />
         )}
         <div className="flex flex-col gap-2">
           <Skeleton className="h-4 w-full" />
@@ -268,7 +268,7 @@ export function CommunityDashboardSkeleton() {
     <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-8">
       <LoadingStatus label="Loading community dashboard…" />
       <Skeleton className="mb-5 h-7 w-64 max-w-full sm:mb-6" />
-      <div className="overflow-hidden rounded-[24px] border border-white/[0.08] bg-black/50">
+      <div className="overflow-hidden rounded-3xl border border-white/[0.08] bg-black/50">
         <div className="grid min-h-[calc(100dvh-12rem)] grid-cols-1 lg:grid-cols-[200px_minmax(0,1fr)_240px]">
           <div className="hidden flex-col gap-2 border-r border-white/[0.06] px-3 py-5 lg:flex">
             {Array.from({ length: 7 }, (_, i) => (
@@ -414,7 +414,7 @@ export function AdminOverviewSkeleton() {
 /** Login / signup card. */
 export function AuthCardSkeleton() {
   return (
-    <div className="w-full max-w-[400px] rounded-[24px] border border-white/10 bg-glass-purple px-7 py-9">
+    <div className="w-full max-w-[400px] rounded-3xl border border-white/10 bg-glass-purple px-7 py-9">
       <LoadingStatus />
       <div className="flex flex-col items-center gap-3">
         <Skeleton className="h-7 w-32" />
@@ -422,10 +422,10 @@ export function AuthCardSkeleton() {
         <Skeleton className="h-4 w-60 max-w-full" />
       </div>
       <div className="mt-8 flex flex-col gap-4">
-        <Skeleton className="h-12 w-full rounded-[12px]" />
-        <Skeleton className="h-12 w-full rounded-[12px]" />
-        <Skeleton className="h-11 w-full rounded-[12px]" />
-        <Skeleton className="h-10 w-full rounded-[10px]" />
+        <Skeleton className="h-12 w-full rounded-xl" />
+        <Skeleton className="h-12 w-full rounded-xl" />
+        <Skeleton className="h-11 w-full rounded-xl" />
+        <Skeleton className="h-10 w-full rounded-xl" />
       </div>
     </div>
   );

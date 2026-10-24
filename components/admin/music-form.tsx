@@ -181,7 +181,7 @@ export function MusicForm({ mode, recordId, initial, initialLinked }: MusicFormP
           </Field>
           <Field label="Kind">
             <select className={inputClass} value={form.kind} onChange={(e) => update("kind", e.target.value as MusicFormInput["kind"])}>
-              {kinds.map((k) => <option key={k} value={k} className="bg-[#1a0d2e]">{k}</option>)}
+              {kinds.map((k) => <option key={k} value={k} className="bg-popover">{k}</option>)}
             </select>
           </Field>
           <Field label="Artist credit" hint="Display name shown on cards and the song page">

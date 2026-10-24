@@ -77,8 +77,8 @@ function WatchChannelRow({
   const accent = getAccentStyle(party.accent ?? "purple");
 
   return (
-    <div className="flex flex-col gap-4 rounded-[20px] border border-white/[0.08] bg-black/35 p-4 shadow-card-inner sm:flex-row sm:items-center sm:p-5">
-      <div className="relative h-[140px] w-full shrink-0 overflow-hidden rounded-[16px] sm:h-[120px] sm:w-[200px]">
+    <div className="flex flex-col gap-4 rounded-card border border-white/[0.08] bg-black/35 p-4 shadow-card-inner sm:flex-row sm:items-center sm:p-5">
+      <div className="relative h-[140px] w-full shrink-0 overflow-hidden rounded-2xl sm:h-[120px] sm:w-[200px]">
         {party.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -124,10 +124,10 @@ function VoiceChannelRow({
   const accent = getAccentStyle(channel.accent ?? "purple");
 
   return (
-    <div className="flex flex-col gap-4 rounded-[20px] border border-white/[0.08] bg-black/35 p-4 shadow-card-inner sm:flex-row sm:items-center sm:p-5">
+    <div className="flex flex-col gap-4 rounded-card border border-white/[0.08] bg-black/35 p-4 shadow-card-inner sm:flex-row sm:items-center sm:p-5">
       <div
         className={cn(
-          "h-[100px] w-full shrink-0 rounded-[16px] sm:h-[88px] sm:w-[160px]",
+          "h-[100px] w-full shrink-0 rounded-2xl sm:h-[88px] sm:w-[160px]",
           accent.header,
         )}
       />
@@ -165,7 +165,7 @@ function SettingsToggle({
   defaultChecked?: boolean;
 }) {
   return (
-    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-[14px] border border-white/[0.08] bg-black/35 px-4 py-3">
+    <label className="flex cursor-pointer items-start justify-between gap-4 rounded-xl border border-white/[0.08] bg-black/35 px-4 py-3">
       <div>
         <p className="text-sm font-semibold text-white/90">{label}</p>
         <p className="mt-0.5 text-xs text-white/55">{description}</p>
@@ -354,7 +354,7 @@ export function CommunityDashboardSectionContent({
               {community.dashboardAnalytics.map((stat) => (
                 <div
                   key={stat.id}
-                  className="rounded-[16px] border border-cyan-400/12 bg-glass-cyan/15 p-4 shadow-card-inner backdrop-blur-sm"
+                  className="rounded-2xl border border-cyan-400/12 bg-glass-cyan/15 p-4 shadow-card-inner backdrop-blur-sm"
                 >
                   <p className="text-xs text-white/55">{stat.label}</p>
                   <p className="mt-1 text-2xl font-bold text-white">
