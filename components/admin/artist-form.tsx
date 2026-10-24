@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useFormDraft } from "@/hooks/use-form-draft";
 import { GradientButton } from "@/components/ui/gradient-button";
@@ -19,19 +19,43 @@ import {
 } from "@/components/admin/catalog-nested-fields";
 import { EnumMultiSelect, EnumSelect } from "@/components/admin/enum-selectors";
 import { ImageUploadInput } from "@/components/ui/image-upload-input";
+import { CatalogImportPanel } from "@/components/admin/ai/catalog-import-panel";
+import { ImportSummary } from "@/components/admin/ai/import-summary";
+import { CatalogReviewPanel } from "@/components/admin/ai/catalog-review-panel";
+import { useConfirm } from "@/components/feedback/feedback-provider";
+import type { AdminAiSettings } from "@/lib/ai/settings";
+import type { ArtistImportResult } from "@/lib/catalog-import/types";
+import { listenServiceFromUrl } from "@/lib/listen-links";
 import type { ArtistFormInput } from "@/lib/validators/admin/artist";
 
 export interface ArtistFormProps {
   mode: "create" | "edit";
   recordId?: string;
   initial: ArtistFormInput;
+  ai?: AdminAiSettings;
 }
+
+const IMPORT_TYPE_HINTS = [
+  { value: "", label: "Any artist" },
+  { value: "group", label: "Group / band" },
+  { value: "solo", label: "Solo artist" },
+] as const;
+
+/** Review suggestions for these fields need an editor, not a one-click replace. */
+const MANUAL_FIELDS = new Set<string>(["general", "members", "catalogReviews", "listenLinks", "isGroup"]);
+const NUMBER_FIELDS = new Set<string>(["rating", "debutYear"]);
+const LIST_VALUES: Record<string, Set<string> | null> = {
+  genreLabels: new Set(ARTIST_GENRE_OPTIONS.map((o) => o.value)),
+  languages: new Set(LANGUAGE_OPTIONS.map((o) => o.value)),
+  primaryTags: null,
+};
+const ACCENT_VALUES = new Set<string>(ACCENT_OPTIONS.map((o) => o.value));
 
 function slugify(title: string) {
   return title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-export function ArtistForm({ mode, recordId, initial }: ArtistFormProps) {
+export function ArtistForm({ mode, recordId, initial, ai = { enabled: false, tmdbEnabled: false } }: ArtistFormProps) {
   const router = useAppRouter();
   const draftKey =
     mode === "create"
@@ -44,9 +68,64 @@ export function ArtistForm({ mode, recordId, initial }: ArtistFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [slugTouched, setSlugTouched] = useState(mode === "edit");
+  const [importResult, setImportResult] = useState<ArtistImportResult | null>(null);
+  const [importFacts, setImportFacts] = useState<Record<string, unknown> | undefined>();
+  const confirmAction = useConfirm();
+  // The textarea keeps blank lines while typing; drop them before saving or reviewing.
+  const cleanForm = useMemo(
+    () => ({
+      ...form,
+      listenLinks: (form.listenLinks ?? [])
+        .map((link) => ({ service: listenServiceFromUrl(link.url.trim()), url: link.url.trim() }))
+        .filter((link) => link.url),
+    }),
+    [form],
+  );
 
   function update<K extends keyof ArtistFormInput>(key: K, value: ArtistFormInput[K]) {
     setForm((c) => ({ ...c, [key]: value }));
+  }
+
+  async function handleImported(result: ArtistImportResult) {
+    if (form.title.trim()) {
+      const replace = await confirmAction({
+        title: "Replace the current form?",
+        description: `The imported profile for "${result.draft.title}" will replace what you've entered so far.`,
+        confirmLabel: "Replace with import",
+      });
+      if (!replace) return;
+    }
+    setForm(result.draft);
+    setSlugTouched(false);
+    setImportResult(result);
+    setImportFacts(result.facts);
+  }
+
+  function canApplySuggestion(field: string) {
+    return !MANUAL_FIELDS.has(field);
+  }
+
+  function applySuggestion(field: string, value: string) {
+    if (!canApplySuggestion(field)) return;
+    const key = field as keyof ArtistFormInput;
+    if (NUMBER_FIELDS.has(field)) {
+      const number = Number(value);
+      update(key, (value.trim() === "" || Number.isNaN(number) ? undefined : number) as never);
+      return;
+    }
+    if (field in LIST_VALUES) {
+      const allowed = LIST_VALUES[field];
+      const items = value.split(",").map((item) => item.trim()).filter(Boolean);
+      update(key, (allowed ? items.map((item) => item.toLowerCase()).filter((item) => allowed.has(item)) : items) as never);
+      return;
+    }
+    if (field === "accent") {
+      const accent = value.trim().toLowerCase();
+      if (!accent || ACCENT_VALUES.has(accent)) update("accent", (accent || undefined) as ArtistFormInput["accent"]);
+      return;
+    }
+    if (key === "slug") setSlugTouched(true);
+    update(key, value as never);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -58,7 +137,7 @@ export function ArtistForm({ mode, recordId, initial }: ArtistFormProps) {
       const res = await fetch(url, {
         method: mode === "create" ? "POST" : "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(cleanForm),
       });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) {
@@ -77,6 +156,24 @@ export function ArtistForm({ mode, recordId, initial }: ArtistFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+      {mode === "create" ? (
+        <CatalogImportPanel<ArtistImportResult>
+          apiBase="/api/admin/ai/artists"
+          aiEnabled={ai.enabled}
+          intro={
+            <>
+              Search an artist — the photo and fan data come from Deezer, group/solo, members and debut from
+              MusicBrainz, Apple Music and Deezer links are attached, and {ai.providerLabel ?? "the AI model"} drafts
+              the bio and tags.
+            </>
+          }
+          placeholder="e.g. YOASOBI, TWICE, LiSA"
+          typeHints={IMPORT_TYPE_HINTS}
+          artwork="square"
+          onImported={(result) => void handleImported(result)}
+        />
+      ) : null}
+      {importResult ? <ImportSummary result={importResult} onDismiss={() => setImportResult(null)} /> : null}
       {draftRestored ? (
         <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-xs text-amber-100/90">
           Restored your unsaved draft from this browser.
@@ -142,6 +239,22 @@ export function ArtistForm({ mode, recordId, initial }: ArtistFormProps) {
           options={ARTIST_GENRE_OPTIONS}
           onChange={(genreLabels) => update("genreLabels", genreLabels)}
         />
+        <Field
+          label="Listen links"
+          hint="One artist-profile URL per line — Apple Music, Deezer, Spotify, YouTube Music, JioSaavn"
+        >
+          <textarea
+            className={`${inputClass} min-h-24 py-2 font-mono text-xs leading-relaxed`}
+            value={(form.listenLinks ?? []).map((link) => link.url).join("\n")}
+            onChange={(e) =>
+              update(
+                "listenLinks",
+                e.target.value.split("\n").map((url) => ({ service: listenServiceFromUrl(url.trim()), url })),
+              )
+            }
+            placeholder={"https://music.apple.com/…/artist/…\nhttps://www.deezer.com/artist/…"}
+          />
+        </Field>
         <TagListEditor label="Primary tags" items={form.primaryTags} placeholder="Dance Pop, K-pop…" onChange={(primaryTags) => update("primaryTags", primaryTags)} />
         <EnumMultiSelect
           label="Languages"
@@ -156,6 +269,16 @@ export function ArtistForm({ mode, recordId, initial }: ArtistFormProps) {
       ) : null}
 
       <CatalogReviewsEditor reviews={form.catalogReviews} onChange={(catalogReviews) => update("catalogReviews", catalogReviews)} />
+
+      <CatalogReviewPanel
+        endpoint="/api/admin/ai/artists/review"
+        form={cleanForm}
+        facts={importFacts}
+        aiEnabled={ai.enabled}
+        providerLabel={ai.providerLabel}
+        canApply={canApplySuggestion}
+        onApply={applySuggestion}
+      />
 
       {error ? <p className="text-sm text-red-400">{error}</p> : null}
       <div className="flex gap-3">

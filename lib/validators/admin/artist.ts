@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { listenLinkSchema } from "@/lib/listen-links";
 import {
   accentEnum,
   artistGenreEnum,
@@ -41,6 +42,8 @@ export const artistFormSchema = z.object({
   isGroup: z.boolean().default(false),
   members: z.array(memberSchema).default([]),
   genreLabels: z.array(artistGenreEnum).default([]),
+  /** Artist profiles on legal streaming services. */
+  listenLinks: z.array(listenLinkSchema).max(8).default([]),
   catalogReviews: z.array(catalogReviewInputSchema).default([]),
 });
 

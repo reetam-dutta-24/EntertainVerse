@@ -1,4 +1,5 @@
 import { labelForArtistGenre } from "@/lib/catalog-enums";
+import { parseListenLinks } from "@/lib/listen-links";
 import type { ArtistRecordFull } from "@/lib/services/artist.service";
 import type {
   AccentColor,
@@ -125,6 +126,7 @@ export function mapArtistRecordToDetail(row: ArtistRecordFull): ArtistDetail {
     imageUrl: row.imageUrl ?? poster(slug),
     accent: (row.accent as AccentColor) ?? undefined,
     matchScore: undefined,
+    listenLinks: parseListenLinks(row.listenLinks),
     songCount: allSongs.length,
     albumCount: albums.length || Math.ceil(allSongs.length / 8),
     engagementStats,

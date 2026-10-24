@@ -8,6 +8,7 @@ import {
   InteractiveReviewSection,
 } from "@/components/content";
 import { MusicCarouselSection, MusicGridSection } from "@/components/dashboard";
+import { ListenLinksSection } from "@/components/song/listen-links-section";
 import { getAllArtistIds, getArtistDetail } from "@/lib/data/artist-detail";
 import { getCommunityMemberPreview } from "@/lib/data/community";
 import { getOptionalUser } from "@/lib/data/user";
@@ -52,6 +53,13 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
       <ArtistKpiSection stats={artist.engagementStats} />
 
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-10 px-4 pt-6 sm:gap-12 sm:px-8 sm:pt-8 lg:gap-14 lg:px-12">
+        <ListenLinksSection
+          heading={`🎧 Listen to ${artist.title}`}
+          query={artist.title}
+          links={artist.listenLinks ?? []}
+          inset={false}
+        />
+
         <MusicGridSection
           title={`🎵 All ${artist.title} Songs`}
           searchPlaceholder="Search tracks…"

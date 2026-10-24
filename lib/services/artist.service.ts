@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { parseListenLinks } from "@/lib/listen-links";
 import { prisma } from "@/lib/prisma";
 import type { ArtistFormInput } from "@/lib/validators/admin/artist";
 import { roundRating } from "@/lib/format-rating";
@@ -40,6 +41,7 @@ function toArtistData(input: ArtistFormInput): Prisma.ArtistCreateInput {
     label: emptyToNull(input.label),
     debutYear: input.debutYear ?? null,
     isGroup: input.isGroup,
+    listenLinks: input.listenLinks,
   } as Prisma.ArtistCreateInput;
 }
 
@@ -191,6 +193,7 @@ export function artistRecordToFormInput(row: ArtistRecordFull): ArtistFormInput 
       imageUrl: m.imageUrl ?? "",
     })),
     genreLabels: asStringArray((row as { genres?: unknown }).genres) as ArtistFormInput["genreLabels"],
+    listenLinks: parseListenLinks(row.listenLinks),
     catalogReviews: row.catalogReviews.map((r) => ({
       authorName: r.authorName,
       authorAvatarColor: r.authorAvatarColor ?? "",

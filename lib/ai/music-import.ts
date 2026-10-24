@@ -31,7 +31,7 @@ const enrichmentSchema = z.object({
   nativeTitle: z.string(),
   description: z.string(),
   genreLabels: z.array(z.enum(genreValues)),
-  language: z.enum([...languageValues, ""] as [string, ...string[]]),
+  language: z.enum(["", ...languageValues] as [string, ...string[]]),
   source: z.string(),
   creditLabel: z.string(),
   accent: z.enum(accentValues),

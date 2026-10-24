@@ -68,9 +68,7 @@ export async function findDeezerTrackLink(artist: string, title: string): Promis
 
 /** An artist photo for the track backdrop — best effort, short timeout. */
 export async function findDeezerArtistPicture(artist: string): Promise<string> {
-  const data = await deezer<{ data: DeezerArtistRef[] }>("/search/artist", { q: artist, limit: "1" }, 4_000);
-  const match = data.data[0];
-  return match && match.name.toLowerCase() === artist.toLowerCase() ? deezerPicture(match.picture_xl) : "";
+  return deezerPicture((await findDeezerArtist(artist))?.picture_xl);
 }
 
 export async function fetchDeezerTrackFacts(id: string): Promise<SourceFacts<MusicFormInput>> {
@@ -103,4 +101,44 @@ export async function fetchDeezerTrackFacts(id: string): Promise<SourceFacts<Mus
       contributors: t.contributors?.map((c) => c.name),
     },
   };
+}
+
+// ---- artists (work in every region) -------------------------------------------------
+
+export interface DeezerArtist extends DeezerArtistRef {
+  nb_fan?: number;
+  nb_album?: number;
+}
+
+const fans = (n?: number) =>
+  n ? `${new Intl.NumberFormat("en", { notation: "compact" }).format(n)} fans on Deezer` : undefined;
+
+export async function searchDeezerArtists(query: string): Promise<CatalogCandidate[]> {
+  const data = await deezer<{ data: DeezerArtist[] }>("/search/artist", { q: query, limit: "15" });
+  // Deezer's own ranking buries big names under exact-spelling lookalikes; fans are a better signal.
+  const ranked = [...data.data].sort((a, b) => (b.nb_fan ?? 0) - (a.nb_fan ?? 0)).slice(0, 6);
+  return ranked.map((a) => ({
+    source: "deezer",
+    sourceId: String(a.id),
+    title: a.name,
+    kindLabel: "Artist",
+    overview: fans(a.nb_fan),
+    imageUrl: deezerPicture(a.picture_xl) || undefined,
+  }));
+}
+
+export function fetchDeezerArtist(id: string) {
+  return deezer<DeezerArtist>(`/artist/${encodeURIComponent(id)}`);
+}
+
+/** Deezer profile for an artist found elsewhere — best effort, short timeout. */
+export async function findDeezerArtist(name: string): Promise<DeezerArtist | null> {
+  const data = await deezer<{ data: DeezerArtist[] }>("/search/artist", { q: name, limit: "10" }, 4_000);
+  const byFans = (list: DeezerArtist[]) => list.sort((a, b) => (b.nb_fan ?? 0) - (a.nb_fan ?? 0))[0];
+  // Exact spelling first ("LiSA" vs "LISA"), then any casing.
+  return (
+    byFans(data.data.filter((a) => a.name === name)) ??
+    byFans(data.data.filter((a) => a.name.toLowerCase() === name.toLowerCase())) ??
+    null
+  );
 }

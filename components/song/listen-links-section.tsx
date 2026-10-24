@@ -1,5 +1,6 @@
 import { ExternalLink, Search } from "lucide-react";
 import { LISTEN_SERVICE_LABELS, listenSearchLinks, type ListenLink } from "@/lib/listen-links";
+import { cn } from "@/lib/utils";
 
 export interface ListenLinksSectionProps {
   heading: string;
@@ -7,18 +8,20 @@ export interface ListenLinksSectionProps {
   query: string;
   /** Deep links stored by the importer / admin. */
   links: ListenLink[];
+  /** False when the page already provides the max-width + side padding. */
+  inset?: boolean;
 }
 
 /**
  * Legal ways to hear the full track: stored deep links first, then search
  * links for the big services that weren't linked directly.
  */
-export function ListenLinksSection({ heading, query, links }: ListenLinksSectionProps) {
+export function ListenLinksSection({ heading, query, links, inset = true }: ListenLinksSectionProps) {
   const region = (process.env.WATCH_REGION || "IN").toLowerCase();
   const search = listenSearchLinks(query, links, region);
 
   return (
-    <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 sm:px-8 lg:px-12">
+    <section className={cn("flex w-full flex-col gap-3", inset && "mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12")}>
       <h2 className="text-lg font-bold text-white sm:text-xl">{heading}</h2>
       <ul className="flex flex-wrap gap-2">
         {links.map((link) => (
@@ -50,7 +53,7 @@ export function ListenLinksSection({ heading, query, links }: ListenLinksSection
         ))}
       </ul>
       <p className="text-caption text-white/40">
-        In-app playback uses official 30-second previews. Open a service to hear the full track.
+        In-app playback uses official 30-second previews. Open a service for full tracks.
       </p>
     </section>
   );

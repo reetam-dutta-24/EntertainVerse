@@ -571,6 +571,8 @@ export interface ArtistDetail {
   imageUrl: string;
   accent?: AccentColor;
   matchScore?: number;
+  /** Artist profiles on legal streaming services. */
+  listenLinks?: ListenLink[];
   songCount?: number;
   albumCount?: number;
   engagementStats: ContentEngagementStat[];

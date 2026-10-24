@@ -31,6 +31,9 @@ function toError(error: unknown): CatalogAiError {
     if (error.status === 400 || error.status === 401 || error.status === 403) {
       return new CatalogAiError("Gemini rejected the request — check GEMINI_API_KEY (and GEMINI_MODEL if set).", 503);
     }
+    if (error.status === 503) {
+      return new CatalogAiError("Gemini is overloaded right now (free tier) — try again in a minute.", 503);
+    }
     return new CatalogAiError(`Gemini API error (${error.status}). Try again.`, 502);
   }
   return new CatalogAiError(error instanceof Error ? error.message : "Unexpected Gemini error.");
@@ -43,20 +46,35 @@ function jsonSchemaFor(schema: z.ZodType) {
   return rest;
 }
 
+/** The free tier answers 503 "model overloaded" at busy times — retry twice with backoff. */
+async function withRetry<T>(call: () => Promise<T>): Promise<T> {
+  for (const delay of [2_000, 5_000]) {
+    try {
+      return await call();
+    } catch (error) {
+      if (!(error instanceof ApiError) || ![500, 502, 503, 504].includes(error.status)) throw error;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  return call();
+}
+
 /**
  * Drafting doesn't need deep reasoning — low thinking keeps imports fast.
  * Older models that don't accept `thinkingLevel` get one retry without it.
  */
 async function generateWithThinking(prompt: string, config: GenerateContentConfig, level: ThinkingLevel) {
   try {
-    return await gemini().models.generateContent({
-      model: model(),
-      contents: prompt,
-      config: { ...config, thinkingConfig: { thinkingLevel: level } },
-    });
+    return await withRetry(() =>
+      gemini().models.generateContent({
+        model: model(),
+        contents: prompt,
+        config: { ...config, thinkingConfig: { thinkingLevel: level } },
+      }),
+    );
   } catch (error) {
     if (error instanceof ApiError && error.status === 400) {
-      return gemini().models.generateContent({ model: model(), contents: prompt, config });
+      return withRetry(() => gemini().models.generateContent({ model: model(), contents: prompt, config }));
     }
     throw error;
   }
@@ -88,11 +106,13 @@ export async function geminiStructured<S extends z.ZodType>(request: StructuredR
 
 export async function geminiResearch(system: string, instructions: string): Promise<WebResearch> {
   try {
-    const response = await gemini().models.generateContent({
-      model: model(),
-      contents: instructions,
-      config: { systemInstruction: system, tools: [{ googleSearch: {} }] },
-    });
+    const response = await withRetry(() =>
+      gemini().models.generateContent({
+        model: model(),
+        contents: instructions,
+        config: { systemInstruction: system, tools: [{ googleSearch: {} }] },
+      }),
+    );
     const factSheet = response.text?.trim();
     if (!factSheet) throw new CatalogAiError("Web research came back empty — try a more specific title.");
 

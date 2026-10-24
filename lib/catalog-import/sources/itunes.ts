@@ -72,6 +72,7 @@ export async function findItunesTrack(artist: string, title: string): Promise<It
   const data = await itunes<{ results: ItunesTrack[] }>("/search", { term: `${artist} ${title}`, entity: "song", limit: "5" });
   const norm = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
   return (
+    data.results.find((t) => norm(t.trackName) === norm(title) && t.artistName === artist) ??
     data.results.find((t) => norm(t.trackName) === norm(title) && norm(t.artistName).includes(norm(artist).slice(0, 6))) ??
     data.results.find((t) => norm(t.trackName).startsWith(norm(title))) ??
     null
@@ -113,5 +114,34 @@ export async function fetchItunesTrackFacts(id: string): Promise<SourceFacts<Mus
       durationSeconds: t.trackTimeMillis ? Math.round(t.trackTimeMillis / 1000) : undefined,
       explicit: t.trackExplicitness === "explicit",
     },
+  };
+}
+
+// ---- artists ---------------------------------------------------------------------------
+
+export interface ItunesArtist {
+  artistId: number;
+  artistName: string;
+  artistLinkUrl?: string;
+  primaryGenreName?: string;
+}
+
+/** Apple Music profile + a few top songs for an artist found elsewhere. */
+export async function findItunesArtist(name: string): Promise<{ url: string; genre?: string; topSongs: string[] } | null> {
+  const data = await itunes<{ results: ItunesArtist[] }>("/search", { term: name, entity: "musicArtist", limit: "10" });
+  // Exact spelling first: "LiSA" (anison singer) and "LISA" (BLACKPINK) only differ by case.
+  const artist =
+    data.results.find((a) => a.artistName === name) ??
+    data.results.find((a) => a.artistName.toLowerCase() === name.toLowerCase());
+  if (!artist) return null;
+  const songs = await itunes<{ results: (ItunesArtist | ItunesTrack)[] }>("/lookup", {
+    id: String(artist.artistId),
+    entity: "song",
+    limit: "6",
+  }).catch(() => ({ results: [] }));
+  return {
+    url: cleanAppleUrl(artist.artistLinkUrl),
+    genre: artist.primaryGenreName,
+    topSongs: songs.results.flatMap((r) => ("trackName" in r ? [r.trackName] : [])),
   };
 }

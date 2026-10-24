@@ -45,6 +45,7 @@ function mapDbTrack(
     imageUrl: string | null;
     backdropUrl: string | null;
     audioUrl: string | null;
+    previewUrl?: string | null;
     lyrics: string | null;
     language: string | null;
     rating: number | null;

@@ -83,7 +83,7 @@ export async function runAiReview(request: AiReviewRequest, report: ProgressRepo
     summary: z.string(),
     issues: z.array(
       z.object({
-        field: z.enum([...request.fieldKeys, "general"] as [string, ...string[]]),
+        field: z.enum(["general", ...request.fieldKeys] as [string, ...string[]]),
         severity: z.enum(["error", "warning", "suggestion"]),
         message: z.string(),
         suggestedValue: z.string().nullable(),
