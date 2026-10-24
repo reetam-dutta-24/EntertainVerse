@@ -86,7 +86,7 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
         <div>
           <h2 className="text-sm font-semibold text-white">Import with AI</h2>
           <p className="mt-1 text-xs text-white/55">
-            Search a title — facts come from {tmdbEnabled ? "TMDB (movies, shows, K-dramas) and " : ""}AniList (anime), and
+            Search a title — facts come from {tmdbEnabled ? "TMDB (movies, shows, K-dramas) and " : ""}AniList (anime), and{" "}
             {providerLabel ?? "the AI model"} drafts the editorial fields. You review everything before saving.
           </p>
         </div>
