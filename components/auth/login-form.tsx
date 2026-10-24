@@ -8,18 +8,25 @@ import { Lock, User } from "lucide-react";
 import { AuthInput } from "@/components/auth/auth-input";
 import { SocialButtons } from "@/components/auth/social-buttons";
 import { GradientButton } from "@/components/ui/gradient-button";
+import { DEFAULT_POST_AUTH_PATH } from "@/lib/auth-redirect";
 
 export interface LoginFormProps {
   googleEnabled?: boolean;
   discordEnabled?: boolean;
+  /** Validated return path (e.g. from middleware) — used once onboarding is done. */
+  callbackUrl?: string;
+  /** Error shown on load, e.g. after a failed Google sign-in. */
+  initialError?: string | null;
 }
 
 export function LoginForm({
   googleEnabled = false,
   discordEnabled = false,
+  callbackUrl,
+  initialError = null,
 }: LoginFormProps) {
   const router = useAppRouter();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError);
   const [pending, setPending] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -42,7 +49,11 @@ export function LoginForm({
 
     const destRes = await fetch("/api/auth/redirect-destination");
     const destData = (await destRes.json()) as { destination?: string };
-    router.push(destData.destination ?? "/dashboard");
+    const destination = destData.destination ?? DEFAULT_POST_AUTH_PATH;
+    // Onboarding always wins; otherwise honour where the user was headed.
+    router.push(
+      destination === DEFAULT_POST_AUTH_PATH && callbackUrl ? callbackUrl : destination,
+    );
     router.refresh();
   }
 
@@ -88,6 +99,7 @@ export function LoginForm({
       </GradientButton>
 
       <SocialButtons
+        callbackUrl={callbackUrl ?? DEFAULT_POST_AUTH_PATH}
         googleEnabled={googleEnabled}
         discordEnabled={discordEnabled}
       />

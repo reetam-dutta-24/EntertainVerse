@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { LoaderCircle } from "lucide-react";
 
 function GoogleIcon() {
   return (
@@ -34,7 +36,7 @@ function DiscordIcon() {
 }
 
 export interface SocialButtonsProps {
-  /** Sent to NextAuth as callbackUrl after OAuth completes. */
+  /** Where NextAuth sends the user after OAuth completes. */
   callbackUrl?: string;
   googleEnabled?: boolean;
   discordEnabled?: boolean;
@@ -46,7 +48,23 @@ export function SocialButtons({
   googleEnabled = true,
   discordEnabled = true,
 }: SocialButtonsProps) {
+  const [pendingProvider, setPendingProvider] = useState<string | null>(null);
+
   if (!googleEnabled && !discordEnabled) return null;
+
+  const single = !(googleEnabled && discordEnabled);
+
+  function start(provider: "google" | "discord") {
+    if (pendingProvider) return;
+    setPendingProvider(provider);
+    // Full-page redirect to the provider; pending stays set until we leave.
+    void signIn(provider, { redirectTo: callbackUrl }).catch(() => {
+      setPendingProvider(null);
+    });
+  }
+
+  const buttonClass =
+    "flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-white/20 bg-white/5 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60";
 
   return (
     <div className="flex flex-col gap-4">
@@ -56,26 +74,38 @@ export function SocialButtons({
         <span className="h-px flex-1 bg-white/15" />
       </div>
       <div
-        className={`grid gap-3 ${googleEnabled && discordEnabled ? "grid-cols-2" : "grid-cols-1"}`}
+        className={`grid gap-3 ${single ? "grid-cols-1" : "grid-cols-2"}`}
       >
         {googleEnabled ? (
           <button
             type="button"
-            onClick={() => signIn("google", { callbackUrl })}
-            className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-white/20 bg-white/5 text-sm font-medium text-white transition-colors hover:bg-white/10"
+            onClick={() => start("google")}
+            disabled={pendingProvider !== null}
+            aria-busy={pendingProvider === "google"}
+            className={buttonClass}
           >
-            <GoogleIcon />
-            Google
+            {pendingProvider === "google" ? (
+              <LoaderCircle className="size-4 animate-spin" aria-hidden />
+            ) : (
+              <GoogleIcon />
+            )}
+            {single ? "Continue with Google" : "Google"}
           </button>
         ) : null}
         {discordEnabled ? (
           <button
             type="button"
-            onClick={() => signIn("discord", { callbackUrl })}
-            className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-[10px] border border-white/20 bg-white/5 text-sm font-medium text-white transition-colors hover:bg-white/10"
+            onClick={() => start("discord")}
+            disabled={pendingProvider !== null}
+            aria-busy={pendingProvider === "discord"}
+            className={buttonClass}
           >
-            <DiscordIcon />
-            Discord
+            {pendingProvider === "discord" ? (
+              <LoaderCircle className="size-4 animate-spin" aria-hidden />
+            ) : (
+              <DiscordIcon />
+            )}
+            {single ? "Continue with Discord" : "Discord"}
           </button>
         ) : null}
       </div>

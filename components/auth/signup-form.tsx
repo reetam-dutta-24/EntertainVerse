@@ -9,6 +9,7 @@ import { AuthInput } from "@/components/auth/auth-input";
 import { SocialButtons } from "@/components/auth/social-buttons";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { clearLegacyOnboardingProfile } from "@/lib/onboarding-store";
+import { DEFAULT_POST_AUTH_PATH } from "@/lib/auth-redirect";
 
 export function SignupForm({
   googleEnabled = false,
@@ -145,8 +146,10 @@ export function SignupForm({
         {pending ? "Creating Account..." : "Create Account"}
       </GradientButton>
 
+      {/* Dashboard layout sends brand-new Google users on to onboarding,
+          while existing accounts skip it instead of retaking the quiz. */}
       <SocialButtons
-        callbackUrl="/onboarding"
+        callbackUrl={DEFAULT_POST_AUTH_PATH}
         googleEnabled={googleEnabled}
         discordEnabled={discordEnabled}
       />

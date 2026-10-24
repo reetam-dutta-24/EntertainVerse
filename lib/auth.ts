@@ -8,6 +8,10 @@ import {
   verifyPassword,
 } from "@/lib/services/user.service";
 import { loginSchema } from "@/lib/validators/auth";
+import {
+  OAUTH_ACCOUNT_SAVE_FAILED,
+  OAUTH_EMAIL_NOT_VERIFIED,
+} from "@/lib/auth-redirect";
 
 const providers: NextAuthConfig["providers"] = [
   Credentials({
@@ -45,6 +49,8 @@ if (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET) {
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      // Always show the account chooser so users can switch Google accounts.
+      authorization: { params: { prompt: "select_account" } },
     }),
   );
 }
@@ -62,15 +68,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers,
   pages: {
     signIn: "/login",
+    // OAuth failures land back on the login card with ?error=<code>.
+    error: "/login",
   },
   session: {
     strategy: "jwt",
   },
   trustHost: true,
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (!account || account.provider === "credentials") return true;
       if (!user.email) return false;
+
+      // We link OAuth logins to existing accounts by email, so the provider
+      // must vouch for that email — otherwise anyone could claim it.
+      const emailVerified =
+        account.provider === "google"
+          ? profile?.email_verified === true
+          : account.provider === "discord"
+            ? profile?.verified === true
+            : false;
+      if (!emailVerified) return `/login?error=${OAUTH_EMAIL_NOT_VERIFIED}`;
 
       try {
         const dbUser = await findOrCreateOAuthUser({
@@ -91,7 +109,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return true;
       } catch (error) {
         console.error("[auth signIn oauth]", error);
-        return false;
+        return `/login?error=${OAUTH_ACCOUNT_SAVE_FAILED}`;
       }
     },
     async jwt({ token, user, trigger, session }) {
