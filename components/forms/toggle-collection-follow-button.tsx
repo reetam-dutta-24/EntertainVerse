@@ -5,6 +5,7 @@ import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { cn } from "@/lib/utils";
 import { detailHeroBtnBase } from "@/lib/detail-route-ui";
 import { emitCollectionFollowerCount } from "@/components/collection/collection-follower-count-chip";
+import { useToast } from "@/components/feedback/feedback-provider";
 
 interface ToggleCollectionFollowButtonProps {
   collectionSlug: string;
@@ -24,6 +25,7 @@ export function ToggleCollectionFollowButton({
   const [following, setFollowing] = useState(initialFollowing);
   useOnValueChange(initialFollowing, (next) => setFollowing(next));
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
   const [error, setError] = useState<string>();
 
   async function handleToggle() {
@@ -44,6 +46,7 @@ export function ToggleCollectionFollowButton({
       }
       const nextFollowing = Boolean(data.following);
       setFollowing(nextFollowing);
+      toast(nextFollowing ? "Following this collection" : "Unfollowed collection");
       if (typeof data.followerCount === "number") {
         emitCollectionFollowerCount(data.followerCount);
       }
@@ -59,6 +62,7 @@ export function ToggleCollectionFollowButton({
           ? toggleError.message
           : "Could not update follow status.",
       );
+      toast(toggleError instanceof Error ? toggleError.message : "Could not update follow status.", "error");
     } finally {
       setLoading(false);
     }

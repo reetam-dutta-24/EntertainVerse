@@ -3,6 +3,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { formatEngagementCount } from "@/lib/services/content.service";
 import type { ContentEngagementStat } from "@/types";
+import { useToast } from "@/components/feedback/feedback-provider";
 
 interface ContentEngagementContextValue {
   contentSlug: string;
@@ -10,7 +11,6 @@ interface ContentEngagementContextValue {
   stats: ContentEngagementStat[];
   favorited: boolean;
   onWatchlist: boolean;
-  toast: string | null;
   setToast: (message: string | null) => void;
   applyFavorite: (favoriteCount: number, favorited: boolean) => void;
   applyWatchlist: (watchingCount: number, onWatchlist: boolean) => void;
@@ -70,7 +70,14 @@ export function ContentEngagementProvider({
   useOnValueChange(initialStats, (next) => setStats(next));
   const [favorited, setFavorited] = useState(initialFavorited);
   const [onWatchlist, setOnWatchlist] = useState(initialOnWatchlist);
-  const [toast, setToast] = useState<string | null>(null);
+  const showToast = useToast();
+  // Kept as an API for children (e.g. hero collection button); renders via the shared toast.
+  const setToast = useCallback(
+    (message: string | null) => {
+      if (message) showToast(message);
+    },
+    [showToast],
+  );
 
   const resolvedFavoriteApiPath =
     favoriteApiPath ?? `/api/content/${encodeURIComponent(contentSlug)}/favorite`;
@@ -78,9 +85,8 @@ export function ContentEngagementProvider({
   const applyFavorite = useCallback((favoriteCount: number, nextFavorited: boolean) => {
     setStats((current) => updateStatValue(current, "likes", favoriteCount));
     setFavorited(nextFavorited);
-    setToast(nextFavorited ? "Added to favourites!" : "Removed from favourites.");
-    window.setTimeout(() => setToast(null), 2400);
-  }, []);
+    setToast(nextFavorited ? "Added to favourites" : "Removed from favourites");
+  }, [setToast]);
 
   const applyWatchlist = useCallback(
     (watchingCount: number, nextOnWatchlist: boolean) => {
@@ -91,12 +97,9 @@ export function ContentEngagementProvider({
         return updateStatValue(current, watchingId, watchingCount);
       });
       setOnWatchlist(nextOnWatchlist);
-      setToast(
-        nextOnWatchlist ? "Added to watchlist!" : "Removed from watchlist.",
-      );
-      window.setTimeout(() => setToast(null), 2400);
+      setToast(nextOnWatchlist ? "Added to watchlist" : "Removed from watchlist");
     },
-    [],
+    [setToast],
   );
 
   const applyViews = useCallback((views: number) => {
@@ -126,7 +129,6 @@ export function ContentEngagementProvider({
       stats,
       favorited,
       onWatchlist,
-      toast,
       setToast,
       applyFavorite,
       applyWatchlist,
@@ -144,8 +146,8 @@ export function ContentEngagementProvider({
       favorited,
       onWatchlist,
       resolvedFavoriteApiPath,
+      setToast,
       stats,
-      toast,
     ],
   );
 

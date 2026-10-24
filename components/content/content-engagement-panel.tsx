@@ -24,7 +24,6 @@ export function ContentEngagementPanel({ accent }: ContentEngagementPanelProps) 
     favoriteApiPath,
     stats,
     favorited,
-    toast,
     applyFavorite,
   } = useContentEngagement();
   const statBackground = getAccentStatBackground(accent);
@@ -60,11 +59,6 @@ export function ContentEngagementPanel({ accent }: ContentEngagementPanelProps) 
 
   return (
     <div className="flex flex-col gap-2">
-      {toast ? (
-        <p className="rounded-full bg-brand-magenta/20 px-4 py-1.5 text-center text-xs font-semibold text-brand-pink">
-          {toast}
-        </p>
-      ) : null}
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         {stats.map((stat) => (
           <EngagementStatTile

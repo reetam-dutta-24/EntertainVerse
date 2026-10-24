@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, Trash2 } from "lucide-react";
 import type { MemberRole } from "@/types";
+import { useConfirm } from "@/components/feedback/feedback-provider";
 
 export interface CommunitySettingsDangerZoneProps {
   communitySlug: string;
@@ -20,6 +21,7 @@ export function CommunitySettingsDangerZone({
 }: CommunitySettingsDangerZoneProps) {
   const router = useRouter();
   const [busy, setBusy] = useState<"leave" | "delete" | null>(null);
+  const confirmAction = useConfirm();
   const [error, setError] = useState<string>();
 
   const canLeave =
@@ -28,13 +30,13 @@ export function CommunitySettingsDangerZone({
     viewerRole === "admin";
 
   async function handleLeave() {
-    if (
-      !window.confirm(
-        `Leave ${communityName}? You will need a room code or a new invite to rejoin.`,
-      )
-    ) {
-      return;
-    }
+    const confirmed = await confirmAction({
+      title: `Leave ${communityName}?`,
+      description: "You'll need a room code or a new invite to rejoin.",
+      confirmLabel: "Leave community",
+      destructive: true,
+    });
+    if (!confirmed) return;
     setBusy("leave");
     setError(undefined);
     try {
@@ -64,13 +66,13 @@ export function CommunitySettingsDangerZone({
   }
 
   async function handleDelete() {
-    if (
-      !window.confirm(
-        `Delete ${communityName} permanently? This removes all posts, channels, and members.`,
-      )
-    ) {
-      return;
-    }
+    const confirmed = await confirmAction({
+      title: `Delete ${communityName}?`,
+      description: "This permanently removes every post, channel and member. It can't be undone.",
+      confirmLabel: "Delete community",
+      destructive: true,
+    });
+    if (!confirmed) return;
     setBusy("delete");
     setError(undefined);
     try {

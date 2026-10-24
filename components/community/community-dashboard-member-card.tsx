@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { DmUserAvatar } from "@/components/messages/dm-user-avatar";
 import type { Member, MemberRole } from "@/types";
 import { DEFAULT_AVATAR_COLOR } from "@/lib/brand-colors";
+import { useConfirm } from "@/components/feedback/feedback-provider";
 
 const ROLE_LABELS: Record<MemberRole, string> = {
   owner: "Admin",
@@ -30,6 +31,7 @@ export function CommunityDashboardMemberCard({
 }: CommunityDashboardMemberCardProps) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
+  const confirmAction = useConfirm();
   const [error, setError] = useState<string>();
 
   async function updateRole(nextRole: "moderator" | "member") {
@@ -64,7 +66,13 @@ export function CommunityDashboardMemberCard({
 
   async function removeMember() {
     if (!communitySlug) return;
-    if (!window.confirm(`Remove ${member.name} from this community?`)) return;
+    const confirmed = await confirmAction({
+      title: `Remove ${member.name}?`,
+      description: "They lose access to the community chat, channels and posts. They can rejoin with an invite or room code.",
+      confirmLabel: "Remove member",
+      destructive: true,
+    });
+    if (!confirmed) return;
     setBusy("remove");
     setError(undefined);
     try {

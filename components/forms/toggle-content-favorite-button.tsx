@@ -5,6 +5,7 @@ import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { detailHeroBtnBase, HERO_BTN_INTERACTIVE } from "@/lib/detail-route-ui";
 import { useOptionalContentEngagement } from "@/components/content/content-engagement-context";
+import { useToast } from "@/components/feedback/feedback-provider";
 
 interface ToggleContentFavoriteButtonProps {
   contentSlug: string;
@@ -20,6 +21,7 @@ export function ToggleContentFavoriteButton({
   const engagement = useOptionalContentEngagement();
   const [favorited, setFavorited] = useState(initialFavorited);
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
   const [error, setError] = useState<string>();
 
   async function handleToggle() {
@@ -40,6 +42,7 @@ export function ToggleContentFavoriteButton({
       }
       const nextFavorited = Boolean(data.favorited);
       setFavorited(nextFavorited);
+      toast(nextFavorited ? "Added to favourites" : "Removed from favourites");
       if (engagement && typeof data.favoriteCount === "number") {
         engagement.applyFavorite(data.favoriteCount, nextFavorited);
       }
@@ -49,6 +52,7 @@ export function ToggleContentFavoriteButton({
           ? toggleError.message
           : "Could not update favourites.",
       );
+      toast(toggleError instanceof Error ? toggleError.message : "Could not update favourites.", "error");
     } finally {
       setLoading(false);
     }

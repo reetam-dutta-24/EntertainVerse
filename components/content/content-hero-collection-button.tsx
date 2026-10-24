@@ -37,8 +37,7 @@ export function ContentHeroCollectionButton({
         .catch(() => undefined);
     }
 
-    engagement?.setToast(`Added to ${count} collection${count > 1 ? "s" : ""}!`);
-    window.setTimeout(() => engagement?.setToast(null), 2400);
+    engagement?.setToast(`Added to ${count} collection${count > 1 ? "s" : ""}`);
   }
 
   return (

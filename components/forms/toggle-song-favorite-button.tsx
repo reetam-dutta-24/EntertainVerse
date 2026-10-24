@@ -5,6 +5,7 @@ import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { detailHeroBtnBase } from "@/lib/detail-route-ui";
+import { useToast } from "@/components/feedback/feedback-provider";
 
 interface ToggleSongFavoriteButtonProps {
   songSlug: string;
@@ -20,6 +21,7 @@ export function ToggleSongFavoriteButton({
   const [favorited, setFavorited] = useState(initialFavorited);
   useOnValueChange(initialFavorited, (next) => setFavorited(next));
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
   const [error, setError] = useState<string>();
 
   async function handleToggle() {
@@ -39,12 +41,14 @@ export function ToggleSongFavoriteButton({
         );
       }
       setFavorited(Boolean(data.favorited));
+      toast(data.favorited ? "Added to favourites" : "Removed from favourites");
     } catch (toggleError) {
       setError(
         toggleError instanceof Error
           ? toggleError.message
           : "Could not update favourites.",
       );
+      toast(toggleError instanceof Error ? toggleError.message : "Could not update favourites.", "error");
     } finally {
       setLoading(false);
     }

@@ -5,6 +5,7 @@ import { UserCheck, UserMinus, UserPlus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { detailHeroBtnBase } from "@/lib/detail-route-ui";
 import type { ViewerFriendStatus } from "@/types";
+import { useToast } from "@/components/feedback/feedback-provider";
 
 interface ToggleUserFriendButtonProps {
   handle: string;
@@ -14,6 +15,13 @@ interface ToggleUserFriendButtonProps {
   onFriendCountChange?: (count: number) => void;
   onStatusChange?: (status: ViewerFriendStatus) => void;
 }
+
+
+const FRIEND_STATUS_TOASTS: Partial<Record<ViewerFriendStatus, string>> = {
+  pending_outgoing: "Friend request sent",
+  friends: "You're now friends",
+  none: "Friend removed",
+};
 
 export function ToggleUserFriendButton({
   handle,
@@ -26,6 +34,7 @@ export function ToggleUserFriendButton({
   const [status, setStatus] = useState<ViewerFriendStatus>(initialStatus);
   const [requestId, setRequestId] = useState(incomingFriendRequestId);
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
   const [error, setError] = useState<string>();
 
   function applyResult(data: Record<string, unknown>) {
@@ -33,6 +42,8 @@ export function ToggleUserFriendButton({
       const next = data.friendStatus as ViewerFriendStatus;
       setStatus(next);
       onStatusChange?.(next);
+      const message = FRIEND_STATUS_TOASTS[next];
+      if (message) toast(message);
     } else if (typeof data.following === "boolean") {
       const next = data.following ? "friends" : "none";
       setStatus(next);

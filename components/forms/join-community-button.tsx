@@ -17,6 +17,7 @@ import {
 } from "@/components/forms/form-shell";
 import { cn } from "@/lib/utils";
 import { getCommunityDetailPath } from "@/lib/community-routes";
+import { useToast } from "@/components/feedback/feedback-provider";
 
 type JoinMode = "code" | "public";
 
@@ -29,6 +30,7 @@ export function JoinCommunityButton() {
   const [error, setError] = useState<string>();
   const [success, setSuccess] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   function resetForm() {
     setJoinCode("");
@@ -59,6 +61,7 @@ export function JoinCommunityButton() {
     }
 
     setSuccess("You joined the private community.");
+    toast("Joined community");
     setOpen(false);
     resetForm();
     if (typeof data.slug === "string") {

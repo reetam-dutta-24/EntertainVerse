@@ -4,6 +4,7 @@ import { useState } from "react";
 import { UserCheck, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { detailHeroBtnBase } from "@/lib/detail-route-ui";
+import { useToast } from "@/components/feedback/feedback-provider";
 
 interface ToggleUserFollowButtonProps {
   handle: string;
@@ -20,6 +21,7 @@ export function ToggleUserFollowButton({
 }: ToggleUserFollowButtonProps) {
   const [following, setFollowing] = useState(initialFollowing);
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
   const [error, setError] = useState<string>();
 
   async function handleToggle() {
@@ -39,6 +41,7 @@ export function ToggleUserFollowButton({
         );
       }
       setFollowing(Boolean(data.following));
+      toast(data.following ? "Following" : "Unfollowed");
       if (typeof data.followerCount === "number") {
         onFollowerCountChange?.(data.followerCount);
       }
@@ -48,6 +51,7 @@ export function ToggleUserFollowButton({
           ? toggleError.message
           : "Could not update follow status.",
       );
+      toast(toggleError instanceof Error ? toggleError.message : "Could not update follow status.", "error");
     } finally {
       setLoading(false);
     }

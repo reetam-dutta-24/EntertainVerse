@@ -29,6 +29,7 @@ import {
 import { getOnboardingProfile } from "@/lib/onboarding-store";
 import { ONBOARDING_RETAKE_PATH } from "@/lib/onboarding-routes";
 import { cn } from "@/lib/utils";
+import { useConfirm, useToast } from "@/components/feedback/feedback-provider";
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -67,6 +68,8 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
   const [status, setStatus] = useState<string>();
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
+  const confirmAction = useConfirm();
+  const toast = useToast();
 
   const persistSettings = useCallback(
     async (patch: {
@@ -101,6 +104,7 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
     try {
       await persistSettings({ [section]: { [key]: value } });
       setStatus("Saved");
+      toast("Settings saved");
       window.setTimeout(() => setStatus(undefined), 1500);
     } catch (patchError) {
       setError(
@@ -144,9 +148,13 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
   }
 
   async function handleClearHistory() {
-    if (!window.confirm("Clear all watch and listen history? This cannot be undone.")) {
-      return;
-    }
+    const confirmed = await confirmAction({
+      title: "Clear watch and listen history?",
+      description: "Your history, continue-watching rows and listening stats reset. This can't be undone.",
+      confirmLabel: "Clear history",
+      destructive: true,
+    });
+    if (!confirmed) return;
     setBusy(true);
     setError(undefined);
     try {
@@ -156,6 +164,7 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
       });
       if (!response.ok) throw new Error("Could not clear history.");
       setStatus("Watch history cleared");
+      toast("Watch history cleared");
       window.setTimeout(() => setStatus(undefined), 2000);
     } catch (historyError) {
       setError(
@@ -169,13 +178,13 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
   }
 
   async function handleDeleteAccount() {
-    if (
-      !window.confirm(
-        "Delete your account permanently? All collections, posts, and data will be removed.",
-      )
-    ) {
-      return;
-    }
+    const confirmed = await confirmAction({
+      title: "Delete your account?",
+      description: "All your collections, posts, reviews and data are removed permanently. This can't be undone.",
+      confirmLabel: "Delete account",
+      destructive: true,
+    });
+    if (!confirmed) return;
     setBusy(true);
     setError(undefined);
     try {
