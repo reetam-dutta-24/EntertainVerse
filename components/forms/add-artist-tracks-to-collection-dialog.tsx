@@ -196,7 +196,7 @@ export function AddArtistTracksToCollectionDialog({
   return (
     <FormShell
       open={open}
-      title="Add to Collection"
+      title="Add to collection"
       description={`Add all ${artistName} songs (${trackSlugs.length}) to one or more music playlists.`}
       onClose={onClose}
       className="max-w-md"

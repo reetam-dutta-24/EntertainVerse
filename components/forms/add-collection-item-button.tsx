@@ -131,7 +131,7 @@ export function AddCollectionItemButton({
   const submitLabel =
     selections.length > 1
       ? `Add ${selections.length} Items`
-      : "Add to Collection";
+      : "Add to collection";
 
   return (
     <>
@@ -146,7 +146,7 @@ export function AddCollectionItemButton({
 
       <FormShell
         open={open}
-        title="Add to Collection"
+        title="Add to collection"
         description="Search and pick multiple titles — keep searching to add more before submitting."
         onClose={() => {
           setOpen(false);

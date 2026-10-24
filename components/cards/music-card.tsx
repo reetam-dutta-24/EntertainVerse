@@ -15,7 +15,7 @@ import { HdImage } from "@/components/ui/hd-image";
 
 const CARD_W = 148;
 const CARD_H = 224;
-const HOVER_W = 164;
+const HOVER_W = 176;
 const HOVER_H = 258;
 
 export interface MusicCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -244,7 +244,7 @@ export function MusicCard({
 
             <div className="flex h-[184px] flex-col items-center gap-1.5 bg-black px-2.5 pb-2 pt-2">
               <div className="w-full text-center">
-                <p className="line-clamp-2 text-sm font-semibold leading-tight text-white">
+                <p className="line-clamp-1 text-sm font-semibold leading-tight text-white">
                   {track.title}
                 </p>
                 <p className="line-clamp-1 text-caption font-normal text-muted">
@@ -257,22 +257,24 @@ export function MusicCard({
               </p>
 
               <div className="mt-auto flex w-full flex-col items-center gap-1.5 pt-1">
-                <div className="flex w-full items-center justify-center gap-2">
+                <div className="flex w-full items-center justify-center gap-1.5">
                   <button
                     type="button"
                     onClick={handleListenNow}
-                    className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
+                    aria-label={`Listen to ${track.title} now`}
+                    className="flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-full border border-brand-magenta px-1.5 py-1 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                   >
-                    <Headphones className="size-3.5 text-brand-magenta" />
-                    Listen now
+                    <Headphones className="size-3 shrink-0 text-brand-magenta" />
+                    Listen
                   </button>
                   <button
                     type="button"
                     onClick={handleViewDetails}
-                    className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
+                    aria-label={`View details for ${track.title}`}
+                    className="flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-full border border-brand-magenta px-1.5 py-1 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                   >
-                    <PlayCircle className="size-3.5 text-brand-magenta" />
-                    View details
+                    <PlayCircle className="size-3 shrink-0 text-brand-magenta" />
+                    Details
                   </button>
                 </div>
                 <CardAddToCollectionButton

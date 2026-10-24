@@ -14,7 +14,7 @@ import { HdImage } from "@/components/ui/hd-image";
 
 const CARD_W = 148;
 const CARD_H = 224;
-const HOVER_W = 164;
+const HOVER_W = 176;
 const HOVER_H = 248;
 
 export interface ArtistCardProps extends React.HTMLAttributes<HTMLDivElement> {

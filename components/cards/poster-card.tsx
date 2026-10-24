@@ -30,7 +30,7 @@ export { SLOT_W } from "@/lib/card-dimensions";
 
 const CARD_W = 148;
 const CARD_H = 206;
-const HOVER_W = 164;
+const HOVER_W = 176;
 const HOVER_H = 240;
 
 export interface PosterCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -239,7 +239,7 @@ export function PosterCard({
             </div>
 
             <div className="flex h-[170px] flex-col items-center gap-1.5 bg-black px-2.5 pb-2 pt-2">
-              <p className="line-clamp-2 w-full text-center text-sm font-semibold leading-tight text-white">
+              <p className="line-clamp-1 w-full text-center text-sm font-semibold leading-tight text-white">
                 {item.title}
               </p>
 
@@ -247,29 +247,31 @@ export function PosterCard({
                 {description}
               </p>
 
-              <p className="flex w-full justify-between text-caption font-normal text-white/75">
-                <span>{meta}</span>
-                <span>{year}</span>
+              <p className="flex w-full justify-between gap-2 whitespace-nowrap text-caption font-normal text-white/75">
+                <span className="truncate">{meta}</span>
+                <span className="shrink-0">{year}</span>
               </p>
 
               <div className="mt-auto flex w-full flex-col items-center gap-1.5 pt-1">
                 {!demo ? (
                   <>
-                    <div className="flex w-full items-center justify-center gap-2">
+                    <div className="flex w-full items-center justify-center gap-1.5">
                       <button
                         type="button"
                         onClick={handleWatchNow}
-                        className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
+                        aria-label={`Watch ${item.title} now`}
+                        className="flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-full border border-brand-magenta px-1.5 py-1 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                       >
-                        <PlayCircle className="size-3.5 text-brand-magenta" />
-                        Watch now
+                        <PlayCircle className="size-3 shrink-0 text-brand-magenta" />
+                        Watch
                       </button>
                       <button
                         type="button"
                         onClick={handleViewDetails}
-                        className="cursor-pointer rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
+                        aria-label={`View details for ${item.title}`}
+                        className="flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-full border border-brand-magenta px-1.5 py-1 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                       >
-                        View details
+                        Details
                       </button>
                     </div>
                     {collectionItemKind ? (

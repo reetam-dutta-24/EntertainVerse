@@ -213,12 +213,12 @@ export function AddToCollectionDialog({
   const submitLabel =
     selectedSlugs.length > 1
       ? `Add to ${selectedSlugs.length} Collections`
-      : "Add to Collection";
+      : "Add to collection";
 
   return (
     <FormShell
       open={open}
-      title="Add to Collection"
+      title="Add to collection"
       description={`Choose one or more ${collectionKind === "music" ? "music playlists" : "content collections"} for "${itemTitle}".`}
       onClose={onClose}
       className="max-w-md"
@@ -357,12 +357,12 @@ export function CardAddToCollectionButton({
           setOpen(true);
         }}
         className={cn(
-          "flex w-full cursor-pointer items-center justify-center gap-1 rounded-full border border-brand-purple/70 px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-purple/15",
+          "flex w-full cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-full border border-brand-purple/70 px-2 py-1 text-micro font-normal text-white transition-colors hover:bg-brand-purple/15",
           className,
         )}
       >
-        <FolderPlus className="size-3 text-brand-purple" />
-        Add to Collection
+        <FolderPlus className="size-3 shrink-0 text-brand-purple" />
+        Add to collection
       </button>
 
       <AddToCollectionDialog
