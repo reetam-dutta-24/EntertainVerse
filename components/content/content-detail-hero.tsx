@@ -4,10 +4,7 @@ import { formatRating } from "@/lib/format-rating";
 import { labelForLanguage } from "@/lib/catalog-enums";
 import { resolveMetadataChip } from "@/lib/chip-styles";
 import { isMovieContentType } from "@/lib/content-media";
-import {
-  DETAIL_HERO_BTN_GROUP,
-  DETAIL_HERO_BTN_PAIR,
-} from "@/lib/detail-route-ui";
+import { DETAIL_HERO_BTN_PAIR } from "@/lib/detail-route-ui";
 import {
   getAccentTint,
   getDetailHeroBoundaryGlow,

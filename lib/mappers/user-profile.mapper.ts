@@ -1,5 +1,4 @@
 import type { Review as PrismaReview, User } from "@prisma/client";
-import type { AccentColor } from "@/lib/catalog-enums";
 import { formatCardDate } from "@/lib/format-dates";
 import { roundRating } from "@/lib/format-rating";
 import {

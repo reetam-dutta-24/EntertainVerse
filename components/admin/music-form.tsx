@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useFormDraft } from "@/hooks/use-form-draft";
 import { GradientButton } from "@/components/ui/gradient-button";
@@ -76,18 +77,18 @@ export function MusicForm({ mode, recordId, initial, initialLinked }: MusicFormP
   const linkedSourceLabel =
     initialLinked?.source?.title ?? (form.source?.trim() ? form.source : null);
 
-  useEffect(() => {
-    if (!initialLinked?.artist) return;
-    setArtistSelection(initialLinked.artist);
-  }, [initialLinked?.artist]);
+  useOnValueChange(initialLinked?.artist, (artist) => {
+    if (artist) setArtistSelection(artist);
+  });
 
   useEffect(() => {
     if (artistSelection?.imageUrl || !form.artistSlug) return;
+    const artistSlug = form.artistSlug;
 
     let cancelled = false;
     void (async () => {
       const response = await fetch(
-        `/api/admin/catalog-search?slug=${encodeURIComponent(form.artistSlug)}&type=artist`,
+        `/api/admin/catalog-search?slug=${encodeURIComponent(artistSlug)}&type=artist`,
         { cache: "no-store" },
       );
       if (!response.ok || cancelled) return;

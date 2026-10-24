@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+import { useClientValue } from "@/hooks/use-prop-sync";
 import Link from "next/link";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { signOut } from "next-auth/react";
@@ -53,7 +54,11 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
   const [notifications, setNotifications] = useState(initialData.notifications);
   const [privacy, setPrivacy] = useState(initialData.privacy);
   const [preferences, setPreferences] = useState(initialData.preferences);
-  const [tasteScore, setTasteScore] = useState(initialData.tasteScore);
+  const storedTasteScore = useClientValue(
+    () => getOnboardingProfile(userId)?.recommendations.tasteScore ?? null,
+    null,
+  );
+  const tasteScore = storedTasteScore || initialData.tasteScore;
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -86,13 +91,6 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
     },
     [],
   );
-
-  useEffect(() => {
-    const savedProfile = getOnboardingProfile(userId);
-    if (savedProfile?.recommendations.tasteScore) {
-      setTasteScore(savedProfile.recommendations.tasteScore);
-    }
-  }, [userId]);
 
   async function patchSetting(
     section: "notifications" | "privacy" | "preferences",

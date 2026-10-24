@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { MusicCard } from "@/components/cards/music-card";
 import {
   CarouselCardSlot,
@@ -63,10 +63,6 @@ export function MusicGridSection({
     if (!track) return null;
     return resolveCardTint(track.id, track.accent, tintSeed).glass;
   }, [hoveredId, filtered, tintSeed]);
-
-  useEffect(() => {
-    setPage((current) => Math.min(current, Math.max(0, totalPages - 1)));
-  }, [totalPages]);
 
   return (
     <section className="flex flex-col gap-3">

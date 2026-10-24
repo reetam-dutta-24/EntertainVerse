@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { GradientButton } from "@/components/ui/gradient-button";
@@ -59,12 +60,11 @@ function ReviewFormShell({
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (open) {
-      setValues(initialValues ?? emptyValues());
-      setError(undefined);
-    }
-  }, [open, initialValues]);
+  useOnValueChange(open, (isOpen) => {
+    if (!isOpen) return;
+    setValues(initialValues ?? emptyValues());
+    setError(undefined);
+  });
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

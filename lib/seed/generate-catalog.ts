@@ -77,7 +77,7 @@ function slugify(value: string): string {
     .replace(/^-|-$/g, "");
 }
 
-function pick<T>(arr: T[], index: number): T {
+function pick<T>(arr: readonly T[], index: number): T {
   return arr[index % arr.length]!;
 }
 

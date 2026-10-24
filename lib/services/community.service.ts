@@ -168,7 +168,7 @@ export async function listRecommendedCommunities(
     orderBy: [{ memberCount: "desc" }, { postCount: "desc" }],
     take: limit,
   });
-  return rows.map(mapCommunityToCardWithMembers);
+  return rows.map((row) => mapCommunityToCardWithMembers(row));
 }
 
 export async function listMostActiveCommunities(
@@ -734,7 +734,7 @@ export async function getCommunityDetailBySlug(
       online: true,
       joinedAt: undefined,
     })),
-    collections: collections.map(mapCollectionToCard),
+    collections: collections.map((row) => mapCollectionToCard(row)),
     similarCommunities: similarRows.map(mapCommunityToCard),
     watchedMost,
     trending,

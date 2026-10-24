@@ -29,7 +29,7 @@ export function getLyricWindow(
 
   const half = Math.floor(maxLines / 2);
   let start = Math.max(0, activeIndex - half);
-  let end = Math.min(lyrics.length, start + maxLines);
+  const end = Math.min(lyrics.length, start + maxLines);
   start = Math.max(0, end - maxLines);
 
   return lyrics.slice(start, end).map((text, offset) => {

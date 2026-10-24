@@ -20,7 +20,7 @@ const voiceChannelInclude = {
   members: {
     include: {
       user: {
-        select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+        select: { id: true, name: true, handle: true, avatarColor: true, avatarUrl: true },
       },
     },
     orderBy: { joinedAt: "asc" as const },
@@ -47,7 +47,7 @@ const watchChannelInclude = {
   members: {
     include: {
       user: {
-        select: { id: true, name: true, avatarColor: true, avatarUrl: true },
+        select: { id: true, name: true, handle: true, avatarColor: true, avatarUrl: true },
       },
     },
     orderBy: { joinedAt: "asc" as const },

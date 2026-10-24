@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
  */
 export const DETAIL_HERO_BTN_WIDTH = "w-[138px]";
 
-export function detailHeroBtnBase(className?: string) {
+export function detailHeroBtnBase(...classNames: (string | undefined)[]) {
   return cn(
     DETAIL_HERO_BTN_WIDTH,
     "inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-full px-2.5 text-[10px] font-semibold leading-tight sm:h-10 sm:px-3 sm:text-[11px]",
-    className,
+    ...classNames,
   );
 }
 

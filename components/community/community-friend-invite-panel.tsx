@@ -27,8 +27,8 @@ export function CommunityFriendInvitePanel({
   const [error, setError] = useState<string>();
   const [status, setStatus] = useState<string>();
 
+  // `loading` starts true; this only runs on mount / when the community changes.
   const loadFriends = useCallback(async () => {
-    setLoading(true);
     try {
       const response = await fetch(
         `/api/communities/${encodeURIComponent(communitySlug)}/invite-friends`,
@@ -51,6 +51,8 @@ export function CommunityFriendInvitePanel({
   }, [communitySlug]);
 
   useEffect(() => {
+    // State updates in loadFriends all happen after its first await.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadFriends();
   }, [loadFriends]);
 

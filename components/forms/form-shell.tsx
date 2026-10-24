@@ -1,6 +1,7 @@
 "use client";
 
-import { Children, cloneElement, isValidElement, useEffect, useState } from "react";
+import { Children, cloneElement, isValidElement, useEffect } from "react";
+import { useIsClient } from "@/hooks/use-prop-sync";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -22,11 +23,7 @@ export function FormShell({
   children,
   className,
 }: FormShellProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsClient();
 
   useEffect(() => {
     if (!open) return;

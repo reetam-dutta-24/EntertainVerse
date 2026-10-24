@@ -1,10 +1,7 @@
 "use client";
-
 import Link from "next/link";
 import { PlayCircle } from "lucide-react";
 import { getCollectionPlayPath } from "@/lib/collection-routes";
-import { getContentDetailPath } from "@/lib/content-routes";
-import { getSongDetailPath } from "@/lib/song-routes";
 import {
   COLLECTION_MEDIA_COPY,
   type CollectionMediaVariant,

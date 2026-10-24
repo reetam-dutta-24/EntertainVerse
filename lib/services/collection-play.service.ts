@@ -53,7 +53,7 @@ const collectionPlayInclude = {
         include: {
           genres: { include: { genre: true } },
           episodes: {
-            orderBy: [{ seasonNumber: "asc" }, { number: "asc" }],
+            orderBy: [{ seasonNumber: "asc" as const }, { number: "asc" as const }],
             take: 1,
             select: { id: true },
           },

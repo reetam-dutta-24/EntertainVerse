@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { PosterCard } from "@/components/cards/poster-card";
 import {
   CarouselCardSlot,
@@ -65,10 +65,6 @@ export function WatchlistGridSection({
     if (!item) return null;
     return resolveCardTint(item.id, item.accent, tintSeed).glass;
   }, [hoveredId, filtered, tintSeed]);
-
-  useEffect(() => {
-    setPage((current) => Math.min(current, Math.max(0, totalPages - 1)));
-  }, [totalPages, itemsPerPage]);
 
   return (
     <section className="flex flex-col gap-3">

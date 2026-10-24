@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { useSearchParams } from "next/navigation";
 import { io, type Socket } from "socket.io-client";
 import { getSocketUrl } from "@/lib/env/socket";
@@ -104,17 +105,23 @@ export function DashboardMessagesPanel() {
   }, []);
 
   useEffect(() => {
+    // loadConversations only sets state after awaiting the network.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadConversations().finally(() => setLoading(false));
   }, [loadConversations]);
 
-  useEffect(() => {
-    if (!targetHandle || conversations.length === 0) return;
-    const match = conversations.find((entry) => entry.peer.handle === targetHandle);
-    if (match) setActiveId(match.id);
-  }, [targetHandle, conversations]);
+  // Open the conversation named in ?user= once it shows up in the list.
+  const targetConversationId = targetHandle
+    ? conversations.find((entry) => entry.peer.handle === targetHandle)?.id
+    : undefined;
+  useOnValueChange(targetConversationId, (id) => {
+    if (id) setActiveId(id);
+  });
 
   useEffect(() => {
     if (!activeId) return;
+    // loadMessages only sets state after awaiting the network.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadMessages(activeId);
 
     const socket = io(getSocketUrl(), {

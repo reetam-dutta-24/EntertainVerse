@@ -56,7 +56,7 @@ export async function getAllCollections(userId: string): Promise<Collection[]> {
 }
 
 export async function getGlobalPublicCollections(
-  userId: string,
+  userId = "",
 ): Promise<Collection[]> {
   return listDiscoverablePublicCollections(userId, 15);
 }

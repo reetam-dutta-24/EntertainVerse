@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MusicCard } from "@/components/cards/music-card";
 import {
@@ -75,10 +75,6 @@ export function MusicCarouselSection({
     if (!track) return null;
     return resolveCardTint(track.id, track.accent, tintSeed).glass;
   }, [hoveredId, filtered, tintSeed]);
-
-  useEffect(() => {
-    setPage((current) => Math.min(current, Math.max(0, totalPages - 1)));
-  }, [totalPages, itemsPerPage]);
 
   function goTo(next: number) {
     const wrapped =

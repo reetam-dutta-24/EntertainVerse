@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { ContentCarouselSection } from "@/components/content/content-carousel-section";
 import { ContentReviewCard } from "@/components/content/content-review-card";
 import {
@@ -37,10 +38,7 @@ export function InteractiveReviewSection({
   className,
 }: InteractiveReviewSectionProps) {
   const [reviews, setReviews] = useState(initialReviews);
-
-  useEffect(() => {
-    setReviews(initialReviews);
-  }, [initialReviews]);
+  useOnValueChange(initialReviews, (next) => setReviews(next));
 
   const ownReview = useMemo(
     () =>

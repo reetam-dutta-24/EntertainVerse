@@ -88,10 +88,6 @@ export function ProfileActivityCarouselSection({
     return resolveCardTint(entry.track.id, entry.track.accent, tintSeed).glass;
   }, [hoveredId, filtered, tintSeed]);
 
-  useEffect(() => {
-    setPage((current) => Math.min(current, Math.max(0, totalPages - 1)));
-  }, [totalPages, itemsPerPage]);
-
   function goTo(next: number) {
     if (totalPages <= 0) return;
     const wrapped = ((next % totalPages) + totalPages) % totalPages;

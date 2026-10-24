@@ -1,12 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireUserApi } from "@/lib/api-auth";
-import {
-  FollowForbiddenError,
-  FollowNotFoundError,
-  isFollowForbidden,
-  isFollowNotFound,
-  toggleUserFollow,
-} from "@/lib/services/follow.service";
+import { isFollowForbidden, isFollowNotFound, toggleUserFollow } from "@/lib/services/follow.service";
 
 interface RouteContext {
   params: Promise<{ handle: string }>;

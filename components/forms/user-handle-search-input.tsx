@@ -32,20 +32,19 @@ export function UserHandleSearchInput({
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<UserSearchResult[]>([]);
+  const [fetching, setLoading] = useState(false);
+  const [fetchedResults, setResults] = useState<UserSearchResult[]>([]);
+  const queryActive = value.trim().length >= 2;
+  const results = queryActive ? fetchedResults : [];
+  const loading = queryActive && fetching;
   const [activeIndex, setActiveIndex] = useState(-1);
 
   useEffect(() => {
     const q = value.trim();
-    if (q.length < 2) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
+    if (q.length < 2) return;
 
-    setLoading(true);
     const timer = window.setTimeout(async () => {
+      setLoading(true);
       try {
         const response = await fetch(
           `/api/users/search?q=${encodeURIComponent(q)}&limit=8`,

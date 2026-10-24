@@ -72,9 +72,9 @@ export function ScrollFadeIn({
 
   if (reduceMotion) {
     return (
-      <div className={className} {...props}>
+      <motion.div className={className} {...props}>
         {children}
-      </div>
+      </motion.div>
     );
   }
 
@@ -116,9 +116,9 @@ export function ScrollFadeStagger({
 
   if (reduceMotion) {
     return (
-      <div className={className} {...props}>
+      <motion.div className={className} {...props}>
         {children}
-      </div>
+      </motion.div>
     );
   }
 
@@ -158,9 +158,9 @@ export function ScrollFadeItem({
 
   if (reduceMotion) {
     return (
-      <div className={className} {...props}>
+      <motion.div className={className} {...props}>
         {children}
-      </div>
+      </motion.div>
     );
   }
 

@@ -1,4 +1,4 @@
-import { labelForArtistGenre, labelForLanguage, labelForSongGenre } from "@/lib/catalog-enums";
+import { labelForLanguage, labelForSongGenre } from "@/lib/catalog-enums";
 import type { TrackRecordFull } from "@/lib/services/music.service";
 import type {
   AccentColor,

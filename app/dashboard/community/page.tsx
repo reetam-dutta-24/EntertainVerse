@@ -25,7 +25,7 @@ export default async function CommunityPage() {
       getFavouriteCommunities(user.id),
       getMostActiveCommunities(user.id),
       getRecommendedCommunities(user.id),
-      getGlobalCommunities(user.id),
+      getGlobalCommunities(),
     ]);
 
   return (

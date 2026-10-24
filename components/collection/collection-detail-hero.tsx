@@ -128,7 +128,7 @@ export function CollectionDetailHero({
             />
             {collection.visibility === "public" ? (
               <CollectionFollowerCountChip
-                initialCount={collection.followerCount}
+                initialCount={collection.followerCount ?? 0}
                 className={DETAIL_CHIP}
               />
             ) : null}

@@ -96,7 +96,7 @@ export function CollectionForm({ mode, recordId, initial }: CollectionFormProps)
   }
 
   function handleKindChange(kind: AdminCollectionFormInput["kind"]) {
-    const allowed = new Set(
+    const allowed = new Set<string>(
       (kind === "music" ? SONG_GENRE_OPTIONS : CONTENT_GENRE_OPTIONS).map(
         (option) => option.value,
       ),

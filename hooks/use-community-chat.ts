@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { io, type Socket } from "socket.io-client";
 import type { CommunityChatChannelId } from "@/lib/community-chat";
 import { getSocketUrl } from "@/lib/env/socket";
@@ -39,15 +40,16 @@ export function useCommunityChat({
   const [error, setError] = useState<string>();
   const socketRef = useRef<Socket | null>(null);
 
-  useEffect(() => {
-    if (!enabled) {
-      setLoading(false);
-      return;
-    }
-
-    let cancelled = false;
+  // Reset the loading/error state whenever the chat target changes.
+  useOnValueChange(`${communitySlug}|${channel}|${viewerUserId}|${enabled}`, () => {
     setLoading(true);
     setError(undefined);
+  });
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    let cancelled = false;
 
     fetch(
       `/api/communities/${encodeURIComponent(communitySlug)}/chat?channel=${encodeURIComponent(channel)}`,
@@ -85,10 +87,7 @@ export function useCommunityChat({
   }, [communitySlug, channel, enabled, viewerUserId]);
 
   useEffect(() => {
-    if (!enabled) {
-      setConnected(false);
-      return;
-    }
+    if (!enabled) return;
 
     const socket = io(getSocketUrl(), {
       path: "/api/socket/io",
@@ -239,8 +238,8 @@ export function useCommunityChat({
 
   return {
     messages,
-    loading,
-    connected,
+    loading: enabled && loading,
+    connected: enabled && connected,
     error,
     sendMessage,
     updateMessage,

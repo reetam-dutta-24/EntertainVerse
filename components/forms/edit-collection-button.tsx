@@ -1,6 +1,7 @@
 "use client";
 
-import { cloneElement, isValidElement, useEffect, useState } from "react";
+import { cloneElement, isValidElement, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { Pencil } from "lucide-react";
 import { GradientButton } from "@/components/ui/gradient-button";
@@ -82,8 +83,8 @@ export function EditCollectionButton({
     );
   }
 
-  useEffect(() => {
-    if (!open) return;
+  useOnValueChange(open, (isOpen) => {
+    if (!isOpen) return;
     setName(collection.name);
     setDescription(collection.description ?? "");
     setCategory(
@@ -95,7 +96,7 @@ export function EditCollectionButton({
     setAccent(collection.accent ?? "blue");
     setImageUrl(collection.imageUrl ?? "");
     setError(undefined);
-  }, [open, collection]);
+  });
 
   function handleOpen(next: boolean) {
     setOpen(next);

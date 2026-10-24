@@ -1,13 +1,6 @@
 "use client";
-
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { formatEngagementCount } from "@/lib/services/content.service";
 import type { ContentEngagementStat } from "@/types";
 
@@ -74,13 +67,10 @@ export function ContentEngagementProvider({
   children,
 }: ContentEngagementProviderProps) {
   const [stats, setStats] = useState(initialStats);
+  useOnValueChange(initialStats, (next) => setStats(next));
   const [favorited, setFavorited] = useState(initialFavorited);
   const [onWatchlist, setOnWatchlist] = useState(initialOnWatchlist);
   const [toast, setToast] = useState<string | null>(null);
-
-  useEffect(() => {
-    setStats(initialStats);
-  }, [initialStats]);
 
   const resolvedFavoriteApiPath =
     favoriteApiPath ?? `/api/content/${encodeURIComponent(contentSlug)}/favorite`;

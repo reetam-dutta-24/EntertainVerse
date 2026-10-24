@@ -1,4 +1,4 @@
-import type { Collection, Community, ContentItem, MusicTrack } from "@/types";
+import type { ContentItem, MusicTrack } from "@/types";
 import { getArtistDetail } from "@/lib/data/artist-detail";
 import { getGlobalCommunities } from "@/lib/data/community";
 import { getGlobalPublicCollections } from "@/lib/data/collections";

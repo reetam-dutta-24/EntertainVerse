@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProfileFriendsPath, getProfilePath } from "@/lib/profile-routes";
+import { getProfilePath } from "@/lib/profile-routes";
 import { getOptionalUser } from "@/lib/data/user";
 import { getUserDetail } from "@/lib/data/user-detail";
 import { listUserFriends } from "@/lib/services/follow.service";

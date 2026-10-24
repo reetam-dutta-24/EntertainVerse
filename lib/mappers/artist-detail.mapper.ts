@@ -10,7 +10,6 @@ import type {
   Review,
 } from "@/types";
 import { buildArtistReferenceUrl } from "@/lib/content-reference-url";
-import { formatEngagementCount } from "@/lib/services/content.service";
 import { roundRating } from "@/lib/format-rating";
 import { mapTrackToMusicTrack } from "./music.mapper";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import type { AccentColor, ContentSeason, Episode } from "@/types";
 import { ContentEpisodeCard } from "@/components/content/content-episode-card";
@@ -40,18 +40,12 @@ export function ContentEpisodeSection({
     [seasons, episodes],
   );
 
-  const [seasonId, setSeasonId] = useState(
+  const [selectedSeasonId, setSeasonId] = useState(
     () => effectiveSeasons[0]?.id ?? "season-1",
   );
-
-  useEffect(() => {
-    if (
-      effectiveSeasons.length > 0 &&
-      !effectiveSeasons.some((season) => season.id === seasonId)
-    ) {
-      setSeasonId(effectiveSeasons[0]!.id);
-    }
-  }, [effectiveSeasons, seasonId]);
+  const seasonId = effectiveSeasons.some((season) => season.id === selectedSeasonId)
+    ? selectedSeasonId
+    : (effectiveSeasons[0]?.id ?? selectedSeasonId);
 
   const filtered = useMemo(() => {
     const selectedSeason = effectiveSeasons.find(

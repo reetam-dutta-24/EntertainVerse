@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { PlayCircle } from "lucide-react";
 import { getArtistPlayPath } from "@/lib/artist-routes";
 import { formatEngagementCount } from "@/lib/services/content.service";
@@ -47,10 +48,7 @@ export function ArtistNowPlayingPanel({
   const [collectionDialogOpen, setCollectionDialogOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>();
   const [liveFollowerCount, setLiveFollowerCount] = useState(followerCount);
-
-  useEffect(() => {
-    setLiveFollowerCount(followerCount);
-  }, [followerCount]);
+  useOnValueChange(followerCount, (next) => setLiveFollowerCount(next));
 
   useEffect(() => {
     if (!statusMessage) return;

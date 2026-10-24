@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { CommunityCard } from "@/components/cards/community-card";
 import { PaginationDots } from "@/components/dashboard/pagination-dots";
 import { SearchPill } from "@/components/dashboard/search-pill";
@@ -49,10 +49,6 @@ export function CommunityGridSection({
     safePage * itemsPerPage + itemsPerPage,
   );
   const emptySlots = Math.max(0, itemsPerPage - pageItems.length);
-
-  useEffect(() => {
-    setPage((current) => Math.min(current, Math.max(0, totalPages - 1)));
-  }, [totalPages, itemsPerPage]);
 
   return (
     <section className="flex flex-col gap-3 sm:gap-4">

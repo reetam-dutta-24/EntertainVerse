@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { PrismaClient, PlatformRole } from "@prisma/client";
+import { PrismaClient, PlatformRole, type Prisma } from "@prisma/client";
 import {
   buildWatchlistForUser,
   COLLECTION_SEEDS,
@@ -330,7 +330,7 @@ async function seedArtists() {
       label: item.label ?? null,
       debutYear: item.debutYear ?? null,
       isGroup: item.isGroup ?? false,
-    } as Parameters<typeof prisma.artist.upsert>[0]["create"];
+    } as unknown as Omit<Prisma.ArtistUncheckedCreateInput, "slug">;
 
     const artist = await prisma.artist.create({
       data: { slug: item.slug, ...data },
@@ -392,7 +392,7 @@ async function seedMusic(
       featuredRank: item.featuredRank ?? null,
       artistId,
       contentId,
-    } as Parameters<typeof prisma.musicTrack.upsert>[0]["create"];
+    } as unknown as Omit<Prisma.MusicTrackUncheckedCreateInput, "slug">;
 
     const track = await prisma.musicTrack.create({
       data: { slug: item.slug, ...data },

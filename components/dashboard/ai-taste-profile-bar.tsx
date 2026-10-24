@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {  } from "react";
+import { useClientValue } from "@/hooks/use-prop-sync";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useSession } from "next-auth/react";
 import { getOnboardingProfile } from "@/lib/onboarding-store";
@@ -15,14 +16,11 @@ export function AiTasteProfileBar({ score: fallbackScore }: AiTasteProfileBarPro
   const router = useAppRouter();
   const { data: session } = useSession();
   const userId = session?.user?.id;
-  const [score, setScore] = useState(fallbackScore);
-
-  useEffect(() => {
-    const profile = getOnboardingProfile(userId);
-    if (profile?.recommendations.tasteScore) {
-      setScore(profile.recommendations.tasteScore);
-    }
-  }, [userId]);
+  const storedScore = useClientValue(
+    () => getOnboardingProfile(userId)?.recommendations.tasteScore ?? null,
+    null,
+  );
+  const score = storedScore || fallbackScore;
 
   return (
     <section className="flex flex-col gap-4 rounded-2xl bg-glass-purple px-4 py-4 shadow-card-inner sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-6">

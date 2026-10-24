@@ -1,6 +1,6 @@
 "use client";
-
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { MusicCard } from "@/components/cards/music-card";
 import { PosterCard } from "@/components/cards/poster-card";
@@ -69,9 +69,7 @@ export function ProfileHeroActivitySlider({
     );
   }
 
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [query]);
+  useOnValueChange(query, () => setActiveIndex(0));
 
   const advanceSlide = useCallback(() => {
     setActiveIndex((current) => (current + 1) % filtered.length);

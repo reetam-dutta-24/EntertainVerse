@@ -1,19 +1,9 @@
-import type {
-  Character,
-  Collection,
-  Community,
-  ContentDetail,
-  MusicTrack,
-  Review,
-  UserSummary,
-} from "@/types";
+import type { Collection, Community, ContentDetail, MusicTrack, Review, UserSummary } from "@/types";
 import { buildSongReferenceUrl } from "@/lib/content-reference-url";
-import { formatDetailSynopsis } from "@/lib/data/content-detail";
 import { normalizeSongSlug } from "@/lib/song-routes";
 import { mapTrackRecordToSongDetail } from "@/lib/mappers/song-detail.mapper";
 import { mapArtistToContentItem } from "@/lib/mappers/artist.mapper";
 import { mapContentToItem } from "@/lib/mappers/content.mapper";
-import { mapTrackToMusicTrack } from "@/lib/mappers/music.mapper";
 import type { TrackRecordFull } from "@/lib/services/music.service";
 import {
   getTrackEngagementStats,
@@ -401,7 +391,6 @@ export async function getSongDetail(
       await Promise.all([
         getTrackEngagementStats(record.id),
         findSimilarTracks({
-          id: record.id,
           slug: record.slug,
           artistId: record.artistId,
           artist: record.artist,

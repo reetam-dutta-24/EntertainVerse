@@ -102,7 +102,7 @@ export function CommunityDashboardMemberCard({
         <div className="relative shrink-0">
           <DmUserAvatar
             name={member.name}
-            avatarColor={member.avatarColor}
+            avatarColor={member.avatarColor ?? "#ff00cc"}
             avatarUrl={member.avatarUrl}
             size="sm"
           />

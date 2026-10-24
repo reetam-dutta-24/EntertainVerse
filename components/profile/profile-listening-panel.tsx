@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import { Pencil } from "lucide-react";
@@ -17,12 +16,7 @@ import { MessageUserButton } from "@/components/forms/message-user-button";
 import { ShareUrlButton } from "@/components/ui/share-url-button";
 import { AvatarStack } from "@/components/ui/avatar-stack";
 import { Chip } from "@/components/ui/chip";
-import type {
-  ProfileCurrentlyWatching,
-  ProfileNowListening,
-  UserProfileDetail,
-  UserSummary,
-} from "@/types";
+import type { UserProfileDetail } from "@/types";
 
 const ACCENT_LINK =
   "font-semibold text-[#4FD1C5] underline decoration-[#4FD1C5]/80 underline-offset-2 transition-colors hover:text-[#6ee7d8]";

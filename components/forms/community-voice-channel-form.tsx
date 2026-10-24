@@ -1,6 +1,6 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { GradientButton } from "@/components/ui/gradient-button";
@@ -124,10 +124,10 @@ export function VoiceChannelActions({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
 
-  useEffect(() => {
-    setTitle(channel.title);
-    setMemberLimit(String(channel.memberLimit ?? 10));
-  }, [channel]);
+  useOnValueChange(channel, (next) => {
+    setTitle(next.title);
+    setMemberLimit(String(next.memberLimit ?? 10));
+  });
 
   async function handleJoinToggle() {
     setLoading(true);

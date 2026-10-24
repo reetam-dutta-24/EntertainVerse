@@ -1,4 +1,4 @@
-import type { AccentColor, CatalogLanguage, ContentGenre } from "@/lib/catalog-enums";
+import type { AccentColor } from "@/lib/catalog-enums";
 import type { ContentSeedBase } from "./helpers";
 import { contentImageUrl } from "./content-images";
 
@@ -62,7 +62,6 @@ function franchise(
       {
         type: "movie",
         bannerKey,
-        genreLabels: shared.genreLabels ?? film.genreLabels,
         accent: film.accent ?? shared.accent,
         country: film.country ?? shared.country,
         studio: film.studio ?? shared.studio,

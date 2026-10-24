@@ -6,7 +6,6 @@ import type {
   User,
 } from "@prisma/client";
 import { formatCardDate, formatPostedAt, formatRelativeTime } from "@/lib/format-dates";
-import { mapCollectionToCard } from "@/lib/mappers/collection.mapper";
 import type {
   AccentColor,
   ActivityLevel,

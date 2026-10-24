@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAppRouter } from "@/hooks/use-app-router";
@@ -38,8 +39,11 @@ export function GlobalSearch({
   const rootRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState(initialQuery);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [fetching, setLoading] = useState(false);
+  const [fetchedResults, setResults] = useState<SearchResult[]>([]);
+  const queryActive = query.trim().length >= 2;
+  const results = queryActive ? fetchedResults : [];
+  const loading = queryActive && fetching;
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const submitSearch = useCallback(
@@ -52,24 +56,19 @@ export function GlobalSearch({
     [router],
   );
 
-  useEffect(() => {
-    if (pathname === "/search") {
-      setQuery(searchParams.get("q") ?? "");
-      return;
-    }
-    if (initialQuery) setQuery(initialQuery);
-  }, [pathname, searchParams, initialQuery]);
+  // Keep the box in sync with the URL on /search, or with a new initial query elsewhere.
+  const externalQuery =
+    pathname === "/search" ? (searchParams.get("q") ?? "") : initialQuery || null;
+  useOnValueChange(externalQuery, (next) => {
+    if (next !== null) setQuery(next);
+  });
 
   useEffect(() => {
     const q = query.trim();
-    if (q.length < 2) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
+    if (q.length < 2) return;
 
-    setLoading(true);
     const timer = window.setTimeout(async () => {
+      setLoading(true);
       try {
         const res = await fetch(
           `/api/search?q=${encodeURIComponent(q)}&limit=8`,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ArtistCard } from "@/components/cards/artist-card";
 import { PosterCard } from "@/components/cards/poster-card";
@@ -80,10 +80,6 @@ export function ContentCarouselSection({
     if (!item) return null;
     return resolveCardTint(item.id, item.accent, tintSeed).glass;
   }, [hoveredId, filtered, tintSeed]);
-
-  useEffect(() => {
-    setPage((current) => Math.min(current, Math.max(0, totalPages - 1)));
-  }, [totalPages, itemsPerPage]);
 
   function goTo(next: number) {
     const wrapped =

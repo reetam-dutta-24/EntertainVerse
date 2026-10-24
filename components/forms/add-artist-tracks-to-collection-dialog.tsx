@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { Check, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -55,14 +56,17 @@ export function AddArtistTracksToCollectionDialog({
     [collections, searchQuery],
   );
 
-  useEffect(() => {
-    if (!open) return;
-
+  useOnValueChange(open, (isOpen) => {
+    if (!isOpen) return;
     setError(undefined);
     setNotice(undefined);
     setSelectedSlugs([]);
     setSearchQuery("");
     setLoadingList(true);
+  });
+
+  useEffect(() => {
+    if (!open) return;
 
     fetch("/api/collections?scope=mine&kind=music")
       .then(async (response) => {

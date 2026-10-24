@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import Link from "next/link";
 import { useAppRouter } from "@/hooks/use-app-router";
 import {
@@ -56,12 +57,14 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeEpisodeId, setActiveEpisodeId] = useState(session.currentEpisodeId);
+  useOnValueChange(session.currentEpisodeId, (next) => setActiveEpisodeId(next));
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.85);
   const [muted, setMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
+  const controlsVisible = showControls || !isPlaying;
 
   const theme = useMemo(() => getPlayAccentTheme(session.accent), [session.accent]);
   const fairyGlow = useMemo(() => getPlayFairyInnerGlow(session.accent), [session.accent]);
@@ -91,10 +94,6 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
       setDuration(video.duration);
     }
   }, []);
-
-  useEffect(() => {
-    setActiveEpisodeId(session.currentEpisodeId);
-  }, [session.currentEpisodeId]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -157,15 +156,9 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
   }, [muted, volume]);
 
   useEffect(() => {
-    let timer: number | undefined;
-    if (isPlaying) {
-      timer = window.setTimeout(() => setShowControls(false), 2800);
-    } else {
-      setShowControls(true);
-    }
-    return () => {
-      if (timer) window.clearTimeout(timer);
-    };
+    if (!isPlaying) return;
+    const timer = window.setTimeout(() => setShowControls(false), 2800);
+    return () => window.clearTimeout(timer);
   }, [isPlaying, progress]);
 
   async function togglePlayback() {
@@ -317,7 +310,7 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
           <div
             className={cn(
               "pointer-events-none absolute inset-0 z-[4] bg-gradient-to-t from-black/85 via-transparent to-black/35 transition-opacity duration-500",
-              showControls || !videoUrl ? "opacity-100" : "opacity-0",
+              controlsVisible || !videoUrl ? "opacity-100" : "opacity-0",
             )}
           />
 
@@ -325,7 +318,7 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
             <div
               className={cn(
                 "absolute inset-x-0 bottom-0 z-10 space-y-3 p-4 transition-opacity duration-500",
-                showControls ? "opacity-100" : "opacity-0",
+                controlsVisible ? "opacity-100" : "opacity-0",
               )}
             >
               <input

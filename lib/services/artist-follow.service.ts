@@ -72,8 +72,9 @@ export async function getArtistFollowerPreview(artistSlug: string) {
       followers: [] as {
         id: string;
         name: string;
+        handle: string;
         avatarColor: string;
-        avatarUrl: string | null;
+        avatarUrl?: string;
       }[],
       summary: undefined as string | undefined,
     };
@@ -100,8 +101,9 @@ export async function getArtistFollowerPreview(artistSlug: string) {
   const followers = recentFollows.map((row) => ({
     id: row.handle,
     name: row.handle,
+    handle: row.handle,
     avatarColor: row.avatarColor,
-    avatarUrl: row.avatarUrl,
+    avatarUrl: row.avatarUrl ?? undefined,
   }));
 
   const visibleNames = followers.map((user) => user.name);

@@ -1,6 +1,7 @@
 "use client";
 
-import { cloneElement, isValidElement, useEffect, useState } from "react";
+import { cloneElement, isValidElement, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { Pencil } from "lucide-react";
 import { GradientButton } from "@/components/ui/gradient-button";
@@ -62,8 +63,8 @@ export function EditCommunityButton({
   const [error, setError] = useState<string>();
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!open) return;
+  useOnValueChange(open, (isOpen) => {
+    if (!isOpen) return;
     setName(community.name);
     setDescription(community.description ?? "");
     setCategory(
@@ -78,7 +79,7 @@ export function EditCommunityButton({
       community.memberLimit != null ? String(community.memberLimit) : "50",
     );
     setError(undefined);
-  }, [open, community]);
+  });
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

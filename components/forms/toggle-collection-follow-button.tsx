@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { cn } from "@/lib/utils";
 import { detailHeroBtnBase } from "@/lib/detail-route-ui";
 import { emitCollectionFollowerCount } from "@/components/collection/collection-follower-count-chip";
@@ -21,12 +22,9 @@ export function ToggleCollectionFollowButton({
   onStatusChange,
 }: ToggleCollectionFollowButtonProps) {
   const [following, setFollowing] = useState(initialFollowing);
+  useOnValueChange(initialFollowing, (next) => setFollowing(next));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
-
-  useEffect(() => {
-    setFollowing(initialFollowing);
-  }, [initialFollowing]);
 
   async function handleToggle() {
     setLoading(true);

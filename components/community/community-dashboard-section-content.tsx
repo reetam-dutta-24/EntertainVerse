@@ -1,5 +1,6 @@
 "use client";
 
+import { CommunityDashboardFeedPost } from "@/components/community/community-dashboard-feed-post";
 import { cn } from "@/lib/utils";
 import { getAccentStyle } from "@/lib/accents";
 import { AvatarStack } from "@/components/ui/avatar-stack";

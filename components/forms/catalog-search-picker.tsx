@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { createPortal } from "react-dom";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -70,10 +71,10 @@ function CatalogSearchInput({
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [fetching, setLoading] = useState(false);
+  const [fetchedResults, setResults] = useState<SearchResult[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [searchError, setSearchError] = useState<string | null>(null);
+  const [fetchError, setSearchError] = useState<string | null>(null);
   const [panelRect, setPanelRect] = useState<{
     top: number;
     left: number;
@@ -82,29 +83,29 @@ function CatalogSearchInput({
   const allowedTypesKey = useMemo(() => allowedTypes.join(","), [allowedTypes]);
   const excludeIdsKey = useMemo(() => excludeIds.join(","), [excludeIds]);
   const canBrowse = adminSearch && browseOnFocus && query.trim().length === 0;
+  // Non-admin search needs 2+ characters; shorter queries show nothing.
+  const queryActive = adminSearch || query.trim().length >= 2;
+  const results = queryActive ? fetchedResults : [];
+  const loading = queryActive && fetching;
+  const searchError = queryActive ? fetchError : null;
 
   useEffect(() => {
     if (autoFocus) inputRef.current?.focus();
   }, [autoFocus]);
 
-  useEffect(() => {
-    if (dismissSignal > 0) setOpen(false);
-  }, [dismissSignal]);
+  useOnValueChange(dismissSignal, (signal) => {
+    if (signal > 0) setOpen(false);
+  });
 
   useEffect(() => {
     const q = query.trim();
     const minLength = adminSearch ? 0 : 2;
-    if (!adminSearch && q.length < minLength) {
-      setResults([]);
-      setLoading(false);
-      setSearchError(null);
-      return;
-    }
+    if (!adminSearch && q.length < minLength) return;
 
-    setLoading(true);
-    setSearchError(null);
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
+      setLoading(true);
+      setSearchError(null);
       try {
         const limit = adminSearch ? Math.max(resultLimit, 24) : resultLimit;
         const params = new URLSearchParams({
@@ -461,8 +462,6 @@ export function CatalogMultiSearchPicker({
   resultLimit = 12,
 }: CatalogMultiSearchPickerProps) {
   const pickerRef = useRef<HTMLDivElement>(null);
-  const typeHintsRef = useRef(typeHints);
-  typeHintsRef.current = typeHints;
 
   const [labels, setLabels] = useState<Record<string, CatalogPickerSelection>>({});
   const [duplicateNotice, setDuplicateNotice] = useState<string>();
@@ -478,7 +477,7 @@ export function CatalogMultiSearchPicker({
     if (source[id]) return source[id];
     return {
       id,
-      type: typeHintsRef.current[id] ?? allowedTypes[0]!,
+      type: typeHints[id] ?? allowedTypes[0]!,
       title: id,
     };
   }
@@ -490,21 +489,6 @@ export function CatalogMultiSearchPicker({
     onChange(nextValues);
     onSelectionsChange?.(nextValues.map((id) => resolveSelection(id, nextLabels)));
   }
-
-  useEffect(() => {
-    setLabels((current) => {
-      const valueSet = new Set(values);
-      let changed = false;
-      const next = { ...current };
-      for (const key of Object.keys(next)) {
-        if (!valueSet.has(key)) {
-          delete next[key];
-          changed = true;
-        }
-      }
-      return changed ? next : current;
-    });
-  }, [valuesKey, values]);
 
   useEffect(() => {
     if (!adminSearch || values.length === 0) return;

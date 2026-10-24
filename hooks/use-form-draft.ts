@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const DRAFT_DEBOUNCE_MS = 800;
 
@@ -37,15 +37,13 @@ export interface FormDraftMeta {
  * Draft is keyed per form (create vs edit id).
  */
 export function useFormDraft<T>(storageKey: string, initial: T) {
-  const initialRef = useRef(initial);
-  initialRef.current = initial;
 
   const [form, setFormState] = useState<T>(() => {
     const saved = readDraft<T>(storageKey);
     if (saved && hasDraftContent(saved)) {
-      return { ...initialRef.current, ...saved };
+      return { ...initial, ...saved };
     }
-    return initialRef.current;
+    return initial;
   });
 
   const [meta, setMeta] = useState<FormDraftMeta>(() => ({

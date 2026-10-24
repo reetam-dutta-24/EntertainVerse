@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -31,7 +32,8 @@ export function CreateWatchChannelButton({
   const [title, setTitle] = useState("");
   const [memberLimit, setMemberLimit] = useState("20");
   const [searchQuery, setSearchQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [fetchedResults, setResults] = useState<SearchResult[]>([]);
+  const results = searchQuery.trim().length >= 2 ? fetchedResults : [];
   const [selected, setSelected] = useState<SearchResult | null>(null);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string>();
@@ -40,10 +42,7 @@ export function CreateWatchChannelButton({
   useEffect(() => {
     if (!open) return;
     const query = searchQuery.trim();
-    if (query.length < 2) {
-      setResults([]);
-      return;
-    }
+    if (query.length < 2) return;
 
     const timer = window.setTimeout(() => {
       setSearching(true);
@@ -231,10 +230,10 @@ export function WatchChannelActions({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
 
-  useEffect(() => {
-    setTitle(channel.title);
-    setMemberLimit(String(channel.memberLimit ?? 20));
-  }, [channel]);
+  useOnValueChange(channel, (next) => {
+    setTitle(next.title);
+    setMemberLimit(String(next.memberLimit ?? 20));
+  });
 
   async function handleEdit(event: React.FormEvent) {
     event.preventDefault();

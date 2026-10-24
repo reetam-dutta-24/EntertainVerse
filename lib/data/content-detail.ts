@@ -1,15 +1,4 @@
-import type {
-  Character,
-  Collection,
-  Community,
-  ContentDetail,
-  ContentItem,
-  Episode,
-  MusicTrack,
-  Review,
-  UserSummary,
-  AccentColor,
-} from "@/types";
+import type { Character, Collection, Community, ContentDetail, ContentItem, Episode, MusicTrack, Review, UserSummary } from "@/types";
 import { normalizeContentSlug } from "@/lib/content-routes";
 import {
   getContentEngagementStats,
@@ -56,7 +45,6 @@ const jjkEpisodeThumbs = [
 
 const epThumb = (index: number) =>
   jjkEpisodeThumbs[index % jjkEpisodeThumbs.length];
-
 import { buildContentReferenceUrl } from "@/lib/content-reference-url";
 import { DETAIL_SYNOPSIS_WORDS, formatDetailSynopsis } from "@/lib/format-detail-synopsis";
 
@@ -556,9 +544,9 @@ const jjkDetail: ContentDetail = {
     { id: "collections", label: "Included in Collections", value: "9.8k" },
   ],
   seasons: [
-    { id: "s1", label: "Season 1", episodeCount: 24 },
-    { id: "s2", label: "Season 2", episodeCount: 23 },
-    { id: "movie", label: "Movie", episodeCount: 1 },
+    { id: "s1", label: "Season 1", seasonNumber: 1, episodeCount: 24 },
+    { id: "s2", label: "Season 2", seasonNumber: 2, episodeCount: 23 },
+    { id: "movie", label: "Movie", seasonNumber: 0, episodeCount: 1 },
   ],
   episodes: jjkEpisodes,
   characters: jjkCharacters,
@@ -683,7 +671,7 @@ function buildDetailFromItem(
       { id: "views", label: "Viewed By", value: "840k" },
       { id: "collections", label: "Included in Collections", value: "3.1k" },
     ],
-    seasons: [{ id: "s1", label: "Season 1", episodeCount: 12 }],
+    seasons: [{ id: "s1", label: "Season 1", seasonNumber: 1, episodeCount: 12 }],
     episodes: Array.from({ length: 9 }, (_, i) => ({
       id: `${item.id}-ep-${i + 1}`,
       seasonNumber: 1,

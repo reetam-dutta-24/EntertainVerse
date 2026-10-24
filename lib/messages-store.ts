@@ -14,7 +14,7 @@ let pollTimer: ReturnType<typeof setInterval> | null = null;
 let fetching = false;
 
 function emit() {
-  for (const listener of listeners) listeners();
+  for (const listener of listeners) listener();
 }
 
 function onVisibilityChange() {

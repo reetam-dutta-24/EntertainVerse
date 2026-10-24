@@ -6,7 +6,7 @@ import type {
 } from "@prisma/client";
 import { CONTENT_GENRE_OPTIONS, SONG_GENRE_OPTIONS } from "@/lib/catalog-enums";
 import { mapContentToItem } from "@/lib/mappers/content.mapper";
-import { mapTrackToContentItem, mapTrackToMusicTrack } from "@/lib/mappers/music.mapper";
+import { mapTrackToContentItem } from "@/lib/mappers/music.mapper";
 import { formatCardDate, formatRelativeTime } from "@/lib/format-dates";
 import { roundRating } from "@/lib/format-rating";
 import { formatEngagementCount } from "@/lib/services/content.service";
@@ -36,7 +36,7 @@ function mapVisibility(value: Collection["visibility"]): AppCollection["visibili
 }
 
 type CollectionCardRow = Collection & {
-  _count?: { favorites: number; follows: number };
+  _count?: { favorites: number; follows?: number };
 };
 
 export function mapCollectionToCard(row: CollectionCardRow): AppCollection {

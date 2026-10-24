@@ -8,6 +8,7 @@ export interface OstTrackSeed {
   genres: string[];
   language?: string;
   explicit?: boolean;
+  lyrics?: string;
 }
 
 /** Elite (Netflix) OST tracks — linked to the Elite show page. */

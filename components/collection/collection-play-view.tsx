@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import Link from "next/link";
 import {
   ExternalLink,
@@ -263,6 +264,7 @@ function MusicPlayQueue({
 }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [tracks, setTracks] = useState(queue.tracks);
+  useOnValueChange(queue.tracks, (next) => setTracks(next));
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -271,10 +273,6 @@ function MusicPlayQueue({
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
 
   const canManage = queue.canManage ?? false;
-
-  useEffect(() => {
-    setTracks(queue.tracks);
-  }, [queue.tracks]);
 
   const currentTrack = tracks[currentIndex];
 
@@ -312,12 +310,13 @@ function MusicPlayQueue({
   useEffect(() => {
     const audioEl = audioRef.current;
     if (!audioEl) return;
+    const el: HTMLAudioElement = audioEl;
 
     function onTimeUpdate() {
-      setProgress(audioEl.currentTime);
+      setProgress(el.currentTime);
     }
     function onLoadedMetadata() {
-      setDuration(audioEl.duration || currentTrack?.durationSeconds || 0);
+      setDuration(el.duration || currentTrack?.durationSeconds || 0);
     }
     function onEnded() {
       if (currentIndex < tracks.length - 1) {
@@ -746,14 +745,11 @@ function ContentPlayQueue({
   collectionSlug: string;
 }) {
   const [items, setItems] = useState(queue.items);
+  useOnValueChange(queue.items, (next) => setItems(next));
   const [activeIndex, setActiveIndex] = useState(0);
   const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
 
   const canManage = queue.canManage ?? false;
-
-  useEffect(() => {
-    setItems(queue.items);
-  }, [queue.items]);
 
   const activeItem = items[activeIndex];
 
@@ -1034,16 +1030,15 @@ export function CollectionPlayView({
   const [loading, setLoading] = useState(!initialQueue);
   const [error, setError] = useState<string>();
 
-  useEffect(() => {
-    if (initialQueue) {
-      setQueue(initialQueue);
-      setLoading(false);
-      setError(undefined);
-      return;
-    }
-
-    setLoading(true);
+  useOnValueChange(initialQueue, (next) => {
+    if (!next) return;
+    setQueue(next);
+    setLoading(false);
     setError(undefined);
+  });
+
+  useEffect(() => {
+    if (initialQueue) return;
 
     fetch(
       playSource === "artist"

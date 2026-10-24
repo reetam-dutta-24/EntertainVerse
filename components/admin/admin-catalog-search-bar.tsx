@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { Search, X } from "lucide-react";
@@ -22,10 +23,7 @@ export function AdminCatalogSearchBar({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(defaultQuery);
-
-  useEffect(() => {
-    setQuery(defaultQuery);
-  }, [defaultQuery]);
+  useOnValueChange(defaultQuery, (next) => setQuery(next));
 
   useEffect(() => {
     const timer = window.setTimeout(() => {

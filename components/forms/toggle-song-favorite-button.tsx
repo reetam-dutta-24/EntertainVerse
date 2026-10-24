@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { detailHeroBtnBase } from "@/lib/detail-route-ui";
@@ -17,12 +18,9 @@ export function ToggleSongFavoriteButton({
   className,
 }: ToggleSongFavoriteButtonProps) {
   const [favorited, setFavorited] = useState(initialFavorited);
+  useOnValueChange(initialFavorited, (next) => setFavorited(next));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
-
-  useEffect(() => {
-    setFavorited(initialFavorited);
-  }, [initialFavorited]);
 
   async function handleToggle() {
     setLoading(true);
