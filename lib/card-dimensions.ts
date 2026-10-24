@@ -5,4 +5,4 @@ export const SLOT_H = 232;
 export const POSTER_SLOT_H = 214;
 
 /** Fixed collection card height — used globally for consistent grid rows. */
-export const COLLECTION_CARD_H = 252;
+export const COLLECTION_CARD_H = 216;

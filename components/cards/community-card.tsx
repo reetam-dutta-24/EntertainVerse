@@ -1,15 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { MessageSquare, Users } from "lucide-react";
 import { useAppRouter } from "@/hooks/use-app-router";
-import { cn } from "@/lib/utils";
-import { COLLECTION_CARD_H } from "@/lib/card-dimensions";
 import { getCommunityDetailPath } from "@/lib/community-routes";
-import { getAccentStyle } from "@/lib/accents";
 import type { Community } from "@/types";
-import { Chip } from "@/components/ui/chip";
 import { Button } from "@/components/ui/button";
-import { CardHeaderImage } from "@/components/cards/card-header-image";
+import { TileCard } from "@/components/cards/tile-card";
 import { DeleteCommunityButton } from "@/components/forms/delete-community-button";
 import { EditCommunityButton } from "@/components/forms/edit-community-button";
 import { cardDeleteActionClass, cardEditActionClass } from "@/lib/form-action-styles";
@@ -18,17 +15,11 @@ const activityLabels: Record<
   NonNullable<Community["activityLevel"]>,
   string
 > = {
-  "very-active": "🔥 Very Active",
-  active: "🔥 Active",
-  moderate: "Moderate",
-  quiet: "Quiet",
+  "very-active": "Very active community",
+  active: "Active community",
+  moderate: "Moderately active",
+  quiet: "Quiet community",
 };
-
-function formatCount(count: number) {
-  return count >= 1000
-    ? `${Math.round(count / 1000)}K`
-    : count.toLocaleString();
-}
 
 export interface CommunityCardProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -46,14 +37,12 @@ export function CommunityCard({
   ctaMode = "view",
   demo = false,
   onAction,
-  className,
   ...props
 }: CommunityCardProps) {
   const router = useAppRouter();
-  const [hovered, setHovered] = useState(false);
-  const accent = getAccentStyle(community.accent ?? "cyan");
+  const [ctaHovered, setCtaHovered] = useState(false);
   const showManage = community.canEdit || community.canDelete;
-  const ctaLabel = ctaMode === "join" && !hovered ? "Join community" : "View community";
+  const ctaLabel = ctaMode === "join" && !ctaHovered ? "Join community" : "View community";
 
   function handleAction() {
     if (demo) return;
@@ -78,129 +67,72 @@ export function CommunityCard({
     canDelete: community.canDelete,
   };
 
+  const lastActive = community.lastActiveAt ? ` · active ${community.lastActiveAt}` : "";
+
   return (
-    <div
-      className={cn(
-        "mx-auto w-full max-w-[180px] rounded-card transition-shadow duration-500 ease-out",
-        hovered && accent.glow,
-        className,
-      )}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+    <TileCard
+      title={community.name}
+      imageUrl={community.imageUrl ?? community.wallpaperUrl}
+      accent={community.accent ?? "cyan"}
+      stats={[
+        { icon: Users, label: "Members", value: community.memberCount },
+        { icon: MessageSquare, label: "Posts", value: community.postCount },
+      ]}
+      visibility={community.visibility === "private" ? "private" : "public"}
+      description={
+        community.description ||
+        `${community.category} · ${activityLabels[community.activityLevel]}${lastActive}`
+      }
+      cta={
+        demo ? undefined : (
+          <Button
+            variant="gradient"
+            size="sm"
+            className="h-8 w-full rounded-full text-caption"
+            onClick={handleAction}
+            onMouseEnter={() => setCtaHovered(true)}
+            onMouseLeave={() => setCtaHovered(false)}
+          >
+            {ctaLabel}
+          </Button>
+        )
+      }
+      manage={
+        showManage ? (
+          <>
+            {community.canEdit ? (
+              <EditCommunityButton
+                community={editValues}
+                trigger={
+                  <button
+                    type="button"
+                    onClick={(event) => event.stopPropagation()}
+                    className={cardEditActionClass}
+                  >
+                    Edit
+                  </button>
+                }
+              />
+            ) : null}
+            {community.canDelete ? (
+              <DeleteCommunityButton
+                communitySlug={community.id}
+                communityName={community.name}
+                trigger={
+                  <button
+                    type="button"
+                    onClick={(event) => event.stopPropagation()}
+                    className={cardDeleteActionClass}
+                  >
+                    Delete
+                  </button>
+                }
+              />
+            ) : null}
+          </>
+        ) : undefined
+      }
       {...props}
-    >
-      <div
-        className="flex flex-col items-center overflow-hidden rounded-card bg-glass-purple"
-        style={{
-          height: showManage
-            ? COLLECTION_CARD_H + 28
-            : demo
-              ? COLLECTION_CARD_H - 28
-              : COLLECTION_CARD_H,
-        }}
-      >
-        <CardHeaderImage
-          imageUrl={community.imageUrl ?? community.wallpaperUrl}
-          accentClass={accent.header}
-        />
-
-        <div className="flex w-full min-h-0 flex-1 flex-col items-center justify-between gap-px bg-surface pb-2.5 shadow-card-inner">
-          <div className="flex w-full flex-col items-center gap-px">
-            <h3 className="line-clamp-2 px-2.5 pt-2.5 text-center text-sm font-semibold leading-tight text-white">
-              {community.name}
-            </h3>
-
-            <div className="flex flex-wrap items-center justify-center gap-1.5 px-1">
-              <Chip variant="blue" className="h-5 text-caption">
-                {formatCount(community.memberCount)} Members
-              </Chip>
-              <Chip variant="indigo" className="h-5 text-caption">
-                {community.category}
-              </Chip>
-            </div>
-
-            {(community.createdAt || community.lastActiveAt) ? (
-              <div className="px-2 py-1">
-                <Chip variant="brand" className="h-5 text-caption">
-                  {community.lastActiveAt
-                    ? `Last Active ${community.lastActiveAt}`
-                    : `Created on ${community.createdAt}`}
-                </Chip>
-              </div>
-            ) : null}
-
-            {community.description ? (
-              <p className="w-[165px] px-1 text-center text-caption font-normal text-white/90 line-clamp-2">
-                {community.description}
-              </p>
-            ) : (
-              <p className="w-[165px] px-1 text-center text-caption font-normal text-white/75 line-clamp-2">
-                {activityLabels[community.activityLevel]}
-              </p>
-            )}
-
-            <p className="flex w-[165px] justify-between px-1.5 py-1 text-caption font-normal text-white/90">
-              <span className="truncate">
-                {community.postCount.toLocaleString()} Posts
-              </span>
-              <span className="shrink-0">
-                {showManage
-                  ? "✏️ Manage"
-                  : community.visibility === "private"
-                    ? "🔒 Private"
-                    : "🌍 Public"}
-              </span>
-            </p>
-          </div>
-
-          <div className="flex w-full flex-col items-center gap-1.5 px-2">
-            {!demo ? (
-              <Button
-                variant="gradient"
-                size="sm"
-                className="h-6 w-[100px] shrink-0 rounded-full px-2 text-micro font-normal"
-                onClick={handleAction}
-              >
-                {ctaLabel}
-              </Button>
-            ) : null}
-
-            {showManage ? (
-              <div className="flex w-full items-center justify-center gap-2">
-                {community.canEdit ? (
-                  <EditCommunityButton
-                    community={editValues}
-                    trigger={
-                      <button
-                        type="button"
-                        onClick={(event) => event.stopPropagation()}
-                        className={cardEditActionClass}
-                      >
-                        Edit
-                      </button>
-                    }
-                  />
-                ) : null}
-                {community.canDelete ? (
-                  <DeleteCommunityButton
-                    communitySlug={community.id}
-                    communityName={community.name}
-                    trigger={
-                      <button
-                        type="button"
-                        onClick={(event) => event.stopPropagation()}
-                        className={cardDeleteActionClass}
-                      >
-                        Delete
-                      </button>
-                    }
-                  />
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </div>
-    </div>
+    />
   );
 }
