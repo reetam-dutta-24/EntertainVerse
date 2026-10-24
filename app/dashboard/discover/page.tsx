@@ -46,7 +46,7 @@ export default async function DiscoverPage() {
   ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 sm:gap-8">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="discover" />
 
       <ActiveFiltersBar filters={filters} />

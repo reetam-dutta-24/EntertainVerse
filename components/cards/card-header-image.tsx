@@ -9,7 +9,7 @@ export interface CardHeaderImageProps {
 export function CardHeaderImage({ imageUrl, accentClass }: CardHeaderImageProps) {
   if (imageUrl) {
     return (
-      <div className="relative h-[84px] w-full shrink-0 overflow-hidden">
+      <div className="relative h-[72px] w-full shrink-0 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imageUrl} alt="" className="size-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
@@ -17,5 +17,5 @@ export function CardHeaderImage({ imageUrl, accentClass }: CardHeaderImageProps)
     );
   }
 
-  return <div className={cn("h-[84px] w-full shrink-0", accentClass)} />;
+  return <div className={cn("h-[72px] w-full shrink-0", accentClass)} />;
 }

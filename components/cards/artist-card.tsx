@@ -9,13 +9,13 @@ import { cn } from "@/lib/utils";
 import { resolveCardTint } from "@/lib/card-theme";
 import { SLOT_H, SLOT_W } from "@/lib/card-dimensions";
 import type { ContentItem } from "@/types";
-import { Chip, MatchChip, RatingChip } from "@/components/ui/chip";
+import { Chip, RatingChip } from "@/components/ui/chip";
 import { HdImage } from "@/components/ui/hd-image";
 
-const CARD_W = 160;
-const CARD_H = 252;
-const HOVER_W = 176;
-const HOVER_H = 278;
+const CARD_W = 148;
+const CARD_H = 224;
+const HOVER_W = 164;
+const HOVER_H = 248;
 
 export interface ArtistCardProps extends React.HTMLAttributes<HTMLDivElement> {
   item: ContentItem;
@@ -58,7 +58,7 @@ export function ArtistCard({
   return (
     <div
       className={cn(
-        "relative isolate mx-auto w-full max-w-[160px] shrink-0 overflow-visible",
+        "relative isolate mx-auto w-full max-w-[148px] shrink-0 overflow-visible",
         className,
       )}
       style={{ width: SLOT_W, height: SLOT_H }}
@@ -103,7 +103,7 @@ export function ArtistCard({
               <Chip mediaType="artist">Artist</Chip>
             </div>
 
-            <div className="mx-auto mt-2 size-[112px] shrink-0 overflow-hidden rounded-full border-2 border-white/15">
+            <div className="mx-auto mt-1.5 size-[104px] shrink-0 overflow-hidden rounded-full border-2 border-white/15">
               {item.imageUrl ? (
                 <HdImage
                   src={item.imageUrl}
@@ -134,9 +134,6 @@ export function ArtistCard({
                     {genre.label}
                   </Chip>
                 ))}
-                {item.matchScore != null ? (
-                  <MatchChip score={item.matchScore} />
-                ) : null}
               </div>
             </div>
           </div>
@@ -150,7 +147,7 @@ export function ArtistCard({
                 : "pointer-events-none translate-y-2 scale-[1.02] opacity-0",
             )}
           >
-            <div className="relative h-[82px] w-full shrink-0 overflow-hidden">
+            <div className="relative h-[74px] w-full shrink-0 overflow-hidden">
               {item.imageUrl ? (
                 <HdImage
                   src={item.imageUrl}
@@ -162,7 +159,7 @@ export function ArtistCard({
               )}
             </div>
 
-            <div className="flex h-[196px] flex-col items-center gap-1.5 bg-black px-2.5 pb-2.5 pt-1.5">
+            <div className="flex h-[174px] flex-col items-center gap-1.5 bg-black px-2.5 pb-2.5 pt-1.5">
               <p className="line-clamp-1 w-full text-center text-sm font-semibold text-white">
                 {item.title}
               </p>
@@ -180,9 +177,6 @@ export function ArtistCard({
                     {genre.label}
                   </Chip>
                 ))}
-                {item.matchScore != null ? (
-                  <MatchChip score={item.matchScore} />
-                ) : null}
               </div>
 
               <div className="flex w-full items-center justify-center gap-2">

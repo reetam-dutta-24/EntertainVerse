@@ -41,7 +41,7 @@ export function SectionCarousel({
         <div className="flex flex-col gap-3 px-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4 sm:px-4 lg:px-6">
           {title ? (
             <div className="min-w-0">
-              <h2 className="text-lg font-bold text-white sm:text-heading">
+              <h2 className="text-lg font-bold text-white sm:text-xl">
                 {title}
               </h2>
               {subtitle ? (

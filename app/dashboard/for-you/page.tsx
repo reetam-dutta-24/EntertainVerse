@@ -22,7 +22,7 @@ export default async function ForYouPage() {
   ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 sm:gap-8">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="foryou" />
 
       <AiTasteProfileBar score={tasteScore} />

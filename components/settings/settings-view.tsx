@@ -198,7 +198,7 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[760px] flex-col gap-6 sm:gap-8">
+    <div className="mx-auto flex w-full max-w-[760px] flex-col gap-5 sm:gap-6">
       <SettingsSection
         title="👤 Public profile"
         subtitle="Bio, portrait, and accent color are edited on your profile page"

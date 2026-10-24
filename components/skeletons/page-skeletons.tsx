@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
  * page layout so content swaps in without the page jumping around.
  */
 
-const DASHBOARD_PAGE = "mx-auto flex w-full max-w-[1200px] flex-col gap-6 sm:gap-8";
+const DASHBOARD_PAGE = "mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6";
 
 /** Full-screen branded loader — used where no shell is rendered yet. */
 export function AppLoadingScreen({ label = "Loading your universe…" }: { label?: string }) {

@@ -55,9 +55,9 @@ export function CommunityGridSection({
   }, [totalPages, itemsPerPage]);
 
   return (
-    <section className="flex flex-col gap-5 sm:gap-6">
+    <section className="flex flex-col gap-3 sm:gap-4">
       <div className="flex flex-col gap-3 px-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
-        <h2 className="text-lg font-bold text-white sm:text-heading">{title}</h2>
+        <h2 className="text-lg font-bold text-white sm:text-xl">{title}</h2>
         <SearchPill
           placeholder={searchPlaceholder}
           value={query}
@@ -70,7 +70,7 @@ export function CommunityGridSection({
 
       <div className="px-2 pt-1 pb-2 sm:pt-2">
         <div
-          className="grid justify-items-center gap-3 sm:gap-6"
+          className="grid justify-items-center gap-3 sm:gap-4"
           style={{
             gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
           }}

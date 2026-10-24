@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { SLOT_H, SLOT_W, COLLECTION_CARD_H } from "@/lib/card-dimensions";
+import { COLLECTION_CARD_H, POSTER_SLOT_H, SLOT_W } from "@/lib/card-dimensions";
 import { cn } from "@/lib/utils";
 
 /**
@@ -19,7 +19,7 @@ const CAROUSEL_SLOT_VISIBILITY = [
 
 /** Card grids show 2 → 3 → 4 → 5 columns (CARD_GRID_COLS_BREAKPOINTS). */
 const CARD_GRID_CLASS =
-  "grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5";
+  "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5";
 
 export function SkeletonSectionHeader({
   withSearch = true,
@@ -51,13 +51,13 @@ export function SkeletonMediaCard({ round = false }: { round?: boolean }) {
   return (
     <div
       className="mx-auto flex w-full flex-col gap-2.5 rounded-[20px] border border-white/[0.06] bg-glass-purple/60 p-3"
-      style={{ maxWidth: SLOT_W, height: SLOT_H }}
+      style={{ maxWidth: SLOT_W, height: POSTER_SLOT_H - 8 }}
     >
       <Skeleton className="h-5 w-16 rounded-full" />
       <Skeleton
         className={cn(
           "mx-auto mt-1 shrink-0",
-          round ? "size-[112px] rounded-full" : "h-[108px] w-full rounded-[14px]",
+          round ? "size-[104px] rounded-full" : "h-[100px] w-full rounded-[14px]",
         )}
       />
       <div className="mt-auto flex flex-col items-center gap-2">
@@ -81,9 +81,9 @@ export function SkeletonCarouselSection({
   withSearch?: boolean;
 }) {
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-2">
       <SkeletonSectionHeader withSearch={withSearch} />
-      <div className="grid grid-cols-2 gap-3 px-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 min-[1200px]:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 px-2 py-4 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 min-[1200px]:grid-cols-6">
         {CAROUSEL_SLOT_VISIBILITY.map((visibility, i) => (
           <div key={i} className={visibility}>
             <SkeletonMediaCard round={round} />
@@ -106,7 +106,7 @@ export function SkeletonTileCard() {
       className="flex w-full flex-col overflow-hidden rounded-[20px] border border-white/[0.06] bg-glass-purple/60"
       style={{ height: COLLECTION_CARD_H }}
     >
-      <Skeleton className="h-[110px] w-full rounded-none" />
+      <Skeleton className="h-[72px] w-full rounded-none" />
       <div className="flex flex-1 flex-col gap-2 p-3">
         <Skeleton className="h-4 w-3/4" />
         <Skeleton className="h-3 w-1/2" />
@@ -158,14 +158,14 @@ export function SkeletonTasteBar() {
 /** Stat panel: `grid-cols-2 lg:grid-cols-4` tiles in a surface card. */
 export function SkeletonStatPanel({ tiles = 4, withHeader = true }: { tiles?: number; withHeader?: boolean }) {
   return (
-    <section className="rounded-2xl bg-surface/40 px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+    <section className="rounded-2xl bg-surface/40 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
       {withHeader ? (
         <>
           <Skeleton className="h-6 w-56 max-w-full sm:h-7" />
           <Skeleton className="mt-2 h-4 w-72 max-w-full" />
         </>
       ) : null}
-      <div className={cn("grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6", withHeader && "mt-6")}>
+      <div className={cn("grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4", withHeader && "mt-4")}>
         {Array.from({ length: tiles }, (_, i) => (
           <div
             key={i}

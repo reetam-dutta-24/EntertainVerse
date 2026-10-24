@@ -53,15 +53,15 @@ export default async function WatchlistPage() {
   const activeGenre = "Anime";
 
   return (
-    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 sm:gap-8">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="watchlist" />
 
-      <section className="rounded-2xl bg-surface/40 px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+      <section className="rounded-2xl bg-surface/40 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-          <h2 className="text-lg font-bold text-white sm:text-heading">📋 Your Watchlist</h2>
+          <h2 className="text-lg font-bold text-white sm:text-xl">📋 Your Watchlist</h2>
           <AddWatchlistButton />
         </div>
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {statTiles(stats).map((tile) => (
             <div
               key={tile.label}

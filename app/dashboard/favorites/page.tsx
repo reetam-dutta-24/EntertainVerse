@@ -83,7 +83,7 @@ export default async function FavoritesPage() {
       <WelcomeBanner userName={user.name} variant="collections" />
 
       <section className="rounded-2xl bg-surface/40 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
-        <h2 className="text-lg font-bold text-white sm:text-heading">❤️ Your Favourites</h2>
+        <h2 className="text-lg font-bold text-white sm:text-xl">❤️ Your Favourites</h2>
         <p className="mt-1 text-sm text-white/70">
           {total} saved across anime, shows, movies, music, artists, collections, and communities.
         </p>

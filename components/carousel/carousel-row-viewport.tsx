@@ -23,7 +23,7 @@ export function CarouselRowViewport({
   const ambience = tintGlass ? getSectionAmbienceStyles(tintGlass) : null;
 
   return (
-    <div className={cn("relative py-6", className)}>
+    <div className={cn("relative py-4", className)}>
       <div
         aria-hidden
         className={cn(

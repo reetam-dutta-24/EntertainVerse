@@ -73,7 +73,7 @@ export function WatchlistGridSection({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex flex-col gap-3 px-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
-        <h2 className="text-lg font-bold text-white sm:text-heading">{title}</h2>
+        <h2 className="text-lg font-bold text-white sm:text-xl">{title}</h2>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <SearchPill
             placeholder={searchPlaceholder}

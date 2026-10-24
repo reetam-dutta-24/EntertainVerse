@@ -19,11 +19,11 @@ Every new route, page, section, and shared component must work well from **320px
 - **Section headers**: stack title + search on mobile (`flex-col gap-3 sm:flex-row`).
 - **SearchPill**: `w-full sm:w-[230px]`.
 - **CTAs in toolbars**: `w-full sm:w-auto` on mobile.
-- **Typography**: `text-lg sm:text-heading` for section titles on dashboard.
+- **Typography**: `text-lg sm:text-xl` for section titles on dashboard (compact).
 
 ## Dashboard checklist for new pages
 
-1. Wrap content in `w-full max-w-[1200px]` container with `gap-6 sm:gap-8`.
+1. Wrap content in `w-full max-w-[1200px]` container with `gap-5 sm:gap-6` (dense dashboard spacing).
 2. Reuse `WelcomeBanner`, responsive grid/carousel sections (already adaptive).
 3. Stat panels: `grid-cols-2 lg:grid-cols-4`, smaller values on mobile (`text-xl sm:text-2xl`).
 4. Filter rows: `flex-col sm:flex-row`, no fixed label widths.

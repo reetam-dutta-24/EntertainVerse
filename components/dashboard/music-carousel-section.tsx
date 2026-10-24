@@ -110,8 +110,8 @@ export function MusicCarouselSection({
 
   if (tracks.length === 0) {
     return (
-      <section className="flex flex-col gap-3">
-        <h2 className="px-2 text-lg font-bold text-white sm:text-heading">{title}</h2>
+      <section className="flex flex-col gap-2">
+        <h2 className="px-2 text-lg font-bold text-white sm:text-xl">{title}</h2>
         <p className="mx-2 rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-sm text-white/65">
           {emptyMessage}
         </p>
@@ -120,12 +120,12 @@ export function MusicCarouselSection({
   }
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-2">
       <div className="flex flex-col gap-3 px-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0">
-          <h2 className="text-lg font-bold text-white sm:text-heading">{title}</h2>
+          <h2 className="text-lg font-bold text-white sm:text-xl">{title}</h2>
           {subtitle ? (
-            <p className="mt-1 text-sm font-normal text-white/90">{subtitle}</p>
+            <p className="mt-0.5 text-sm font-normal text-white/80">{subtitle}</p>
           ) : null}
         </div>
         <SearchPill
@@ -163,7 +163,7 @@ export function MusicCarouselSection({
               {pages.map((pageTracks, pageIndex) => (
                 <div
                   key={pageIndex}
-                  className="grid w-full min-w-full shrink-0 gap-3 overflow-hidden sm:gap-6"
+                  className="grid w-full min-w-full shrink-0 gap-3 overflow-hidden sm:gap-4"
                   style={{
                     gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
                   }}

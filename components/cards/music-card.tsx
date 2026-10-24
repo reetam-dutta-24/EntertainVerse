@@ -10,13 +10,13 @@ import { resolveCardTint } from "@/lib/card-theme";
 import { SLOT_H, SLOT_W } from "@/lib/card-dimensions";
 import { CardAddToCollectionButton } from "@/components/forms/add-to-collection-dialog";
 import type { MusicTrack } from "@/types";
-import { Chip, MatchChip, RatingChip } from "@/components/ui/chip";
+import { Chip, RatingChip } from "@/components/ui/chip";
 import { HdImage } from "@/components/ui/hd-image";
 
-const CARD_W = 160;
-const CARD_H = 252;
-const HOVER_W = 176;
-const HOVER_H = 278;
+const CARD_W = 148;
+const CARD_H = 224;
+const HOVER_W = 164;
+const HOVER_H = 258;
 
 export interface MusicCardProps extends React.HTMLAttributes<HTMLDivElement> {
   track: MusicTrack;
@@ -115,7 +115,7 @@ export function MusicCard({
 
   return (
     <div
-      className={cn("relative isolate mx-auto w-full max-w-[160px] shrink-0 overflow-visible", className)}
+      className={cn("relative isolate mx-auto w-full max-w-[148px] shrink-0 overflow-visible", className)}
       style={{ width: SLOT_W, height: SLOT_H }}
       {...props}
       onMouseEnter={() => {
@@ -178,7 +178,7 @@ export function MusicCard({
               <Chip musicKind={track.kind}>{kindLabel(track.kind)}</Chip>
             </div>
 
-            <div className="mx-auto mt-1 h-[118px] w-[136px] shrink-0 overflow-hidden rounded-[14px]">
+            <div className="mx-auto mt-1 h-[108px] w-[124px] shrink-0 overflow-hidden rounded-[14px]">
               {track.imageUrl ? (
                 <HdImage
                   src={track.imageUrl}
@@ -201,9 +201,6 @@ export function MusicCard({
               </div>
               <div className="flex flex-wrap items-center justify-center gap-1">
                 <Chip language={langLabel}>{langLabel}</Chip>
-                {track.matchScore != null ? (
-                  <MatchChip score={track.matchScore} />
-                ) : null}
               </div>
             </div>
           </div>
@@ -217,7 +214,7 @@ export function MusicCard({
                 : "pointer-events-none translate-y-2 scale-[1.02] opacity-0",
             )}
           >
-            <div className="relative h-[82px] w-full shrink-0 overflow-hidden">
+            <div className="relative h-[74px] w-full shrink-0 overflow-hidden">
               {track.imageUrl ? (
                 <HdImage
                   src={track.imageUrl}
@@ -229,7 +226,7 @@ export function MusicCard({
               )}
             </div>
 
-            <div className="flex h-[196px] flex-col items-center gap-1.5 bg-black px-2.5 pb-2 pt-2">
+            <div className="flex h-[184px] flex-col items-center gap-1.5 bg-black px-2.5 pb-2 pt-2">
               <div className="w-full text-center">
                 <p className="line-clamp-2 text-sm font-semibold leading-tight text-white">
                   {track.title}

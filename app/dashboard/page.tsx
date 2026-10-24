@@ -62,19 +62,19 @@ export default async function DashboardHomePage() {
   ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 sm:gap-8">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="home" />
 
       <AiTasteProfileBar score={stats.aiTasteScore} />
 
-      <section className="rounded-2xl bg-surface/40 px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
-        <h2 className="text-lg font-bold text-white sm:text-heading">
+      <section className="rounded-2xl bg-surface/40 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+        <h2 className="text-lg font-bold text-white sm:text-xl">
           🌌 Your Universe at a Glance
         </h2>
         <p className="mt-1 text-sm text-white/75">
           A snapshot of your taste, saves, and activity across AniVerse.
         </p>
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {statTiles(stats).map((tile) => (
             <div
               key={tile.label}

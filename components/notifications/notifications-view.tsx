@@ -30,7 +30,7 @@ export function NotificationsView({
   const read = notifications.filter((n) => n.read);
 
   return (
-    <div className="mx-auto flex w-full max-w-[760px] flex-col gap-6 sm:gap-8">
+    <div className="mx-auto flex w-full max-w-[760px] flex-col gap-5 sm:gap-6">
       <section className="bg-gradient-brand rounded-2xl px-4 py-4 shadow-[0_4px_24px_rgba(255,0,204,0.2)] sm:px-6 sm:py-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>

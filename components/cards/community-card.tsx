@@ -81,7 +81,7 @@ export function CommunityCard({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-[190px] rounded-[20px] transition-shadow duration-500 ease-out",
+        "mx-auto w-full max-w-[180px] rounded-[20px] transition-shadow duration-500 ease-out",
         hovered && accent.glow,
         className,
       )}
