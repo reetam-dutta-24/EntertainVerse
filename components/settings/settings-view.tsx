@@ -289,7 +289,7 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
         </GradientButton>
       </SettingsSection>
 
-      <SettingsSection title="🧠 Taste & AI" subtitle="Your personalized match engine">
+      <SettingsSection title="🧠 Taste & AI" subtitle="Your personalized match engine — see, edit or wipe what it knows">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <span className="flex size-12 items-center justify-center rounded-full bg-gradient-brand">
@@ -300,14 +300,23 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
               <p className="text-2xl font-bold text-brand-pink">{tasteScore}%</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => router.push(ONBOARDING_RETAKE_PATH)}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-brand-magenta px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-magenta/15 sm:w-auto"
-          >
-            <RefreshCw className="size-4" />
-            Retake Taste Test
-          </button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Link
+              href="/dashboard/settings/ai"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-brand px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto"
+            >
+              <Sparkles className="size-4" />
+              What the AI knows
+            </Link>
+            <button
+              type="button"
+              onClick={() => router.push(ONBOARDING_RETAKE_PATH)}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-brand-magenta px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-magenta/15 sm:w-auto"
+            >
+              <RefreshCw className="size-4" />
+              Retake Taste Test
+            </button>
+          </div>
         </div>
       </SettingsSection>
 

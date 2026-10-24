@@ -21,6 +21,8 @@ export interface Anchor {
   verb: string;
   weight: number;
   vector: Vector | null;
+  /** Set for the AI-mode answers anchor: its explanation, e.g. "Fits your vibe · Cozy & Found family". */
+  reason?: string;
 }
 
 export interface AnchorInput {
@@ -68,7 +70,7 @@ export function closestAnchor(vector: Vector | undefined, anchors: Anchor[], exc
   if (!vector) return null;
   let best: { anchor: Anchor; similarity: number } | null = null;
   for (const anchor of anchors) {
-    if (!anchor.vector || anchor.slug === excludeSlug) continue;
+    if (!anchor.vector || anchor.slug === excludeSlug || anchor.reason) continue;
     const similarity = dot(vector, anchor.vector);
     if (!best || similarity > best.similarity) best = { anchor, similarity };
   }
@@ -80,6 +82,27 @@ export function closestAnchor(vector: Vector | undefined, anchors: Anchor[], exc
  * sits around 0.78+; unrelated ones around 0.65–0.72.
  */
 export const RELATED_SIMILARITY = 0.78;
+
+/**
+ * The answers anchor is a query embedding (asymmetric retrieval): its similarities
+ * to catalog documents sit in a narrow, lower band than document-to-document ones,
+ * so "fits your vibe" uses a relative cutoff — the top share of the catalog.
+ */
+export const VIBE_TOP_SHARE = 0.15;
+
+export function topShareCutoff(target: Vector, vectors: Iterable<Vector>, share = VIBE_TOP_SHARE) {
+  const sims = [...vectors].map((vector) => dot(vector, target)).sort((a, b) => b - a);
+  return sims.length ? sims[Math.max(0, Math.floor(sims.length * share) - 1)]! : Infinity;
+}
+
+/** Pseudo-anchor for the user's AI-mode answers (no catalog item behind it). */
+export function answersAnchor(kind: EmbeddingKind, vector: number[], reason: string, weight = 0.9): Anchor | null {
+  if (!vector.length) return null;
+  let norm = 0;
+  for (const value of vector) norm += value * value;
+  norm = Math.sqrt(norm) || 1;
+  return { kind, slug: "__answers", title: "your AI-mode answers", verb: "", weight, vector: Float32Array.from(vector, (value) => value / norm), reason };
+}
 
 /** Who interacted with what, across every user (favorites, ≥20 min watched, ratings ≥7, listens). */
 export const loadInteractionGraph = cache(async () => {

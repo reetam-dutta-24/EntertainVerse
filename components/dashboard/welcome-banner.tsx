@@ -6,7 +6,8 @@ export type WelcomeBannerVariant =
   | "watchlist"
   | "community"
   | "analytics"
-  | "settings";
+  | "settings"
+  | "aiprofile";
 
 export interface WelcomeBannerProps {
   userName: string;
@@ -85,6 +86,16 @@ const copy: Record<
       "🎧 214 hours of music listened",
       "🎯 AI match accuracy at an all-time 93%",
       "🔥 24-day activity streak going strong",
+    ],
+  },
+  aiprofile: {
+    message:
+      "Everything AniVerse's AI uses to recommend for you — in plain words, and fully in your control.",
+    highlights: [
+      "🧬 How your taste reads",
+      "📈 What it learned from activity",
+      "💬 Your AI-mode answers",
+      "🎛️ Turn off, download or wipe",
     ],
   },
   settings: {

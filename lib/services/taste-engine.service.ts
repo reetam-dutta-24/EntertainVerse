@@ -15,9 +15,13 @@ import {
   type OnboardingSelection,
 } from "@/lib/data/onboarding-config";
 import { labelForSongGenre } from "@/lib/catalog-enums";
+import { parseListenPrefs, parseWatchPrefs, type ListenPrefs, type WatchPrefs } from "@/lib/ai-profile/schema";
+import { VOCAB } from "@/lib/ai-profile/vocabulary";
 import { dot, embeddingKey, loadEmbeddingIndex, type Vector } from "@/lib/recommender/embeddings";
 import {
   RELATED_SIMILARITY,
+  answersAnchor,
+  topShareCutoff,
   blendScore,
   buildAnchors,
   closestAnchor,
@@ -71,9 +75,15 @@ export interface TasteSignals {
   watched: Map<string, number>;
   /** Recent listening by track slug, 0–1 (decayed, half-life 30 days). */
   listened: Map<string, number>;
+  /** AI-mode answers (quiz or chat) and their embeddings — see Settings → AI profile. */
+  ai?: { watch: WatchPrefs; listen: ListenPrefs; watchVector: number[]; listenVector: number[] };
 }
 
 interface TasteVector {
+  /** Genres the user asked AI mode to avoid. */
+  avoidGenres: Set<string>;
+  avoidLongSeries: boolean;
+  commitment: string;
   types: Set<string>;
   genreWeights: Map<string, number>;
   languages: Set<string>;
@@ -139,7 +149,7 @@ function historyWeights(rows: { slug: string; minutes: number; at: Date }[]): Ma
 
 export const loadTasteSignals = cache(async (userId: string): Promise<TasteSignals> => {
   const since = new Date(Date.now() - 180 * 86_400_000);
-  const [profile, favorites, watchlist, follows, trackFavorites, watches, listens] = await Promise.all([
+  const [profile, favorites, watchlist, follows, trackFavorites, watches, listens, aiProfile] = await Promise.all([
     prisma.tasteProfile.findUnique({ where: { userId }, select: { selections: true } }),
     prisma.contentFavorite.findMany({
       where: { userId },
@@ -165,7 +175,10 @@ export const loadTasteSignals = cache(async (userId: string): Promise<TasteSigna
       where: { userId, listenedAt: { gte: since } },
       select: { minutes: true, listenedAt: true, track: { select: { slug: true } } },
     }),
+    prisma.aiTasteProfile.findUnique({ where: { userId } }),
   ]);
+  // The user can switch off learning from activity (Settings → AI profile).
+  const learn = aiProfile?.learnFromActivity ?? true;
 
   return {
     selection: profile
@@ -177,8 +190,16 @@ export const loadTasteSignals = cache(async (userId: string): Promise<TasteSigna
     followedArtists: new Set(follows.map((row) => row.artist.slug)),
     favoriteTracks: new Set(trackFavorites.map((row) => row.track.slug)),
     userId,
-    watched: historyWeights(watches.map((row) => ({ slug: row.content.slug, minutes: row.minutes, at: row.watchedAt }))),
-    listened: historyWeights(listens.map((row) => ({ slug: row.track.slug, minutes: row.minutes, at: row.listenedAt }))),
+    watched: learn ? historyWeights(watches.map((row) => ({ slug: row.content.slug, minutes: row.minutes, at: row.watchedAt }))) : new Map(),
+    listened: learn ? historyWeights(listens.map((row) => ({ slug: row.track.slug, minutes: row.minutes, at: row.listenedAt }))) : new Map(),
+    ai: aiProfile
+      ? {
+          watch: parseWatchPrefs(aiProfile.watch),
+          listen: parseListenPrefs(aiProfile.listen),
+          watchVector: aiProfile.watchVector,
+          listenVector: aiProfile.listenVector,
+        }
+      : undefined,
   };
 });
 
@@ -192,6 +213,13 @@ function buildVector(signals: TasteSignals, catalog: ContentRow[]): TasteVector 
   for (const mood of selection.moods) {
     for (const genre of MOOD_GENRES[mood] ?? []) bump(genre, 0.6);
   }
+  const watchAnswers = signals.ai?.watch;
+  const listenAnswers = signals.ai?.listen;
+  for (const vibe of watchAnswers?.vibes ?? []) {
+    for (const genre of VOCAB.vibes.get(vibe)?.genres ?? []) bump(genre, 0.65);
+  }
+  const avoidGenres = new Set((watchAnswers?.avoid ?? []).flatMap((id) => VOCAB.avoid.get(id)?.genres ?? []));
+  for (const genre of avoidGenres) genreWeights.delete(genre);
 
   const anchors = new Set([...selection.favoriteTitles, ...signals.favoriteContent]);
   const anchorGenres = new Map<string, number>();
@@ -206,10 +234,13 @@ function buildVector(signals: TasteSignals, catalog: ContentRow[]): TasteVector 
   for (const [genre, count] of anchorGenres) bump(genre, 0.35 + 0.4 * (count / anchorTotal));
 
   return {
-    types: new Set(selection.contentTypes),
+    avoidGenres,
+    avoidLongSeries: watchAnswers?.avoid.includes("long-series") ?? false,
+    commitment: watchAnswers?.commitment ?? "",
+    types: new Set([...selection.contentTypes, ...(watchAnswers?.formats ?? [])]),
     genreWeights,
-    languages: new Set(selection.languages),
-    musicGenres: new Set(selection.musicTastes),
+    languages: new Set([...selection.languages, ...(watchAnswers?.languages ?? []), ...(listenAnswers?.languages ?? [])]),
+    musicGenres: new Set([...selection.musicTastes, ...(listenAnswers?.genres ?? [])]),
     artists: new Set([...selection.artists, ...signals.followedArtists]),
     anchors,
     anchorGenres,
@@ -269,12 +300,35 @@ const TYPE_WORDS: Record<string, string> = {
 const titleCase = (text: string) => text.replace(/\b\w/g, (char) => char.toUpperCase());
 const genreWord = (genre: string) => genreLabel(genre).label || titleCase(genre);
 
+/** "Fits your vibe · Cozy & Found family" — from the strongest AI-mode answers. */
+function vibeReason(prefs: WatchPrefs) {
+  const labels = [
+    ...prefs.vibes.map((id) => VOCAB.vibes.get(id)?.label),
+    ...prefs.themes.map((id) => VOCAB.themes.get(id)?.label),
+  ].filter(Boolean);
+  return labels.length ? `Fits your vibe · ${labels.slice(0, 2).join(" & ")}` : "Fits what you told AI mode";
+}
+
+function listenVibeReason(prefs: ListenPrefs) {
+  const labels = prefs.moods.map((id) => VOCAB.listenMoods.get(id)?.label).filter(Boolean);
+  return labels.length ? `Fits your ${labels.slice(0, 2).join(" & ")} mood` : "Fits what you told AI mode";
+}
+
+/** The answers anchor's reason, when this item is among the closest to the answers. */
+function answersMatch(anchors: Anchor[], vector: Vector | undefined, cutoff: number) {
+  const answers = anchors.find((anchor) => anchor.reason);
+  if (!answers?.vector || !vector) return null;
+  return dot(vector, answers.vector) >= cutoff ? answers.reason! : null;
+}
+
 interface ContentContext {
   anchors: Anchor[];
   profile: Vector | null;
   vectorOf: (row: ContentRow) => Vector | undefined;
   rowOf: (slug: string) => ContentRow | undefined;
   collab: ReturnType<typeof coOccurrence>;
+  /** Similarity an item needs to the AI-mode answers for "Fits your vibe". */
+  vibeCutoff: number;
 }
 
 /** What the user has shown interest in, placed in embedding space. */
@@ -291,12 +345,16 @@ async function contentContext(signals: TasteSignals, content: ContentRow[]): Pro
   for (const [slug, weight] of signals.watched) push(slug, "watched", 0.3 + 0.55 * weight);
   for (const slug of signals.watchlist) push(slug, "saved", 0.35);
   const anchors = buildAnchors(index, inputs);
+  const answers = signals.ai ? answersAnchor("content", signals.ai.watchVector, vibeReason(signals.ai.watch)) : null;
+  if (answers) anchors.push(answers);
+  const vectorOf = (row: ContentRow) => index.vectors.get(embeddingKey("content", row.id));
   return {
     anchors,
     profile: tasteCentroid(anchors),
-    vectorOf: (row) => index.vectors.get(embeddingKey("content", row.id)),
+    vectorOf,
     rowOf: (slug) => bySlug.get(slug),
     collab: coOccurrence(anchors, graph.content, signals.userId),
+    vibeCutoff: answers?.vector ? topShareCutoff(answers.vector, content.flatMap((row) => vectorOf(row) ?? [])) : Infinity,
   };
 }
 
@@ -316,6 +374,8 @@ function explainContent(row: ContentRow, v: TasteVector, ctx: ContentContext, si
   if (near && near.similarity >= RELATED_SIMILARITY) {
     return `Because you ${near.anchor.verb} ${near.anchor.title}${sharedWith(ctx.rowOf(near.anchor.slug))}`;
   }
+  const vibe = answersMatch(ctx.anchors, ctx.vectorOf(row), ctx.vibeCutoff);
+  if (vibe) return vibe;
   const fans = ctx.collab.get(row.slug);
   if (fans) return `Fans of ${fans.via.title} also watch this`;
 
@@ -332,6 +392,7 @@ interface MusicContext {
   trackVector: (row: TrackRow) => Vector | undefined;
   artistVector: (row: ArtistRow) => Vector | undefined;
   collab: ReturnType<typeof coOccurrence>;
+  vibeCutoff: number;
 }
 
 /** Music taste: loved/played tracks, followed artists, and (lightly) loved shows for OSTs. */
@@ -361,10 +422,14 @@ async function musicContext(
     if (row) inputs.push({ kind: "content", itemId: row.id, slug, title: row.title, verb: "loved", weight: 0.3 });
   }
   const anchors = buildAnchors(index, inputs);
+  const answers = signals.ai ? answersAnchor("track", signals.ai.listenVector, listenVibeReason(signals.ai.listen)) : null;
+  if (answers) anchors.push(answers);
+  const trackVector = (row: TrackRow) => index.vectors.get(embeddingKey("track", row.id));
   return {
     anchors,
     profile: tasteCentroid(anchors),
-    trackVector: (row) => index.vectors.get(embeddingKey("track", row.id)),
+    vibeCutoff: answers?.vector ? topShareCutoff(answers.vector, catalog.tracks.flatMap((row) => trackVector(row) ?? [])) : Infinity,
+    trackVector,
     artistVector: (row) => index.vectors.get(embeddingKey("artist", row.id)),
     collab: coOccurrence(
       anchors.filter((anchor) => anchor.kind === "track"),
@@ -381,6 +446,8 @@ function explainTrack(row: TrackRow, v: TasteVector, ctx: MusicContext): string 
 
   const near = closestAnchor(ctx.trackVector(row), ctx.anchors, row.slug);
   if (near && near.similarity >= RELATED_SIMILARITY) return `Because you ${near.anchor.verb} ${near.anchor.title}`;
+  const vibe = answersMatch(ctx.anchors, ctx.trackVector(row), ctx.vibeCutoff);
+  if (vibe) return vibe;
   const fans = ctx.collab.get(row.slug);
   if (fans) return `Listeners of ${fans.via.title} also play this`;
 
@@ -446,13 +513,21 @@ function scoreContentRow(row: ContentRow, v: TasteVector): number {
     anchorFit = shared / genres.length;
   }
 
-  return (
+  const score =
     typeFit * 0.2 +
     genreFit * 0.34 +
     languageFit * 0.08 +
     anchorFit * 0.14 +
-    contentQuality(row.rating) * 0.24
-  );
+    contentQuality(row.rating) * 0.24;
+
+  // AI-mode answers: things to avoid and how long a commitment they want.
+  let fit = 1;
+  if (genres.some((genre) => v.avoidGenres.has(genre))) fit *= 0.55;
+  if (v.avoidLongSeries && (row.episodeCount ?? 0) > 60) fit *= 0.6;
+  const isFilm = type === "movie" || type === "documentary";
+  if (v.commitment === "bite-size" && !isFilm && (row.seasonCount ?? 1) > 2) fit *= 0.85;
+  if (v.commitment === "epic" && isFilm) fit *= 0.9;
+  return score * fit;
 }
 
 function scoreTrackRow(row: TrackRow, v: TasteVector, signals: TasteSignals): number {
@@ -608,6 +683,13 @@ export async function rankArtists(
       matchScore: toMatch(score),
       reason: explainArtist(row, v, ctx),
     }));
+}
+
+/** Where the user sits in embedding space, for content and for music (null without embeddings). */
+export async function tasteCentroids(signals: TasteSignals) {
+  const catalog = await loadTasteCatalog();
+  const [content, music] = await Promise.all([contentContext(signals, catalog.content), musicContext(signals, catalog)]);
+  return { content: content.profile, music: music.profile };
 }
 
 /** The user's strongest genres, explicit picks first, then moods/favorites. */

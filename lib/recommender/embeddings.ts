@@ -5,6 +5,7 @@ import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { CatalogAiError } from "@/lib/ai/errors";
 import { GEMINI_EMBEDDING_MODEL, geminiEmbed, isGeminiConfigured } from "@/lib/ai/providers/gemini";
+import { LISTEN_MOODS, WATCH_THEMES, WATCH_VIBES } from "@/lib/ai-profile/vocabulary";
 
 /**
  * Semantic layer of the recommender. Every catalog item is turned into a short
@@ -16,7 +17,8 @@ import { GEMINI_EMBEDDING_MODEL, geminiEmbed, isGeminiConfigured } from "@/lib/a
  * memory — no vector database needed.
  */
 
-export type EmbeddingKind = "content" | "track" | "artist" | "collection" | "community";
+/** "trait" = AI-mode vocabulary phrases (vibes, themes, listening moods) — used to describe a user's taste. */
+export type EmbeddingKind = "content" | "track" | "artist" | "collection" | "community" | "trait";
 
 const DIMENSIONS = 768;
 /**
@@ -141,6 +143,16 @@ async function loadSourceItems(): Promise<SourceItem[]> {
       kind: "community" as const,
       itemId: c.id,
       text: doc(`${c.name}. A fan community.`, line("Category", c.category), c.description ?? ""),
+    })),
+    ...[...WATCH_VIBES, ...WATCH_THEMES].map((option) => ({
+      kind: "trait" as const,
+      itemId: `watch:${option.id}`,
+      text: `Stories that feel ${option.phrase}.`,
+    })),
+    ...LISTEN_MOODS.map((option) => ({
+      kind: "trait" as const,
+      itemId: `listen:${option.id}`,
+      text: `Music for ${option.phrase}.`,
     })),
   ];
 }

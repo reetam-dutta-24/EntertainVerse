@@ -42,6 +42,7 @@ model User {
 
   accounts              Account[]
   tasteProfile          TasteProfile?
+  aiTasteProfile        AiTasteProfile?
   preferences           UserPreferences?
   watchlistItems        WatchlistItem[]
   collectionFavorites   CollectionFavorite[]
@@ -111,6 +112,26 @@ model TasteProfile {
   completedAt    DateTime @default(now())
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// What the AI recommender knows about a user: answers from AI mode (quiz or chat)
+/// per mode, their embedding, and the user's controls. Viewable, editable and
+/// wipeable from Settings → AI profile.
+model AiTasteProfile {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  /// Learn from watch / listen history. Off = only answers and favorites are used.
+  learnFromActivity Boolean  @default(true)
+  /// Structured answers per mode (validated by lib/ai-profile/schema.ts).
+  watch             Json     @default("{}")
+  listen            Json     @default("{}")
+  /// Query embeddings of those answers — the cold-start anchor for the recommender.
+  watchVector       Float[]
+  listenVector      Float[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
