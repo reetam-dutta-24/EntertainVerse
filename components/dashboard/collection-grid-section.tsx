@@ -10,6 +10,8 @@ import {
   COMMUNITY_GRID_ROWS,
 } from "@/lib/grid-section-config";
 import type { Collection } from "@/types";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Library, SearchX } from "lucide-react";
 
 export interface CollectionGridSectionProps {
   title: string;
@@ -86,11 +88,13 @@ export function CollectionGridSection({
               />
             ))
           ) : (
-            <p className="text-sm text-muted" style={{ gridColumn: "1 / -1" }}>
-              {query.trim()
-                ? `No results for "${query}"`
-                : emptyMessage}
-            </p>
+            <div style={{ gridColumn: "1 / -1" }}>
+              {query.trim() ? (
+                <EmptyState compact icon={<SearchX />} description={`No results for “${query}”.`} />
+              ) : (
+                <EmptyState compact icon={<Library />} description={emptyMessage} action={{ href: "/dashboard/collections", label: "Browse collections" }} />
+              )}
+            </div>
           )}
           {pageItems.length > 0 && emptySlots > 0
             ? Array.from({ length: emptySlots }).map((_, i) => (

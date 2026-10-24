@@ -97,7 +97,7 @@ export function SearchResultsView({ data }: SearchResultsViewProps) {
             tracks={data.similarSongs}
           />
           <ContentCarouselSection
-            title={`🎤 Artists Similar To ${data.topSong?.artist ?? "LiSA"}`}
+            title={data.topSong?.artist ? `🎤 Artists Similar To ${data.topSong.artist}` : "🎤 Similar Artists"}
             searchPlaceholder="Search artists…"
             items={data.similarArtists}
           />

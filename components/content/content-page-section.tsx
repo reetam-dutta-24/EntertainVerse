@@ -4,6 +4,8 @@ import {
   type CarouselSlide,
   type ContentCarouselVariant,
 } from "@/components/content/content-carousel-section";
+import { EmptyState, type EmptyStateLink } from "@/components/ui/empty-state";
+import { Sparkles } from "lucide-react";
 
 export type { CarouselSlide };
 
@@ -24,6 +26,8 @@ export interface ContentPageSectionProps {
   autoAdvanceMs?: number;
   /** Shown when slides is empty. */
   emptyMessage?: string;
+  /** Optional next action shown with the empty state. */
+  emptyAction?: EmptyStateLink;
 }
 
 /** Content detail section — heading + paginated carousel (shared app structure). */
@@ -41,6 +45,7 @@ export function ContentPageSection({
   rowHover = true,
   autoAdvanceMs,
   emptyMessage = "No related content available yet.",
+  emptyAction,
 }: ContentPageSectionProps) {
   const hasHeader = Boolean(title || subtitle || action);
   const isEmpty = slides.length === 0;
@@ -75,9 +80,7 @@ export function ContentPageSection({
       ) : null}
 
       {isEmpty ? (
-        <p className="rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-sm text-white/65">
-          {emptyMessage}
-        </p>
+        <EmptyState compact icon={<Sparkles />} description={emptyMessage} action={emptyAction} />
       ) : (
         <ContentCarouselSection
           slides={slides}

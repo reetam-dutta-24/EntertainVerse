@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { CheckCheck } from "lucide-react";
+import { CheckCheck, BellOff } from "lucide-react";
 import { NotificationItem } from "@/components/notifications/notification-item";
 import { useNotifications } from "@/components/notifications/use-notifications";
 import {
@@ -9,6 +9,7 @@ import {
   markAllNotificationsRead,
 } from "@/lib/notifications-store";
 import type { AppNotification } from "@/types";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export interface NotificationsViewProps {
   initialNotifications?: AppNotification[];
@@ -67,6 +68,15 @@ export function NotificationsView({
             />
           ))}
         </section>
+      ) : null}
+
+      {unread.length === 0 && read.length === 0 ? (
+        <EmptyState
+          compact
+          icon={<BellOff />}
+          description="No notifications yet — follows, friend requests and community activity show up here."
+          action={{ href: "/dashboard/community", label: "Join a community" }}
+        />
       ) : null}
 
       {read.length > 0 ? (

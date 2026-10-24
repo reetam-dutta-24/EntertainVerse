@@ -29,6 +29,7 @@ import { isMovieContentType } from "@/lib/content-media";
 import { HdImage } from "@/components/ui/hd-image";
 import { PlayAmbientBackground } from "@/components/collection/play-ambient-background";
 import type { ContentPlaySession, Episode } from "@/types";
+import { usePlayerShortcuts } from "@/hooks/use-player-shortcuts";
 
 interface ContentPlayViewProps {
   session: ContentPlaySession;
@@ -181,6 +182,16 @@ export function ContentPlayView({ session }: ContentPlayViewProps) {
     video.currentTime = value;
     setProgress(value);
   }
+
+  usePlayerShortcuts({
+    onTogglePlay: () => void togglePlayback(),
+    onSeekBy: (delta) => {
+      const video = videoRef.current;
+      if (!video) return;
+      handleSeek(Math.min(Math.max(video.currentTime + delta, 0), video.duration || 0));
+    },
+    onToggleMute: () => setMuted((current) => !current),
+  }, Boolean(videoUrl));
 
   function goToEpisode(episodeId: string) {
     if (episodeId === activeEpisodeId) return;

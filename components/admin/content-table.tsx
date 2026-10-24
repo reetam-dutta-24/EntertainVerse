@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus, SearchX } from "lucide-react";
 import type { AdminContentRow } from "@/components/admin/types";
 import { AdminDeleteAction } from "@/components/admin/admin-delete-action";
 import { getContentDetailPath } from "@/lib/content-routes";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export function AdminContentTable({
   rows,
@@ -15,11 +16,12 @@ export function AdminContentTable({
 }) {
   if (rows.length === 0) {
     return (
-      <p className="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center text-sm text-white/60">
-        {searchQuery
-          ? `No content matches “${searchQuery}”. Try a different title or slug.`
-          : "No catalog content yet. Create your first title to replace mock data."}
-      </p>
+      <EmptyState
+        compact
+        icon={searchQuery ? <SearchX /> : <Plus />}
+        description={searchQuery ? `No content matches “${searchQuery}”. Try a different title or slug.` : "No catalog content yet. Create your first title."}
+        action={searchQuery ? undefined : { href: "/admin/content/new", label: "Create title" }}
+      />
     );
   }
 

@@ -8,6 +8,8 @@ import {
   getUserFavoritesCatalog,
   labelForFavoriteSection,
 } from "@/lib/data/favorites";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Heart } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Favourites — AniVerse",
@@ -16,9 +18,12 @@ export const metadata: Metadata = {
 
 function EmptySection({ label }: { label: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 px-6 py-6 text-center">
-      <p className="text-sm text-white/65">No {label.toLowerCase()} in your favourites yet.</p>
-    </div>
+    <EmptyState
+      compact
+      icon={<Heart />}
+      description={`No ${label.toLowerCase()} in your favourites yet — tap the heart on anything you love.`}
+      action={{ href: "/dashboard/discover", label: "Discover something to love" }}
+    />
   );
 }
 

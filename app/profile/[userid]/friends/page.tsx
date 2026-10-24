@@ -8,6 +8,8 @@ import { listUserFriends } from "@/lib/services/follow.service";
 import { normalizeProfileSlug } from "@/lib/profile-routes";
 import { prisma } from "@/lib/prisma";
 import { mapUserSummary } from "@/lib/mappers/community.mapper";
+import { EmptyState } from "@/components/ui/empty-state";
+import { UserPlus } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -59,9 +61,7 @@ export default async function ProfileFriendsPage({ params }: FriendsPageProps) {
       </div>
 
       {friends.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-white/15 bg-white/5 px-6 py-10 text-center text-sm text-white/70">
-          No friends yet.
-        </p>
+        <EmptyState compact icon={<UserPlus />} description="No friends yet." action={{ href: "/dashboard/messages", label: "Find people to follow" }} />
       ) : (
         <ul className="flex flex-col gap-3">
           {friends.map((friend) => (

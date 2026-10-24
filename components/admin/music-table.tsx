@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus, SearchX } from "lucide-react";
 import { AdminDeleteAction } from "@/components/admin/admin-delete-action";
 import { getSongDetailPath } from "@/lib/song-routes";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export interface AdminMusicRow {
   recordId: string;
@@ -22,11 +23,12 @@ export function AdminMusicTable({
 }) {
   if (rows.length === 0) {
     return (
-      <p className="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center text-sm text-white/60">
-        {searchQuery
-          ? `No tracks match “${searchQuery}”. Try a different title, artist, or slug.`
-          : "No tracks yet. Create your first song or OST."}
-      </p>
+      <EmptyState
+        compact
+        icon={searchQuery ? <SearchX /> : <Plus />}
+        description={searchQuery ? `No tracks match “${searchQuery}”. Try a different title, artist, or slug.` : "No tracks yet. Create your first song or OST."}
+        action={searchQuery ? undefined : { href: "/admin/music/new", label: "Create track" }}
+      />
     );
   }
 

@@ -5,9 +5,10 @@ import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { useSearchParams } from "next/navigation";
 import { io, type Socket } from "socket.io-client";
 import { getSocketUrl } from "@/lib/env/socket";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, MessagesSquare } from "lucide-react";
 import { DmUserAvatar } from "@/components/messages/dm-user-avatar";
 import { refreshMessagesUnread } from "@/lib/messages-store";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface DmPeer {
   id: string;
@@ -283,7 +284,7 @@ export function DashboardMessagesPanel() {
         {loading ? (
           <p className="px-2 text-xs text-white/60">Loading…</p>
         ) : conversations.length === 0 ? (
-          <p className="px-2 text-xs text-white/60">No conversations yet.</p>
+          <EmptyState compact icon={<MessagesSquare />} description="No conversations yet. Search a username to start one." />
         ) : (
           <ul className="flex flex-col gap-1">
             {conversations.map((entry) => {

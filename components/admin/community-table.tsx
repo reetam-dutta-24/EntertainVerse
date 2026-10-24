@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus, SearchX } from "lucide-react";
 import { AdminDeleteAction } from "@/components/admin/admin-delete-action";
 import { getCommunityDetailPath } from "@/lib/community-routes";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export interface AdminCommunityRow {
   recordId: string;
@@ -24,11 +25,12 @@ export function AdminCommunityTable({
 }) {
   if (rows.length === 0) {
     return (
-      <p className="rounded-2xl border border-white/10 bg-white/5 px-4 py-8 text-center text-sm text-white/60">
-        {searchQuery
-          ? `No communities match “${searchQuery}”.`
-          : "No communities yet. Create your first global community."}
-      </p>
+      <EmptyState
+        compact
+        icon={searchQuery ? <SearchX /> : <Plus />}
+        description={searchQuery ? `No communities match “${searchQuery}”.` : "No communities yet. Create your first global community."}
+        action={searchQuery ? undefined : { href: "/admin/communities/new", label: "Create community" }}
+      />
     );
   }
 

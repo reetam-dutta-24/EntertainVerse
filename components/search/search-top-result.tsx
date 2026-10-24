@@ -8,6 +8,8 @@ import { GradientButton } from "@/components/ui/gradient-button";
 import { getProfilePath } from "@/lib/profile-routes";
 import { sectionTintSeed } from "@/lib/card-theme";
 import type { SearchPageData } from "@/lib/search/types";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SearchX } from "lucide-react";
 
 export interface SearchTopResultProps {
   data: SearchPageData;
@@ -105,7 +107,17 @@ export function SearchTopResult({ data }: SearchTopResultProps) {
     );
   }
 
-  if (!data.topContentMatches.length) return null;
+  if (!data.topContentMatches.length) {
+    return (
+      <EmptyState
+        compact
+        icon={<SearchX />}
+        title={`No exact matches for “${data.query}”`}
+        description="Check the spelling, or browse similar picks below."
+        action={{ href: "/dashboard/discover", label: "Browse Discover" }}
+      />
+    );
+  }
 
   return (
     <TopResultRow label={label}>

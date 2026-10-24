@@ -1,4 +1,6 @@
 import type { RankedItem } from "@/lib/data/analytics";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ChartColumn } from "lucide-react";
 
 export interface RankingListProps {
   items: RankedItem[];
@@ -8,9 +10,7 @@ export interface RankingListProps {
 export function RankingList({ items }: RankingListProps) {
   if (items.length === 0) {
     return (
-      <p className="py-6 text-center text-sm text-muted">
-        No activity logged yet.
-      </p>
+      <EmptyState compact icon={<ChartColumn />} description="No activity logged yet — your stats fill in as you watch and listen." action={{ href: "/dashboard/discover", label: "Start exploring" }} />
     );
   }
 

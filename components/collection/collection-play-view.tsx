@@ -40,6 +40,7 @@ import type {
   CollectionPlayQueue,
   CollectionPlayTrack,
 } from "@/types";
+import { usePlayerShortcuts } from "@/hooks/use-player-shortcuts";
 
 interface CollectionPlayViewProps {
   collectionSlug?: string;
@@ -373,6 +374,16 @@ function MusicPlayQueue({
     audio.currentTime = value;
     setProgress(value);
   }
+
+  usePlayerShortcuts({
+    onTogglePlay: () => void togglePlay(),
+    onSeekBy: (delta) => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      handleSeek(Math.min(Math.max(audio.currentTime + delta, 0), audio.duration || 0));
+    },
+    onToggleMute: () => setVolume((current) => (current > 0 ? 0 : 0.8)),
+  });
 
   const handleAddToQueue = useCallback(
     (index: number) => {

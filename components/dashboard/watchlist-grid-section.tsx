@@ -15,6 +15,8 @@ import {
   POSTER_GRID_COLS_BREAKPOINTS,
 } from "@/lib/grid-section-config";
 import type { ContentItem } from "@/types";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SearchX } from "lucide-react";
 
 export interface WatchlistGridSectionProps {
   title: string;
@@ -112,12 +114,9 @@ export function WatchlistGridSection({
                 </CarouselCardSlot>
               ))
             ) : (
-              <p
-                className="text-sm text-muted"
-                style={{ gridColumn: "1 / -1" }}
-              >
-                No results for &ldquo;{query}&rdquo;
-              </p>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <EmptyState compact icon={<SearchX />} description={<>No results for &ldquo;{query}&rdquo;. Try another title or genre.</>} />
+              </div>
             )}
             {pageItems.length > 0 && emptySlots > 0
               ? Array.from({ length: emptySlots }).map((_, i) => (

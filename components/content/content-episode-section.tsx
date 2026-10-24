@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Tv } from "lucide-react";
 import type { AccentColor, ContentSeason, Episode } from "@/types";
 import { ContentEpisodeCard } from "@/components/content/content-episode-card";
 import { ContentPageSection } from "@/components/content/content-page-section";
+import { EmptyState } from "@/components/ui/empty-state";
 
 export interface ContentEpisodeSectionProps {
   episodes: Episode[];
@@ -94,9 +95,7 @@ export function ContentEpisodeSection({
           </h2>
           {seasonAction}
         </div>
-        <p className="text-sm text-white/60">
-          No episodes available for this season yet.
-        </p>
+        <EmptyState compact icon={<Tv />} description="No episodes available for this season yet." />
       </section>
     );
   }

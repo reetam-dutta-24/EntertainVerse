@@ -394,6 +394,17 @@ body {
   animation: navigation-spin 0.75s linear infinite;
 }
 
+/* Artwork fades in instead of popping (disabled by the reduced-motion guard). */
+@keyframes image-in {
+  from {
+    opacity: 0;
+  }
+}
+
+img {
+  animation: image-in 300ms ease-out both;
+}
+
 /* Skeleton loaders — a soft violet sweep across placeholder blocks */
 @keyframes skeleton-sweep {
   100% {

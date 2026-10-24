@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clapperboard, SearchX } from "lucide-react";
 import { ArtistCard } from "@/components/cards/artist-card";
 import { PosterCard } from "@/components/cards/poster-card";
 import {
@@ -15,6 +15,7 @@ import { useColumnCount } from "@/hooks/use-column-count";
 import { resolveCardTint, sectionTintSeed } from "@/lib/card-theme";
 import { CAROUSEL_COLS_BREAKPOINTS } from "@/lib/grid-section-config";
 import type { ContentItem } from "@/types";
+import { EmptyState, type EmptyStateLink } from "@/components/ui/empty-state";
 
 export interface ContentCarouselSectionProps {
   title: string;
@@ -24,6 +25,8 @@ export interface ContentCarouselSectionProps {
   /** Auto-advance pages (ms) — for related-content rows only. */
   autoAdvanceMs?: number;
   emptyMessage?: string;
+  /** Next useful action shown with the empty state. */
+  emptyAction?: EmptyStateLink;
 }
 
 function filterContent(items: ContentItem[], query: string) {
@@ -52,6 +55,7 @@ export function ContentCarouselSection({
   searchPlaceholder,
   items,
   autoAdvanceMs,
+  emptyAction = { href: "/dashboard/discover", label: "Discover titles" },
   emptyMessage = "No related content available yet.",
 }: ContentCarouselSectionProps) {
   const [query, setQuery] = useState("");
@@ -113,9 +117,9 @@ export function ContentCarouselSection({
     return (
       <section className="flex flex-col gap-2">
         <h2 className="px-2 text-lg font-bold text-white sm:text-xl">{title}</h2>
-        <p className="mx-2 rounded-xl border border-white/10 bg-white/5 px-4 py-6 text-center text-sm text-white/65">
-          {emptyMessage}
-        </p>
+        <div className="px-2">
+          <EmptyState compact icon={<Clapperboard />} description={emptyMessage} action={emptyAction} />
+        </div>
       </section>
     );
   }
@@ -196,12 +200,9 @@ export function ContentCarouselSection({
                       </CarouselCardSlot>
                     ))
                   ) : (
-                    <p
-                      className="text-sm text-muted"
-                      style={{ gridColumn: "1 / -1" }}
-                    >
-                      No results for &ldquo;{query}&rdquo;
-                    </p>
+                    <div style={{ gridColumn: "1 / -1" }}>
+                <EmptyState compact icon={<SearchX />} description={<>No results for &ldquo;{query}&rdquo;. Try another title or genre.</>} />
+              </div>
                   )}
                   {pageItems.length > 0 && pageItems.length < itemsPerPage
                     ? Array.from({

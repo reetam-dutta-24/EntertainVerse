@@ -22,6 +22,8 @@ import {
 } from "@/components/forms/community-watch-channel-form";
 import type { CommunityDashboardSection } from "@/lib/community-routes";
 import type { CommunityDetail } from "@/types";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Megaphone, Radio, Sparkles, Tv } from "lucide-react";
 
 export interface CommunityDashboardSectionContentProps {
   section: CommunityDashboardSection;
@@ -209,7 +211,7 @@ export function CommunityDashboardSectionContent({
           </SectionHeader>
           <ScrollBody className="flex flex-col items-center gap-3">
             {community.dashboardPosts.length === 0 ? (
-              <p className="text-sm text-white/55">No posts yet. Be the first to share.</p>
+              <EmptyState compact icon={<Sparkles />} description="No posts yet. Be the first to share." />
             ) : (
               community.dashboardPosts.map((post) => (
                 <CommunityDashboardFeedPost
@@ -267,7 +269,7 @@ export function CommunityDashboardSectionContent({
           </SectionHeader>
           <ScrollBody className="flex flex-col gap-4">
             {community.dashboardWatchParties.length === 0 ? (
-              <p className="text-sm text-white/55">No watch channels yet.</p>
+              <EmptyState compact icon={<Tv />} description="No watch channels yet." />
             ) : (
               community.dashboardWatchParties.map((party) => (
                 <WatchChannelRow
@@ -301,7 +303,7 @@ export function CommunityDashboardSectionContent({
           </SectionHeader>
           <ScrollBody className="flex flex-col gap-4">
             {community.dashboardVoiceChannels.length === 0 ? (
-              <p className="text-sm text-white/55">No voice channels yet.</p>
+              <EmptyState compact icon={<Radio />} description="No voice channels yet." />
             ) : (
               community.dashboardVoiceChannels.map((channel) => (
                 <VoiceChannelRow
@@ -328,7 +330,7 @@ export function CommunityDashboardSectionContent({
           </SectionHeader>
           <ScrollBody className="flex flex-col items-center gap-3">
             {community.dashboardAnnouncements.length === 0 ? (
-              <p className="text-sm text-white/55">No announcements yet.</p>
+              <EmptyState compact icon={<Megaphone />} description="No announcements yet." />
             ) : (
               community.dashboardAnnouncements.map((post) => (
                 <CommunityDashboardFeedPost

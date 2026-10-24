@@ -13,6 +13,8 @@ import { ToggleReviewLikeButton } from "@/components/forms/toggle-review-like-bu
 import { cn } from "@/lib/utils";
 import type { ReviewTargetType } from "@/lib/review-routes";
 import type { Review } from "@/types";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Star } from "lucide-react";
 
 const REVIEW_AUTO_ADVANCE_MS = 3000;
 
@@ -149,11 +151,7 @@ export function InteractiveReviewSection({
           />
         </div>
       ) : (
-        <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 px-6 py-10 text-center">
-          <p className="text-sm text-white/70">
-            No reviews yet. Be the first to share your take.
-          </p>
-        </div>
+        <EmptyState compact icon={<Star />} description="No reviews yet. Be the first to share your take." />
       )}
     </section>
   );

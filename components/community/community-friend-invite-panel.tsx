@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
 import { DmUserAvatar } from "@/components/messages/dm-user-avatar";
+import { EmptyState } from "@/components/ui/empty-state";
 
 interface InviteFriend {
   id: string;
@@ -96,9 +97,7 @@ export function CommunityFriendInvitePanel({
       {loading ? (
         <p className="text-sm text-white/55">Loading your friends…</p>
       ) : friends.length === 0 ? (
-        <p className="rounded-xl border border-white/10 bg-black/30 px-4 py-6 text-center text-sm text-white/55">
-          No friends available to invite — they may already be members.
-        </p>
+        <EmptyState compact icon={<UserPlus />} description="No friends available to invite — they may already be members." />
       ) : (
         <ul className="flex flex-col gap-2">
           {friends.map((friend) => (

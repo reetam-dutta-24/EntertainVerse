@@ -11,6 +11,8 @@ import { SearchPill } from "@/components/dashboard/search-pill";
 import { resolveCardTint, sectionTintSeed } from "@/lib/card-theme";
 import { MUSIC_GRID_ITEMS_PER_PAGE } from "@/lib/grid-section-config";
 import type { MusicTrack } from "@/types";
+import { EmptyState } from "@/components/ui/empty-state";
+import { SearchX } from "lucide-react";
 
 export interface MusicGridSectionProps {
   title: string;
@@ -107,12 +109,9 @@ export function MusicGridSection({
                 </CarouselCardSlot>
               ))
             ) : (
-              <p
-                className="text-sm text-muted"
-                style={{ gridColumn: `1 / -1` }}
-              >
-                No results for &ldquo;{query}&rdquo;
-              </p>
+              <div style={{ gridColumn: "1 / -1" }}>
+                <EmptyState compact icon={<SearchX />} description={<>No results for &ldquo;{query}&rdquo;. Try another title or genre.</>} />
+              </div>
             )}
             {pageTracks.length > 0 && emptySlots > 0
               ? Array.from({ length: emptySlots }).map((_, i) => (
