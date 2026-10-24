@@ -1,10 +1,8 @@
 import "server-only";
 
 import { z } from "zod";
-import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { ACCENT_OPTIONS, CONTENT_GENRE_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/catalog-enums";
-import { CATALOG_MODEL, CatalogAiError, REFUSAL_FALLBACK, claude } from "@/lib/ai/claude";
-import { researchWithWeb } from "@/lib/ai/web-research";
+import { generateStructured, researchWithWeb } from "@/lib/ai/provider";
 import { contentMediaTypes, type ContentFormInput } from "@/lib/validators/admin/content";
 import { fetchAnilistFacts, searchAnilist } from "@/lib/catalog-import/sources/anilist";
 import { fetchTmdbFacts, isTmdbConfigured, searchTmdb } from "@/lib/catalog-import/sources/tmdb";
@@ -19,7 +17,7 @@ const genreValues = CONTENT_GENRE_OPTIONS.map((o) => o.value) as [string, ...str
 const languageValues = LANGUAGE_OPTIONS.map((o) => o.value) as [string, ...string[]];
 const accentValues = ACCENT_OPTIONS.map((o) => o.value) as [string, ...string[]];
 
-/** Editorial fields Claude fills on top of the facts mapped in code. */
+/** Editorial fields the model fills on top of the facts mapped in code. */
 const enrichmentSchema = z.object({
   type: z.enum(contentMediaTypes),
   description: z.string(),
@@ -39,7 +37,7 @@ const enrichmentSchema = z.object({
   notes: z.array(z.string()),
 });
 
-/** Web fallback: no structured source, so Claude also fills the factual fields. */
+/** Web fallback: no structured source, so the model also fills the factual fields. */
 const webDraftSchema = enrichmentSchema.extend({
   title: z.string(),
   nativeTitle: z.string(),
@@ -111,30 +109,19 @@ function emptyForm(): ContentFormInput {
   } as ContentFormInput;
 }
 
-async function enrich(facts: Record<string, unknown>, draft: Partial<ContentFormInput>) {
-  const response = await claude().beta.messages.parse({
-    ...REFUSAL_FALLBACK,
-    model: CATALOG_MODEL,
-    max_tokens: 16000,
-    output_config: { effort: "medium", format: betaZodOutputFormat(enrichmentSchema) },
+function enrich(facts: Record<string, unknown>, draft: Partial<ContentFormInput>) {
+  return generateStructured({
     system: STYLE_GUIDE,
-    messages: [
-      {
-        role: "user",
-        content:
-          `Facts from the metadata source:\n${JSON.stringify(facts, null, 2)}\n\n` +
-          `Fields already filled from those facts (keep consistent with them):\n` +
-          JSON.stringify({ title: draft.title, type: draft.type, year: draft.year, studio: draft.studio, meta: draft.meta }, null, 2) +
-          `\n\nFill the editorial fields.`,
-      },
-    ],
+    schema: enrichmentSchema,
+    prompt:
+      `Facts from the metadata source:\n${JSON.stringify(facts, null, 2)}\n\n` +
+      `Fields already filled from those facts (keep consistent with them):\n` +
+      JSON.stringify({ title: draft.title, type: draft.type, year: draft.year, studio: draft.studio, meta: draft.meta }, null, 2) +
+      `\n\nFill the editorial fields.`,
   });
-  if (response.stop_reason === "refusal") throw new CatalogAiError("Claude declined to write this entry.", 422);
-  if (!response.parsed_output) throw new CatalogAiError("Claude returned an unreadable draft — try again.");
-  return response.parsed_output;
 }
 
-/** Import from TMDB / AniList: facts mapped in code, editorial fields by Claude. */
+/** Import from TMDB / AniList: facts mapped in code, editorial fields by the model. */
 export async function importFromSource(candidate: Pick<CatalogCandidate, "source" | "sourceId" | "tmdbKind">): Promise<ContentImportResult> {
   let source: SourceFacts;
   if (candidate.source === "anilist") source = await fetchAnilistFacts(candidate.sourceId);
@@ -146,7 +133,7 @@ export async function importFromSource(candidate: Pick<CatalogCandidate, "source
     ...emptyForm(),
     ...source.draft,
     ...editorial,
-    // Keep source facts when Claude left a factual field blank.
+    // Keep source facts when the model left a factual field blank.
     originalAuthor: editorial.originalAuthor || source.draft.originalAuthor || "",
     country: editorial.country || source.draft.country || "",
   } as ContentFormInput;
@@ -186,17 +173,11 @@ export async function importFromWeb(query: string, typeHint?: string): Promise<C
       `if it is anime, main cast/characters (character name, voice actor or actor), and a short spoiler-free plot summary.`,
   );
 
-  const response = await claude().beta.messages.parse({
-    ...REFUSAL_FALLBACK,
-    model: CATALOG_MODEL,
-    max_tokens: 16000,
-    output_config: { effort: "medium", format: betaZodOutputFormat(webDraftSchema) },
+  const out = await generateStructured({
     system: `${STYLE_GUIDE}\n\nThe facts below come from web research. Every factual value must come from that fact sheet; anything marked unknown stays empty or null.`,
-    messages: [{ role: "user", content: `Fact sheet:\n${research.factSheet}\n\nFill the catalog entry.` }],
+    schema: webDraftSchema,
+    prompt: `Fact sheet:\n${research.factSheet}\n\nFill the catalog entry.`,
   });
-  if (response.stop_reason === "refusal") throw new CatalogAiError("Claude declined to write this entry.", 422);
-  const out = response.parsed_output;
-  if (!out) throw new CatalogAiError("Claude returned an unreadable draft — try again.");
 
   const { notes, seasons, characters, year, rating, imdbRating, malScore, seasonCount, episodeCount, ...strings } = out;
   const isFilm = out.type === "movie" || out.type === "documentary";

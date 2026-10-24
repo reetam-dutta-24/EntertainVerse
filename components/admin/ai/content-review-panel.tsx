@@ -18,12 +18,13 @@ export interface ContentReviewPanelProps {
   /** Facts from the last import — lets the reviewer check against the source. */
   facts?: Record<string, unknown>;
   aiEnabled: boolean;
+  providerLabel?: string;
   canApply: (field: ReviewIssue["field"]) => boolean;
   onApply: (field: ReviewIssue["field"], value: string) => void;
 }
 
-/** "Review with AI": rule checks + Claude's review, with one-click fixes. */
-export function ContentReviewPanel({ form, facts, aiEnabled, canApply, onApply }: ContentReviewPanelProps) {
+/** "Review with AI": rule checks + the AI provider's review, with one-click fixes. */
+export function ContentReviewPanel({ form, facts, aiEnabled, providerLabel, canApply, onApply }: ContentReviewPanelProps) {
   const [verifyOnline, setVerifyOnline] = useState(false);
   const [loading, setLoading] = useState(false);
   const [review, setReview] = useState<ContentReviewResult | null>(null);
@@ -66,8 +67,8 @@ export function ContentReviewPanel({ form, facts, aiEnabled, canApply, onApply }
             <h2 className="text-sm font-semibold text-white">Review before publishing</h2>
             <p className="mt-1 text-xs text-white/50">
               {aiEnabled
-                ? "Checks every field for errors, inconsistencies and likely-wrong facts."
-                : "Automatic consistency checks (add ANTHROPIC_API_KEY for the AI review)."}
+                ? `Checks every field for errors, inconsistencies and likely-wrong facts${providerLabel ? ` · ${providerLabel}` : ""}.`
+                : "Automatic consistency checks (add GEMINI_API_KEY or ANTHROPIC_API_KEY for the AI review)."}
             </p>
           </div>
         </div>

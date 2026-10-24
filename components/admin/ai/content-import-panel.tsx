@@ -17,6 +17,8 @@ const TYPE_HINTS = [
 export interface ContentImportPanelProps {
   aiEnabled: boolean;
   tmdbEnabled: boolean;
+  /** e.g. "Google Gemini" — shown so the admin knows which model drafts fields. */
+  providerLabel?: string;
   onImported: (result: ContentImportResult) => void;
 }
 
@@ -24,7 +26,7 @@ export interface ContentImportPanelProps {
  * Search TMDB / AniList for a title, pick the right match, and let Claude draft
  * the catalog entry from the source facts. Falls back to web research.
  */
-export function ContentImportPanel({ aiEnabled, tmdbEnabled, onImported }: ContentImportPanelProps) {
+export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onImported }: ContentImportPanelProps) {
   const [query, setQuery] = useState("");
   const [typeHint, setTypeHint] = useState<(typeof TYPE_HINTS)[number]["value"]>("");
   const [candidates, setCandidates] = useState<CatalogCandidate[] | null>(null);
@@ -85,15 +87,16 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, onImported }: Conte
           <h2 className="text-sm font-semibold text-white">Import with AI</h2>
           <p className="mt-1 text-xs text-white/55">
             Search a title — facts come from {tmdbEnabled ? "TMDB (movies, shows, K-dramas) and " : ""}AniList (anime), and
-            Claude drafts the editorial fields. You review everything before saving.
+            {providerLabel ?? "the AI model"} drafts the editorial fields. You review everything before saving.
           </p>
         </div>
       </div>
 
       {!aiEnabled ? (
         <p className="rounded-xl border border-amber-300/30 bg-amber-300/[0.08] px-4 py-3 text-xs text-amber-100">
-          AI import needs a Claude API key. Add <code className="font-mono">ANTHROPIC_API_KEY</code> to{" "}
-          <code className="font-mono">.env.local</code> and restart the server.
+          AI import needs a model key. Add <code className="font-mono">GEMINI_API_KEY</code> (free, from Google AI
+          Studio) or <code className="font-mono">ANTHROPIC_API_KEY</code> to <code className="font-mono">.env.local</code>{" "}
+          and restart the server.
         </p>
       ) : (
         <>

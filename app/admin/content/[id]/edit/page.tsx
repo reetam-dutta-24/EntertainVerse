@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ContentForm } from "@/components/admin/content-form";
 import { requireContentAdmin } from "@/lib/auth-guards";
-import { isClaudeConfigured } from "@/lib/ai/claude";
+import { activeProvider, PROVIDER_LABELS } from "@/lib/ai/provider";
 import { isTmdbConfigured } from "@/lib/catalog-import/sources/tmdb";
 import { contentRecordToFormInput, getContentRecordById } from "@/lib/services/content.service";
 
@@ -13,6 +13,15 @@ export const metadata: Metadata = {
 
 interface EditContentPageProps {
   params: Promise<{ id: string }>;
+}
+
+function aiSettings() {
+  const provider = activeProvider();
+  return {
+    enabled: provider !== null,
+    tmdbEnabled: isTmdbConfigured(),
+    providerLabel: provider ? PROVIDER_LABELS[provider] : undefined,
+  };
 }
 
 export default async function AdminEditContentPage({ params }: EditContentPageProps) {
@@ -33,7 +42,7 @@ export default async function AdminEditContentPage({ params }: EditContentPagePr
         mode="edit"
         contentId={id}
         initial={initial}
-        ai={{ enabled: isClaudeConfigured(), tmdbEnabled: isTmdbConfigured() }}
+        ai={aiSettings()}
       />
     </div>
   );

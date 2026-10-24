@@ -1,9 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
-import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
-import { CATALOG_MODEL, CatalogAiError, REFUSAL_FALLBACK, claude } from "@/lib/ai/claude";
-import { researchWithWeb } from "@/lib/ai/web-research";
+import { generateStructured, researchWithWeb } from "@/lib/ai/provider";
 import { contentFormSchema, type ContentFormInput } from "@/lib/validators/admin/content";
 import { CONTENT_GENRE_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/catalog-enums";
 
@@ -138,11 +136,9 @@ export async function reviewContentForm(
     sources = research.sources;
   }
 
-  const response = await claude().beta.messages.parse({
-    ...REFUSAL_FALLBACK,
-    model: CATALOG_MODEL,
-    max_tokens: 16000,
-    output_config: { effort: "high", format: betaZodOutputFormat(reviewSchema) },
+  const out = await generateStructured({
+    depth: "deep",
+    schema: reviewSchema,
     system:
       "You review catalog entries for AniVerse before an admin publishes them. Find values that are wrong, " +
       "inconsistent with each other, implausible for this title, badly formatted, or important but missing.\n\n" +
@@ -156,20 +152,11 @@ export async function reviewContentForm(
       "- suggestedValue must be the exact replacement value for that field (comma-separated for list fields), or null.\n" +
       "- No issue for empty optional fields unless they matter for this title. An empty issue list is a valid result.\n" +
       "- summary: one sentence on overall readiness.",
-    messages: [
-      {
-        role: "user",
-        content:
-          (facts ? `Reference facts:\n${JSON.stringify(facts, null, 2)}\n\n` : "No reference facts — rely on well-established knowledge only.\n\n") +
-          `Already found by automatic checks:\n${JSON.stringify(ruleIssues.map((i) => `${i.field}: ${i.message}`))}\n\n` +
-          `Catalog entry:\n${JSON.stringify(compactForm(form), null, 2)}`,
-      },
-    ],
+    prompt:
+      (facts ? `Reference facts:\n${JSON.stringify(facts, null, 2)}\n\n` : "No reference facts — rely on well-established knowledge only.\n\n") +
+      `Already found by automatic checks:\n${JSON.stringify(ruleIssues.map((i) => `${i.field}: ${i.message}`))}\n\n` +
+      `Catalog entry:\n${JSON.stringify(compactForm(form), null, 2)}`,
   });
-
-  if (response.stop_reason === "refusal") throw new CatalogAiError("Claude declined to review this entry.", 422);
-  const out = response.parsed_output;
-  if (!out) throw new CatalogAiError("Claude returned an unreadable review — try again.");
 
   const aiIssues: ReviewIssue[] = out.issues.map((issue) => ({
     ...issue,

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireContentAdminApi } from "@/lib/admin-auth";
-import { isClaudeConfigured, toCatalogAiError } from "@/lib/ai/claude";
+import { asCatalogAiError } from "@/lib/ai/errors";
+import { isAiConfigured } from "@/lib/ai/provider";
 import { checkContentRules, reviewContentForm } from "@/lib/ai/content-review";
 import type { ContentFormInput } from "@/lib/validators/admin/content";
 
@@ -23,11 +24,11 @@ export async function POST(request: Request) {
   }
   const form = parsed.data.form as unknown as ContentFormInput;
 
-  // Without Claude, still return the rule-based checks.
-  if (!isClaudeConfigured()) {
+  // Without an AI provider, still return the rule-based checks.
+  if (!isAiConfigured()) {
     return NextResponse.json({
       review: {
-        summary: "Automatic checks only — add ANTHROPIC_API_KEY to enable the AI review.",
+        summary: "Automatic checks only — add GEMINI_API_KEY (free) or ANTHROPIC_API_KEY to enable the AI review.",
         issues: checkContentRules(form),
         checkedOnline: false,
         sources: [],
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ review });
   } catch (error) {
-    const aiError = toCatalogAiError(error);
+    const aiError = asCatalogAiError(error);
     console.error("[admin ai review]", error);
     return NextResponse.json({ error: aiError.message }, { status: aiError.status });
   }

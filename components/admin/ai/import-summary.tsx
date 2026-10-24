@@ -31,7 +31,7 @@ export function ImportSummary({ result, onDismiss }: { result: ContentImportResu
           <h2 className="font-semibold text-white">Draft imported — review before saving</h2>
           <p className="mt-1 text-xs text-white/60">
             {fromSource.length} fields from {sourceLabel}
-            {fromAi.length ? ` · ${fromAi.length} drafted by Claude` : ""}. Nothing is saved until you press Create.
+            {fromAi.length ? ` · ${fromAi.length} drafted by AI` : ""}. Nothing is saved until you press Create.
           </p>
         </div>
         <button
@@ -47,7 +47,7 @@ export function ImportSummary({ result, onDismiss }: { result: ContentImportResu
       {fromAi.length ? (
         <p className="flex flex-wrap items-center gap-1.5 text-xs text-white/70">
           <Sparkles className="size-3.5 text-brand-pink" aria-hidden />
-          <span className="text-white/55">Drafted by Claude — check these:</span>
+          <span className="text-white/55">Drafted by AI — check these:</span>
           {fromAi.map((field) => (
             <span key={field} className="rounded-full bg-white/10 px-2 py-0.5 text-white/85">
               {fieldLabel(field)}

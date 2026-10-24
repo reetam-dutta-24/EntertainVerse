@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireContentAdminApi } from "@/lib/admin-auth";
-import { isClaudeConfigured, toCatalogAiError } from "@/lib/ai/claude";
+import { asCatalogAiError } from "@/lib/ai/errors";
+import { isAiConfigured } from "@/lib/ai/provider";
 import { importFromSource, importFromWeb } from "@/lib/ai/content-import";
 
 const bodySchema = z.union([
@@ -23,9 +24,9 @@ export async function POST(request: Request) {
   const denied = await requireContentAdminApi();
   if (denied) return denied;
 
-  if (!isClaudeConfigured()) {
+  if (!isAiConfigured()) {
     return NextResponse.json(
-      { error: "AI import isn't set up yet — add ANTHROPIC_API_KEY to .env.local." },
+      { error: "AI import isn't set up yet — add GEMINI_API_KEY (free) or ANTHROPIC_API_KEY to .env.local." },
       { status: 503 },
     );
   }
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
         : await importFromWeb(parsed.data.query, parsed.data.typeHint);
     return NextResponse.json({ result });
   } catch (error) {
-    const aiError = toCatalogAiError(error);
+    const aiError = asCatalogAiError(error);
     console.error("[admin ai import]", error);
     return NextResponse.json({ error: aiError.message }, { status: aiError.status });
   }

@@ -34,7 +34,7 @@ export interface ContentFormProps {
   contentId?: string;
   initial: ContentFormInput;
   /** Which AI helpers are configured on the server. */
-  ai?: { enabled: boolean; tmdbEnabled: boolean };
+  ai?: { enabled: boolean; tmdbEnabled: boolean; providerLabel?: string };
 }
 
 const NUMBER_FIELDS = new Set<keyof ContentFormInput>(["rating", "year", "imdbRating", "malScore", "seasonCount", "episodeCount"]);
@@ -304,7 +304,7 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
   return (
     <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
       {mode === "create" ? (
-        <ContentImportPanel aiEnabled={ai.enabled} tmdbEnabled={ai.tmdbEnabled} onImported={(result) => void handleImported(result)} />
+        <ContentImportPanel aiEnabled={ai.enabled} tmdbEnabled={ai.tmdbEnabled} providerLabel={ai.providerLabel} onImported={(result) => void handleImported(result)} />
       ) : null}
       {importResult ? <ImportSummary result={importResult} onDismiss={() => setImportResult(null)} /> : null}
       {draftRestored ? (
@@ -803,6 +803,7 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
         form={form}
         facts={importFacts}
         aiEnabled={ai.enabled}
+        providerLabel={ai.providerLabel}
         canApply={canApplySuggestion}
         onApply={applySuggestion}
       />
