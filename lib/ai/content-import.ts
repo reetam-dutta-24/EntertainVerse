@@ -2,7 +2,8 @@ import "server-only";
 
 import { z } from "zod";
 import { ACCENT_OPTIONS, CONTENT_GENRE_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/catalog-enums";
-import { generateStructured, researchWithWeb } from "@/lib/ai/provider";
+import { activeProviderLabel, generateStructured, researchWithWeb } from "@/lib/ai/provider";
+import type { ProgressReporter } from "@/lib/ai/progress-types";
 import { contentMediaTypes, type ContentFormInput } from "@/lib/validators/admin/content";
 import { fetchAnilistFacts, searchAnilist } from "@/lib/catalog-import/sources/anilist";
 import { fetchTmdbFacts, isTmdbConfigured, searchTmdb } from "@/lib/catalog-import/sources/tmdb";
@@ -123,12 +124,19 @@ function enrich(facts: Record<string, unknown>, draft: Partial<ContentFormInput>
 }
 
 /** Import from TMDB / AniList: facts mapped in code, editorial fields by the model. */
-export async function importFromSource(candidate: Pick<CatalogCandidate, "source" | "sourceId" | "tmdbKind">): Promise<ContentImportResult> {
+export async function importFromSource(
+  candidate: Pick<CatalogCandidate, "source" | "sourceId" | "tmdbKind">,
+  report: ProgressReporter = () => {},
+): Promise<ContentImportResult> {
+  const sourceName = candidate.source === "anilist" ? "AniList" : "TMDB";
+  report({ label: `Fetching facts, episodes and cast from ${sourceName}`, percent: 5, ceiling: 22 });
   let source: SourceFacts;
   if (candidate.source === "anilist") source = await fetchAnilistFacts(candidate.sourceId);
   else source = await fetchTmdbFacts(candidate.sourceId, candidate.tmdbKind ?? "movie");
 
+  report({ label: `Drafting the editorial fields with ${activeProviderLabel()}`, percent: 25, ceiling: 92 });
   const ai = await enrich(source.facts, source.draft);
+  report({ label: "Assembling the draft", percent: 95, ceiling: 99 });
   const { notes, ...editorial } = ai;
   const draft: ContentFormInput = {
     ...emptyForm(),
@@ -165,7 +173,12 @@ export async function importFromSource(candidate: Pick<CatalogCandidate, "source
 }
 
 /** Fallback when no metadata source has the title: research on the web, then map. */
-export async function importFromWeb(query: string, typeHint?: string): Promise<ContentImportResult> {
+export async function importFromWeb(
+  query: string,
+  typeHint?: string,
+  report: ProgressReporter = () => {},
+): Promise<ContentImportResult> {
+  report({ label: `Researching "${query}" on the web with ${activeProviderLabel()}`, percent: 4, ceiling: 50 });
   const research = await researchWithWeb(
     `Research the ${typeHint ? `${typeHint} ` : ""}title "${query}". Write a fact sheet covering: official English and ` +
       `native titles, type, release/air dates, status, number of seasons and episodes (with per-season counts), ` +
@@ -174,6 +187,7 @@ export async function importFromWeb(query: string, typeHint?: string): Promise<C
       `if it is anime, main cast/characters (character name, voice actor or actor), and a short spoiler-free plot summary.`,
   );
 
+  report({ label: `Drafting the entry from ${research.sources.length || "the"} web sources`, percent: 55, ceiling: 94 });
   const out = await generateStructured({
     system: `${STYLE_GUIDE}\n\nThe facts below come from web research. Every factual value must come from that fact sheet; anything marked unknown stays empty or null.`,
     schema: webDraftSchema,

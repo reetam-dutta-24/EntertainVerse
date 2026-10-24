@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireContentAdminApi } from "@/lib/admin-auth";
-import { asCatalogAiError } from "@/lib/ai/errors";
+import { streamAiTask } from "@/lib/ai/progress-stream";
 import { isAiConfigured } from "@/lib/ai/provider";
 import { importFromSource, importFromWeb } from "@/lib/ai/content-import";
 
@@ -19,7 +19,7 @@ const bodySchema = z.union([
   }),
 ]);
 
-/** POST /api/admin/ai/content/import — build a pre-filled content draft. */
+/** POST /api/admin/ai/content/import — build a pre-filled content draft, streaming progress. */
 export async function POST(request: Request) {
   const denied = await requireContentAdminApi();
   if (denied) return denied;
@@ -36,15 +36,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid import request." }, { status: 400 });
   }
 
-  try {
-    const result =
-      parsed.data.mode === "source"
-        ? await importFromSource(parsed.data)
-        : await importFromWeb(parsed.data.query, parsed.data.typeHint);
-    return NextResponse.json({ result });
-  } catch (error) {
-    const aiError = asCatalogAiError(error);
-    console.error("[admin ai import]", error);
-    return NextResponse.json({ error: aiError.message }, { status: aiError.status });
-  }
+  const input = parsed.data;
+  // Streams NDJSON progress lines, then the draft (or an error line).
+  return streamAiTask("admin ai import", (report) =>
+    input.mode === "source"
+      ? importFromSource(input, report)
+      : importFromWeb(input.query, input.typeHint, report),
+  );
 }

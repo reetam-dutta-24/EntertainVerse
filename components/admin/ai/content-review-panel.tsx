@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { Check, CircleAlert, ExternalLink, Info, LoaderCircle, ShieldCheck, TriangleAlert } from "lucide-react";
+import { AiProgress } from "@/components/admin/ai/ai-progress";
 import { fieldLabel } from "@/components/admin/ai/import-summary";
+import { useAiTask } from "@/hooks/use-ai-task";
 import type { ContentReviewResult, ReviewIssue, ReviewSeverity } from "@/lib/ai/content-review";
 import type { ContentFormInput } from "@/lib/validators/admin/content";
 import { cn } from "@/lib/utils";
@@ -30,20 +32,14 @@ export function ContentReviewPanel({ form, facts, aiEnabled, providerLabel, canA
   const [review, setReview] = useState<ContentReviewResult | null>(null);
   const [applied, setApplied] = useState<Set<number>>(new Set());
   const [error, setError] = useState<string | null>(null);
+  const reviewTask = useAiTask<ContentReviewResult>();
 
   async function runReview() {
     setLoading(true);
     setError(null);
     setApplied(new Set());
     try {
-      const response = await fetch("/api/admin/ai/content/review", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ form, facts, verifyOnline }),
-      });
-      const data = (await response.json()) as { review?: ContentReviewResult; error?: string };
-      if (!response.ok || !data.review) throw new Error(data.error ?? "Review failed.");
-      setReview(data.review);
+      setReview(await reviewTask.run("/api/admin/ai/content/review", { form, facts, verifyOnline }));
     } catch (reviewError) {
       setError(reviewError instanceof Error ? reviewError.message : "Review failed.");
     } finally {
@@ -95,6 +91,8 @@ export function ContentReviewPanel({ form, facts, aiEnabled, providerLabel, canA
           ) : null}
         </div>
       </div>
+
+      {reviewTask.progress ? <AiProgress progress={reviewTask.progress} /> : null}
 
       {error ? <p className="text-sm text-red-300">{error}</p> : null}
 

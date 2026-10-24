@@ -1,7 +1,8 @@
 import "server-only";
 
 import { z } from "zod";
-import { generateStructured, researchWithWeb } from "@/lib/ai/provider";
+import { activeProviderLabel, generateStructured, researchWithWeb } from "@/lib/ai/provider";
+import type { ProgressReporter } from "@/lib/ai/progress-types";
 import { contentFormSchema, type ContentFormInput } from "@/lib/validators/admin/content";
 import { CONTENT_GENRE_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/catalog-enums";
 
@@ -120,12 +121,15 @@ function compactForm(form: ContentFormInput) {
 export async function reviewContentForm(
   form: ContentFormInput,
   options: { facts?: Record<string, unknown>; verifyOnline?: boolean } = {},
+  report: ProgressReporter = () => {},
 ): Promise<ContentReviewResult> {
+  report({ label: "Running automatic consistency checks", percent: 5, ceiling: 10 });
   const ruleIssues = checkContentRules(form);
   let facts = options.facts;
   let sources: ContentReviewResult["sources"] = [];
 
   if (options.verifyOnline && form.title.trim()) {
+    report({ label: `Verifying "${form.title}" online`, percent: 12, ceiling: 45 });
     const research = await researchWithWeb(
       `Find authoritative facts for the ${form.type} "${form.title}"${form.year ? ` (${form.year})` : ""} so an editor ` +
         `can verify a catalog entry: release/air dates, status, seasons and episodes, runtime, studio, director/creator, ` +
@@ -136,6 +140,8 @@ export async function reviewContentForm(
     sources = research.sources;
   }
 
+  const reviewStart = options.verifyOnline ? 50 : 15;
+  report({ label: `Reviewing ${FIELD_KEYS.length} fields with ${activeProviderLabel()}`, percent: reviewStart, ceiling: 94 });
   const out = await generateStructured({
     depth: "deep",
     schema: reviewSchema,

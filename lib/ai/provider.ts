@@ -38,6 +38,12 @@ export function activeProvider(): AiProviderName | null {
   return null;
 }
 
+/** "Google Gemini" / "Anthropic Claude" — used in progress labels. */
+export function activeProviderLabel() {
+  const provider = activeProvider();
+  return provider ? PROVIDER_LABELS[provider] : "the AI model";
+}
+
 export function isAiConfigured() {
   return activeProvider() !== null;
 }

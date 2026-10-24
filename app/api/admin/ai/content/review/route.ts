@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { requireContentAdminApi } from "@/lib/admin-auth";
-import { asCatalogAiError } from "@/lib/ai/errors";
+import { streamAiTask } from "@/lib/ai/progress-stream";
 import { isAiConfigured } from "@/lib/ai/provider";
 import { checkContentRules, reviewContentForm } from "@/lib/ai/content-review";
 import type { ContentFormInput } from "@/lib/validators/admin/content";
@@ -13,7 +13,7 @@ const bodySchema = z.object({
   verifyOnline: z.boolean().optional(),
 });
 
-/** POST /api/admin/ai/content/review — check a content form before publishing. */
+/** POST /api/admin/ai/content/review — check a content form before publishing, streaming progress. */
 export async function POST(request: Request) {
   const denied = await requireContentAdminApi();
   if (denied) return denied;
@@ -26,25 +26,15 @@ export async function POST(request: Request) {
 
   // Without an AI provider, still return the rule-based checks.
   if (!isAiConfigured()) {
-    return NextResponse.json({
-      review: {
-        summary: "Automatic checks only — add GEMINI_API_KEY (free) or ANTHROPIC_API_KEY to enable the AI review.",
-        issues: checkContentRules(form),
-        checkedOnline: false,
-        sources: [],
-      },
-    });
+    return streamAiTask("admin ai review", async () => ({
+      summary: "Automatic checks only — add GEMINI_API_KEY (free) or ANTHROPIC_API_KEY to enable the AI review.",
+      issues: checkContentRules(form),
+      checkedOnline: false,
+      sources: [],
+    }));
   }
 
-  try {
-    const review = await reviewContentForm(form, {
-      facts: parsed.data.facts,
-      verifyOnline: parsed.data.verifyOnline,
-    });
-    return NextResponse.json({ review });
-  } catch (error) {
-    const aiError = asCatalogAiError(error);
-    console.error("[admin ai review]", error);
-    return NextResponse.json({ error: aiError.message }, { status: aiError.status });
-  }
+  const { facts, verifyOnline } = parsed.data;
+  // Streams NDJSON progress lines, then the review (or an error line).
+  return streamAiTask("admin ai review", (report) => reviewContentForm(form, { facts, verifyOnline }, report));
 }

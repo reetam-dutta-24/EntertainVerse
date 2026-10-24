@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Globe, LoaderCircle, Search, Sparkles } from "lucide-react";
+import { AiProgress } from "@/components/admin/ai/ai-progress";
+import { useAiTask } from "@/hooks/use-ai-task";
 import { SOURCE_LABELS, type CatalogCandidate, type ContentImportResult } from "@/lib/catalog-import/types";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +35,7 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
   const [searching, setSearching] = useState(false);
   const [importingKey, setImportingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const importTask = useAiTask<ContentImportResult>();
 
   async function search() {
     if (query.trim().length < 2) return;
@@ -58,14 +61,8 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
     setImportingKey(key);
     setError(null);
     try {
-      const response = await fetch("/api/admin/ai/content/import", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = (await response.json()) as { result?: ContentImportResult; error?: string };
-      if (!response.ok || !data.result) throw new Error(data.error ?? "Import failed.");
-      onImported(data.result);
+      const result = await importTask.run("/api/admin/ai/content/import", body);
+      onImported(result);
       setCandidates(null);
     } catch (importError) {
       setError(importError instanceof Error ? importError.message : "Import failed.");
@@ -212,12 +209,11 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
             </div>
           ) : null}
 
-          {importingKey ? (
-            <p role="status" className="text-xs text-white/55">
-              {importingKey === "web"
-                ? "Researching on the web and drafting the entry — this can take a minute…"
-                : "Fetching facts and drafting the entry — usually 15–40 seconds…"}
-            </p>
+          {importTask.progress ? (
+            <AiProgress
+              progress={importTask.progress}
+              hint={importingKey === "web" ? "Web research usually takes about a minute." : "Free-tier models can take 30–60 seconds."}
+            />
           ) : null}
         </>
       )}
