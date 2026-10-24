@@ -60,6 +60,20 @@ export function useFormDraft<T>(storageKey: string, initial: T) {
     setMeta({ restored: false });
   }, [storageKey]);
 
+  /** Bumped on every reset — key the <form> on it so field widgets with their own state remount. */
+  const [resetKey, setResetKey] = useState(0);
+
+  /** Start over: replace the form with `value` and forget the browser draft. */
+  const resetForm = useCallback(
+    (value: T) => {
+      if (typeof window !== "undefined") window.localStorage.removeItem(storageKey);
+      setFormState(value);
+      setMeta({ restored: false });
+      setResetKey((key) => key + 1);
+    },
+    [storageKey],
+  );
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const timer = window.setTimeout(() => {
@@ -91,5 +105,5 @@ export function useFormDraft<T>(storageKey: string, initial: T) {
     return () => window.removeEventListener("beforeunload", persistNow);
   }, [form, storageKey]);
 
-  return { form, setForm, clearDraft, draftRestored: meta.restored };
+  return { form, setForm, clearDraft, resetForm, resetKey, draftRestored: meta.restored };
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useFormDraft } from "@/hooks/use-form-draft";
+import { FormResetButton } from "@/components/admin/form-reset-button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import {
   ACCENT_OPTIONS,
@@ -180,7 +181,7 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
     mode === "create"
       ? "aniverse:admin:content:create"
       : `aniverse:admin:content:edit:${contentId}`;
-  const { form, setForm, clearDraft, draftRestored } = useFormDraft<ContentFormInput>(
+  const { form, setForm, clearDraft, resetForm, resetKey, draftRestored } = useFormDraft<ContentFormInput>(
     draftKey,
     initial,
   );
@@ -253,6 +254,15 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
     });
   }
 
+  /** Start over: empty form on create, last saved version on edit. */
+  function handleReset() {
+    resetForm(initial);
+    setSlugTouched(mode === "edit");
+    setError(null);
+    setImportResult(null);
+    setImportFacts(undefined);
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
@@ -310,7 +320,10 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+    <form key={resetKey} onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+      <div className="flex justify-end">
+        <FormResetButton mode={mode} onReset={handleReset} disabled={pending} className="w-full sm:w-auto" />
+      </div>
       {mode === "create" ? (
         <CatalogImportPanel<ContentImportResult>
           apiBase="/api/admin/ai/content"
@@ -865,6 +878,7 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
         >
           Cancel
         </button>
+        <FormResetButton mode={mode} onReset={handleReset} disabled={pending} className="sm:ms-auto" />
       </div>
     </form>
   );

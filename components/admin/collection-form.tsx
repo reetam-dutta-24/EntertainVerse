@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useFormDraft } from "@/hooks/use-form-draft";
+import { FormResetButton } from "@/components/admin/form-reset-button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import {
   ACCENT_OPTIONS,
@@ -43,7 +44,7 @@ export function CollectionForm({ mode, recordId, initial }: CollectionFormProps)
     mode === "create"
       ? "aniverse:admin:collection:create"
       : `aniverse:admin:collection:edit:${recordId}`;
-  const { form, setForm, clearDraft, draftRestored } = useFormDraft<AdminCollectionFormInput>(
+  const { form, setForm, clearDraft, resetForm, resetKey, draftRestored } = useFormDraft<AdminCollectionFormInput>(
     draftKey,
     initial,
   );
@@ -109,6 +110,13 @@ export function CollectionForm({ mode, recordId, initial }: CollectionFormProps)
     }));
   }
 
+  /** Start over: empty form on create, last saved version on edit. */
+  function handleReset() {
+    resetForm(initial);
+    setSlugTouched(mode === "edit");
+    setError(null);
+  }
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
@@ -139,7 +147,10 @@ export function CollectionForm({ mode, recordId, initial }: CollectionFormProps)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+    <form key={resetKey} onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+      <div className="flex justify-end">
+        <FormResetButton mode={mode} onReset={handleReset} disabled={pending} className="w-full sm:w-auto" />
+      </div>
       {draftRestored ? (
         <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-xs text-amber-100/90">
           Restored your unsaved draft from this browser.
@@ -284,7 +295,7 @@ export function CollectionForm({ mode, recordId, initial }: CollectionFormProps)
       </Section>
 
       {error ? <p className="text-sm text-red-400">{error}</p> : null}
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <GradientButton type="submit" disabled={pending} className="rounded-full px-6">
           {pending ? "Saving…" : mode === "create" ? "Create collection" : "Save changes"}
         </GradientButton>
@@ -295,6 +306,7 @@ export function CollectionForm({ mode, recordId, initial }: CollectionFormProps)
         >
           Cancel
         </button>
+        <FormResetButton mode={mode} onReset={handleReset} disabled={pending} className="sm:ms-auto" />
       </div>
     </form>
   );

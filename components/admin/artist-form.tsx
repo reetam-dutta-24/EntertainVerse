@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useFormDraft } from "@/hooks/use-form-draft";
+import { FormResetButton } from "@/components/admin/form-reset-button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import {
   ACCENT_OPTIONS,
@@ -61,7 +62,7 @@ export function ArtistForm({ mode, recordId, initial, ai = { enabled: false, tmd
     mode === "create"
       ? "aniverse:admin:artist:create"
       : `aniverse:admin:artist:edit:${recordId}`;
-  const { form, setForm, clearDraft, draftRestored } = useFormDraft<ArtistFormInput>(
+  const { form, setForm, clearDraft, resetForm, resetKey, draftRestored } = useFormDraft<ArtistFormInput>(
     draftKey,
     initial,
   );
@@ -128,6 +129,15 @@ export function ArtistForm({ mode, recordId, initial, ai = { enabled: false, tmd
     update(key, value as never);
   }
 
+  /** Start over: empty form on create, last saved version on edit. */
+  function handleReset() {
+    resetForm(initial);
+    setSlugTouched(mode === "edit");
+    setError(null);
+    setImportResult(null);
+    setImportFacts(undefined);
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -155,7 +165,10 @@ export function ArtistForm({ mode, recordId, initial, ai = { enabled: false, tmd
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+    <form key={resetKey} onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+      <div className="flex justify-end">
+        <FormResetButton mode={mode} onReset={handleReset} disabled={pending} className="w-full sm:w-auto" />
+      </div>
       {mode === "create" ? (
         <CatalogImportPanel<ArtistImportResult>
           apiBase="/api/admin/ai/artists"
@@ -281,11 +294,12 @@ export function ArtistForm({ mode, recordId, initial, ai = { enabled: false, tmd
       />
 
       {error ? <p className="text-sm text-red-400">{error}</p> : null}
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <GradientButton type="submit" disabled={pending} className="rounded-full px-6">
           {pending ? "Saving…" : mode === "create" ? "Create artist" : "Save changes"}
         </GradientButton>
         <button type="button" onClick={() => router.back()} className="cursor-pointer rounded-full border border-white/20 px-5 py-2 text-sm text-white/80 hover:bg-white/10">Cancel</button>
+        <FormResetButton mode={mode} onReset={handleReset} disabled={pending} className="sm:ms-auto" />
       </div>
     </form>
   );

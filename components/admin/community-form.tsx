@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useFormDraft } from "@/hooks/use-form-draft";
+import { FormResetButton } from "@/components/admin/form-reset-button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { ACCENT_OPTIONS } from "@/lib/catalog-enums";
 import { Field, Section, inputClass } from "@/components/admin/catalog-nested-fields";
@@ -38,7 +39,7 @@ export function CommunityForm({ mode, recordId, initial }: CommunityFormProps) {
     mode === "create"
       ? "aniverse:admin:community:create"
       : `aniverse:admin:community:edit:${recordId}`;
-  const { form, setForm, clearDraft, draftRestored } = useFormDraft<AdminCommunityFormInput>(
+  const { form, setForm, clearDraft, resetForm, resetKey, draftRestored } = useFormDraft<AdminCommunityFormInput>(
     draftKey,
     initial,
   );
@@ -51,6 +52,13 @@ export function CommunityForm({ mode, recordId, initial }: CommunityFormProps) {
     value: AdminCommunityFormInput[K],
   ) {
     setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  /** Start over: empty form on create, last saved version on edit. */
+  function handleReset() {
+    resetForm(initial);
+    setSlugTouched(mode === "edit");
+    setError(null);
   }
 
   async function handleSubmit(event: React.FormEvent) {
@@ -83,7 +91,10 @@ export function CommunityForm({ mode, recordId, initial }: CommunityFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+    <form key={resetKey} onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+      <div className="flex justify-end">
+        <FormResetButton mode={mode} onReset={handleReset} disabled={pending} className="w-full sm:w-auto" />
+      </div>
       {draftRestored ? (
         <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-xs text-amber-100/90">
           Restored your unsaved draft from this browser.
@@ -192,7 +203,7 @@ export function CommunityForm({ mode, recordId, initial }: CommunityFormProps) {
       </Section>
 
       {error ? <p className="text-sm text-red-400">{error}</p> : null}
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <GradientButton type="submit" disabled={pending} className="rounded-full px-6">
           {pending ? "Saving…" : mode === "create" ? "Create community" : "Save changes"}
         </GradientButton>
@@ -203,6 +214,7 @@ export function CommunityForm({ mode, recordId, initial }: CommunityFormProps) {
         >
           Cancel
         </button>
+        <FormResetButton mode={mode} onReset={handleReset} disabled={pending} className="sm:ms-auto" />
       </div>
     </form>
   );
