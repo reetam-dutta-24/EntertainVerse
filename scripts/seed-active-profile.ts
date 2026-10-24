@@ -14,7 +14,7 @@ import { prisma } from "@/lib/prisma";
 import { collectionFormSchema } from "@/lib/validators/collection";
 import { communityPostFormSchema } from "@/lib/validators/community";
 import { reviewFormSchema } from "@/lib/validators/review";
-import { addCollectionItem, createCollection } from "@/lib/services/collection.service";
+import { createCollection } from "@/lib/services/collection.service";
 import { isCollectionFollowed, toggleCollectionFollow } from "@/lib/services/collection-follow.service";
 import {
   isArtistFavorited,

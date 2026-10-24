@@ -22,12 +22,29 @@ import {
 } from "@/components/admin/catalog-nested-fields";
 import { EnumMultiSelect, EnumSelect } from "@/components/admin/enum-selectors";
 import { ImageUploadInput } from "@/components/ui/image-upload-input";
+import { ContentImportPanel } from "@/components/admin/ai/content-import-panel";
+import { ImportSummary } from "@/components/admin/ai/import-summary";
+import { ContentReviewPanel } from "@/components/admin/ai/content-review-panel";
+import { useConfirm } from "@/components/feedback/feedback-provider";
+import type { ContentImportResult } from "@/lib/catalog-import/types";
+import type { ReviewIssue } from "@/lib/ai/content-review";
 
 export interface ContentFormProps {
   mode: "create" | "edit";
   contentId?: string;
   initial: ContentFormInput;
+  /** Which AI helpers are configured on the server. */
+  ai?: { enabled: boolean; tmdbEnabled: boolean };
 }
+
+const NUMBER_FIELDS = new Set<keyof ContentFormInput>(["rating", "year", "imdbRating", "malScore", "seasonCount", "episodeCount"]);
+const LIST_FIELDS = new Set<keyof ContentFormInput>(["genreLabels", "languages", "highlightTags", "featuredTrackSlugs", "relatedContentSlugs"]);
+/** Structured editors — the reviewer can flag them, but fixes are made by hand. */
+const MANUAL_FIELDS = new Set<string>(["seasons", "episodes", "characters", "catalogReviews", "general", "type"]);
+const ALLOWED_LIST_VALUES: Partial<Record<keyof ContentFormInput, Set<string>>> = {
+  genreLabels: new Set(CONTENT_GENRE_OPTIONS.map((o) => o.value)),
+  languages: new Set(LANGUAGE_OPTIONS.map((o) => o.value)),
+};
 
 function slugify(title: string) {
   return title
@@ -149,7 +166,7 @@ function TagListEditor({
 }
 
 /** Admin form for creating and editing catalog content (video titles). */
-export function ContentForm({ mode, contentId, initial }: ContentFormProps) {
+export function ContentForm({ mode, contentId, initial, ai = { enabled: false, tmdbEnabled: false } }: ContentFormProps) {
   const router = useAppRouter();
   const draftKey =
     mode === "create"
@@ -162,7 +179,47 @@ export function ContentForm({ mode, contentId, initial }: ContentFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [slugTouched, setSlugTouched] = useState(mode === "edit");
+  const [importResult, setImportResult] = useState<ContentImportResult | null>(null);
+  const [importFacts, setImportFacts] = useState<Record<string, unknown> | undefined>();
+  const confirmAction = useConfirm();
   const isMovie = isMovieType(form.type);
+
+  async function handleImported(result: ContentImportResult) {
+    if (form.title.trim()) {
+      const replace = await confirmAction({
+        title: "Replace the current form?",
+        description: `The imported draft for "${result.draft.title}" will replace what you've entered so far.`,
+        confirmLabel: "Replace with import",
+      });
+      if (!replace) return;
+    }
+    setForm(result.draft);
+    setSlugTouched(false);
+    setImportResult(result);
+    setImportFacts(result.facts);
+  }
+
+  function canApplySuggestion(field: ReviewIssue["field"]) {
+    return !MANUAL_FIELDS.has(field);
+  }
+
+  function applySuggestion(field: ReviewIssue["field"], value: string) {
+    if (field === "general" || MANUAL_FIELDS.has(field)) return;
+    const key = field as keyof ContentFormInput;
+    if (NUMBER_FIELDS.has(key)) {
+      const number = Number(value);
+      update(key, (value.trim() === "" || Number.isNaN(number) ? undefined : number) as never);
+      return;
+    }
+    if (LIST_FIELDS.has(key)) {
+      const allowed = ALLOWED_LIST_VALUES[key];
+      const items = value.split(",").map((item) => item.trim()).filter(Boolean);
+      update(key, (allowed ? items.map((item) => item.toLowerCase()).filter((item) => allowed.has(item)) : items) as never);
+      return;
+    }
+    if (key === "slug") setSlugTouched(true);
+    update(key, value as never);
+  }
 
   function update<K extends keyof ContentFormInput>(
     key: K,
@@ -246,6 +303,10 @@ export function ContentForm({ mode, contentId, initial }: ContentFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="flex max-w-4xl flex-col gap-6">
+      {mode === "create" ? (
+        <ContentImportPanel aiEnabled={ai.enabled} tmdbEnabled={ai.tmdbEnabled} onImported={(result) => void handleImported(result)} />
+      ) : null}
+      {importResult ? <ImportSummary result={importResult} onDismiss={() => setImportResult(null)} /> : null}
       {draftRestored ? (
         <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-xs text-amber-100/90">
           Restored your unsaved draft from this browser. Your entries are kept locally until you save successfully.
@@ -736,6 +797,14 @@ export function ContentForm({ mode, contentId, initial }: ContentFormProps) {
       <CatalogReviewsEditor
         reviews={form.catalogReviews}
         onChange={(catalogReviews) => update("catalogReviews", catalogReviews)}
+      />
+
+      <ContentReviewPanel
+        form={form}
+        facts={importFacts}
+        aiEnabled={ai.enabled}
+        canApply={canApplySuggestion}
+        onApply={applySuggestion}
       />
 
       {error ? <p className="text-sm text-red-400">{error}</p> : null}

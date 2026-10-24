@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { ContentForm } from "@/components/admin/content-form";
 import { requireContentAdmin } from "@/lib/auth-guards";
+import { isClaudeConfigured } from "@/lib/ai/claude";
+import { isTmdbConfigured } from "@/lib/catalog-import/sources/tmdb";
 import type { ContentFormInput } from "@/lib/validators/admin/content";
 
 export const metadata: Metadata = {
@@ -56,11 +58,15 @@ export default async function AdminNewContentPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">New content</h1>
         <p className="mt-1 text-sm text-white/60">
-          Add a title to the catalog. It will appear on public detail pages
-          once saved.
+          Import a title with AI or fill the form by hand. It appears on public
+          detail pages once saved.
         </p>
       </div>
-      <ContentForm mode="create" initial={emptyForm} />
+      <ContentForm
+        mode="create"
+        initial={emptyForm}
+        ai={{ enabled: isClaudeConfigured(), tmdbEnabled: isTmdbConfigured() }}
+      />
     </div>
   );
 }
