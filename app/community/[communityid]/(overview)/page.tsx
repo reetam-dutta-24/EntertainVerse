@@ -76,25 +76,25 @@ export default async function CommunityDetailPage({
         />
 
         <ContentCarouselSection
-          title="🎬 Most Watched Content"
+          title="🎬 Most watched content"
           searchPlaceholder="Search titles…"
           items={community.watchedMost}
         />
 
         <ContentCarouselSection
-          title="🚀 Currently Trending"
+          title="🚀 Currently trending"
           searchPlaceholder="Search titles…"
           items={community.trending}
         />
 
         <MusicCarouselSection
-          title="🎧 Most Listened Music"
+          title="🎧 Most listened music"
           searchPlaceholder="Search tracks…"
           tracks={community.musicTracks}
         />
 
         <ContentPageSection
-          title="📒 Public Collections"
+          title="📒 Public collections"
           variant="community"
           slides={community.collections.map((collection) => ({
             id: collection.id,
@@ -103,7 +103,7 @@ export default async function CommunityDetailPage({
         />
 
         <ContentPageSection
-          title="👥 Similar Communities"
+          title="👥 Similar communities"
           variant="community"
           slides={community.similarCommunities.map((entry) => ({
             id: entry.id,

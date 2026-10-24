@@ -77,7 +77,7 @@ export function ToggleContentFavoriteButton({
       >
         <Heart className={cn("size-3.5 shrink-0", favorited && "fill-current")} />
         <span className="truncate">
-          {favorited ? "Added to Favourites" : "Add To Favourites"}
+          {favorited ? "Added to Favourites" : "Add to favourites"}
         </span>
       </button>
       {error ? (

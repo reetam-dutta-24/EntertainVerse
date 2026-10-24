@@ -61,7 +61,7 @@ export function WatchLiveCard({
         </div>
         <div className="mt-2">
           <Button variant="gradient" size="md" onClick={onJoin}>
-            {party.live ? "Join Room" : "Set Reminder"}
+            {party.live ? "Join room" : "Set reminder"}
           </Button>
         </div>
       </div>

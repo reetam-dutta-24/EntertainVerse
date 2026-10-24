@@ -61,7 +61,7 @@ export function ContentHeroWatchlistButton({
     }
   }
 
-  const label = onWatchlist ? "On Watchlist" : "Add To Watchlist";
+  const label = onWatchlist ? "On Watchlist" : "Add to watchlist";
 
   return (
     <div className={cn("min-w-0 flex-1", className)}>

@@ -97,7 +97,7 @@ export function HighlightsSection() {
               "Watch rooms and discussions",
               "Public and niche fandom spaces",
             ]}
-            cta="View Communities"
+            cta="View communities"
             href="/login?callbackUrl=/community"
           />
         </ScrollFadeIn>
@@ -128,7 +128,7 @@ export function HighlightsSection() {
               "Save favorites in one place",
               "Revisit your best picks anytime",
             ]}
-            cta="See Collections"
+            cta="See collections"
             href="/login?callbackUrl=/collection"
           />
         </ScrollFadeIn>

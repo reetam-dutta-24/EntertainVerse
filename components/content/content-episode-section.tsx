@@ -102,7 +102,7 @@ export function ContentEpisodeSection({
 
   return (
     <ContentPageSection
-      title="📺 Watch All Episodes"
+      title="📺 Watch all episodes"
       action={seasonAction}
       slides={slides}
       variant="episode"

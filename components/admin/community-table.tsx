@@ -35,9 +35,9 @@ export function AdminCommunityTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10">
+    <div className="max-h-[70vh] overflow-auto rounded-2xl border border-white/10">
       <table className="w-full text-left text-sm">
-        <thead className="bg-white/5 text-xs uppercase tracking-wide text-white/50">
+        <thead className="sticky top-0 z-10 bg-popover-deep text-xs uppercase tracking-wide text-white/50">
           <tr>
             <th className="px-4 py-3 font-medium">Name</th>
             <th className="px-4 py-3 font-medium">Category</th>

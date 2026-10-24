@@ -112,7 +112,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
         />
 
         <ContentPageSection
-          title="📀 EP Collections"
+          title="📀 EP collections"
           variant="community"
           emptyMessage={`No collections featuring ${artist.title} yet.`}
           slides={artist.collections.map((collection) => ({

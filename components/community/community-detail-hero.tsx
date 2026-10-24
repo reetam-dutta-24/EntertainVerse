@@ -106,7 +106,7 @@ export function CommunityDetailHero({
           <div className="min-h-0 flex-1">
             <CollectionHeroSpotlightSlider
               variant="content"
-              title="❤️ Most Liked Content"
+              title="❤️ Most liked content"
               items={community.favoriteItems}
             />
           </div>

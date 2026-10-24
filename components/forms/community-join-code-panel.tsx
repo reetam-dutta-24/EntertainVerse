@@ -74,7 +74,7 @@ export function CommunityJoinCodePanel({
             className="shrink-0 rounded-full border-brand-magenta/70 text-xs"
           >
             <RefreshCw className="me-1 size-3.5" />
-            {hasJoinCode ? "New Code" : "Generate Code"}
+            {hasJoinCode ? "New Code" : "Generate code"}
           </Button>
         ) : null}
       </div>

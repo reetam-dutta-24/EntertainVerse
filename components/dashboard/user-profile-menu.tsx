@@ -104,7 +104,7 @@ export function UserProfileMenu({
 
   const menuItems = [
     {
-      label: "View Profile",
+      label: "View profile",
       href: getProfilePath(user.handle),
       icon: User,
     },

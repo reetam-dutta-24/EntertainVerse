@@ -43,7 +43,7 @@ export default async function AnalyticsPage() {
       {/* 3 + 4 — Watch/listen trend + watchlist progress */}
       <div className="grid gap-6 lg:grid-cols-3">
         <ChartPanel
-          title="📈 Watch & Listen Hours"
+          title="📈 Watch & listen hours"
           subtitle="Monthly hours across the last 12 months"
           className="lg:col-span-2"
         >
@@ -58,7 +58,7 @@ export default async function AnalyticsPage() {
           />
         </ChartPanel>
         <ChartPanel
-          title="📋 Watchlist Progress"
+          title="📋 Watchlist progress"
           subtitle={`Where your ${data.summary.watchlistTotal} saved titles stand`}
         >
           <AniPieChart data={data.watchlistStatus} innerRadius={60} height={300} />
@@ -68,13 +68,13 @@ export default async function AnalyticsPage() {
       {/* 5 + 6 — Genre split + taste radar */}
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartPanel
-          title="🎭 Genre Distribution"
+          title="🎭 Genre distribution"
           subtitle="Hours watched per genre this year"
         >
           <AniPieChart data={data.genreDistribution} height={300} />
         </ChartPanel>
         <ChartPanel
-          title="🧠 AI Taste Profile"
+          title="🧠 AI taste profile"
           subtitle="How strongly each mood defines your taste"
         >
           <AniRadarChart data={data.tasteProfile} name="Taste Score" height={300} />
@@ -84,7 +84,7 @@ export default async function AnalyticsPage() {
       {/* 7 + 8 — Weekly rhythm + peak hours */}
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartPanel
-          title="📅 Weekly Activity"
+          title="📅 Weekly activity"
           subtitle="Average daily hours by weekday"
         >
           <AniBarChart
@@ -98,7 +98,7 @@ export default async function AnalyticsPage() {
           />
         </ChartPanel>
         <ChartPanel
-          title="⏰ Peak Activity Hours"
+          title="⏰ Peak activity hours"
           subtitle="When you watch and listen the most"
         >
           <AniBarChart
@@ -115,7 +115,7 @@ export default async function AnalyticsPage() {
       {/* 9 + 10 — AI accuracy trend + month comparison */}
       <div className="grid gap-6 lg:grid-cols-3">
         <ChartPanel
-          title="🎯 AI Match Accuracy"
+          title="🎯 AI match accuracy"
           subtitle="How well recommendations fit you over time"
           className="lg:col-span-2"
         >
@@ -127,7 +127,7 @@ export default async function AnalyticsPage() {
           />
         </ChartPanel>
         <ChartPanel
-          title="🗓️ This Month vs Last"
+          title="🗓️ This month vs last"
           subtitle={`${data.summary.currentMonthLabel} compared with ${data.summary.previousMonthLabel}`}
         >
           <MonthComparisonPanel rows={data.monthComparison} />
@@ -137,7 +137,7 @@ export default async function AnalyticsPage() {
       {/* 11 + 12 — Ratings given + content type split */}
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartPanel
-          title="⭐ Ratings You Give"
+          title="⭐ Ratings you give"
           subtitle="How many titles received each score"
         >
           <AniBarChart
@@ -150,7 +150,7 @@ export default async function AnalyticsPage() {
           />
         </ChartPanel>
         <ChartPanel
-          title="🎬 Content Type Split"
+          title="🎬 Content type split"
           subtitle="Share of watch time by format"
         >
           <AniPieChart data={data.contentTypes} innerRadius={60} height={280} />
@@ -159,7 +159,7 @@ export default async function AnalyticsPage() {
 
       {/* 13 — Community engagement */}
       <ChartPanel
-        title="👥 Community Engagement"
+        title="👥 Community engagement"
         subtitle="Posts, likes, and chat messages per month"
       >
         <AniBarChart
@@ -177,13 +177,13 @@ export default async function AnalyticsPage() {
       {/* 14 + 15 — Top titles + top artists */}
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartPanel
-          title="🏆 Most Watched Titles"
+          title="🏆 Most watched titles"
           subtitle="Your top 5 by hours watched"
         >
           <RankingList items={data.topTitles} />
         </ChartPanel>
         <ChartPanel
-          title="🎤 Most Played Artists"
+          title="🎤 Most played artists"
           subtitle="Your top 5 by listening hours"
         >
           <RankingList items={data.topArtists} />

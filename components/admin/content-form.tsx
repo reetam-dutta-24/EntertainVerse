@@ -136,6 +136,7 @@ function TagListEditor({
               key={item}
               type="button"
               onClick={() => onChange(items.filter((g) => g !== item))}
+              aria-label={`Remove ${item}`}
               className="cursor-pointer rounded-full bg-white/10 px-3 py-1 text-xs text-white hover:bg-red-500/20"
             >
               {item} ×

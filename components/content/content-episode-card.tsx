@@ -119,7 +119,7 @@ export function ContentEpisodeCard({
               className="flex cursor-pointer items-center gap-1.5 rounded-full border border-brand-magenta bg-black/80 px-3 py-1 text-micro font-medium text-white transition-colors hover:bg-brand-magenta/20"
             >
               <PlayCircle className="size-3.5 text-brand-magenta" />
-              Watch Now
+              Watch now
             </ContentWatchNowLink>
             <div className="flex items-center gap-2">
               {episode.rating != null ? (

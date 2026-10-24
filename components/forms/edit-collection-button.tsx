@@ -157,13 +157,13 @@ export function EditCollectionButton({
           onClick={() => handleOpen(true)}
         >
           <Pencil className="size-3.5" />
-          Edit Collection
+          Edit collection
         </GradientButton>
       )}
 
       <FormShell
         open={open}
-        title="Edit Collection"
+        title="Edit collection"
         description="Update metadata, visibility, and cover image."
         onClose={() => handleOpen(false)}
         className="max-w-xl"
@@ -266,7 +266,7 @@ export function EditCollectionButton({
           <FormError message={error} />
           <FormActions
             onCancel={() => handleOpen(false)}
-            submitLabel="Save Changes"
+            submitLabel="Save changes"
             loading={loading}
           />
         </form>

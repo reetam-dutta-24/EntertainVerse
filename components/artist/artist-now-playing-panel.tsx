@@ -163,7 +163,7 @@ export function ArtistNowPlayingPanel({
               )}
             >
               <PlayCircle className="size-3 shrink-0 text-brand-magenta" />
-              <span className="truncate">Play Playlist</span>
+              <span className="truncate">Play playlist</span>
             </Link>
           </div>
 

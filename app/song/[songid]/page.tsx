@@ -87,7 +87,7 @@ export default async function SongDetailPage({ params }: SongPageProps) {
       />
 
       <ContentPageSection
-        title="📒 Included in Collections"
+        title="📒 Included in collections"
         variant="community"
         emptyMessage={`${song.title} is not in any collections yet.`}
         slides={song.collections.map((collection) => ({

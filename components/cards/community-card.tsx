@@ -53,7 +53,7 @@ export function CommunityCard({
   const [hovered, setHovered] = useState(false);
   const accent = getAccentStyle(community.accent ?? "cyan");
   const showManage = community.canEdit || community.canDelete;
-  const ctaLabel = ctaMode === "join" && !hovered ? "Join Community" : "View Community";
+  const ctaLabel = ctaMode === "join" && !hovered ? "Join community" : "View community";
 
   function handleAction() {
     if (demo) return;

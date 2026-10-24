@@ -113,12 +113,12 @@ export function CreateWatchChannelButton({
         onClick={() => setOpen(true)}
       >
         <Plus className="size-3.5" />
-        Create Watch Channel
+        Create watch channel
       </GradientButton>
 
       <FormShell
         open={open}
-        title="Create Watch Channel"
+        title="Create watch channel"
         description="Pick what to watch and set a member limit."
         onClose={() => !loading && setOpen(false)}
         className="max-w-lg"
@@ -204,7 +204,7 @@ export function CreateWatchChannelButton({
           <FormError message={error} />
           <FormActions
             onCancel={() => setOpen(false)}
-            submitLabel="Create Channel"
+            submitLabel="Create channel"
             loading={loading}
           />
         </form>
@@ -329,7 +329,8 @@ export function WatchChannelActions({
         <button
           type="button"
           onClick={() => setEditOpen(true)}
-          className="rounded-full border border-white/20 p-2 text-white/70 hover:text-white"
+          aria-label={`Edit ${channel.title}`}
+          className="rounded-full border border-white/20 p-2.5 text-white/70 hover:text-white"
         >
           <Pencil className="size-3.5" />
         </button>
@@ -338,7 +339,8 @@ export function WatchChannelActions({
         <button
           type="button"
           onClick={() => setDeleteOpen(true)}
-          className="rounded-full border border-white/20 p-2 text-white/70 hover:text-red-300"
+          aria-label={`Delete ${channel.title}`}
+          className="rounded-full border border-white/20 p-2.5 text-white/70 hover:text-red-300"
         >
           <Trash2 className="size-3.5" />
         </button>
@@ -347,7 +349,7 @@ export function WatchChannelActions({
 
       <FormShell
         open={editOpen}
-        title="Edit Watch Channel"
+        title="Edit watch channel"
         onClose={() => !loading && setEditOpen(false)}
       >
         <form onSubmit={handleEdit} className="flex flex-col gap-4">
@@ -371,7 +373,7 @@ export function WatchChannelActions({
 
       <FormShell
         open={deleteOpen}
-        title="Delete Watch Channel"
+        title="Delete watch channel"
         description={`Delete "${channel.title}"?`}
         onClose={() => !loading && setDeleteOpen(false)}
         className="max-w-md"

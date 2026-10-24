@@ -52,49 +52,49 @@ export default async function DiscoverPage() {
       <ActiveFiltersBar filters={filters} />
 
       <ContentCarouselSection
-        title="🚀 Trending This Week"
+        title="🚀 Trending this week"
         subtitle="Most watched across AniVerse"
         searchPlaceholder="Search Trending Content……. "
         items={trending}
       />
 
       <ContentCarouselSection
-        title="🎯 Recommended For You"
+        title="🎯 Recommended for you"
         subtitle="Based on your genres, ratings, and watch history"
         searchPlaceholder="Search Recommended Content……. "
         items={recommended}
       />
 
       <ContentCarouselSection
-        title="🆕 New Releases"
+        title="🆕 New releases"
         subtitle="Fresh anime, movies, shows, and music added this week"
         searchPlaceholder="Search New Content…… "
         items={newReleases}
       />
 
       <ContentCarouselSection
-        title="⏳ Continue Watching"
+        title="⏳ Continue watching"
         subtitle="Pick up your unfinished stories and episodes"
         searchPlaceholder="Search Watching Content……. "
         items={continueWatching}
       />
 
       <MusicCarouselSection
-        title="🎧 Recommended For Your Taste"
+        title="🎧 Recommended for your taste"
         subtitle="Songs, OSTs, and artists matched to your mood and watch history"
         searchPlaceholder="Search Music Content……. "
         tracks={musicForTaste}
       />
 
       <MusicCarouselSection
-        title="📈 Trending Songs / OSTs / Artists"
+        title="📈 Trending songs / OSTs / artists"
         subtitle="Most played anime songs, soundtracks, and artists across AniVerse"
         searchPlaceholder="Search Trending Music…… "
         tracks={trendingMusic}
       />
 
       <MusicCarouselSection
-        title="🎵 Continue Listening"
+        title="🎵 Continue listening"
         subtitle="Resume tracks, albums, and playlists you recently played"
         searchPlaceholder="Search Listening Content……. "
         tracks={continueListening}

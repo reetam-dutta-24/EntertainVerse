@@ -202,7 +202,7 @@ export function ArtistCard({
                   className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                 >
                   <MicVocal className="size-3.5 text-brand-magenta" />
-                  View Artist
+                  View artist
                 </button>
               </div>
 

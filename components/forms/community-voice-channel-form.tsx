@@ -66,12 +66,12 @@ export function CreateVoiceChannelButton({
         onClick={() => setOpen(true)}
       >
         <Plus className="size-3.5" />
-        Create Voice Channel
+        Create voice channel
       </GradientButton>
 
       <FormShell
         open={open}
-        title="Create Voice Channel"
+        title="Create voice channel"
         description="Set a channel title and member limit."
         onClose={() => !loading && setOpen(false)}
       >
@@ -98,7 +98,7 @@ export function CreateVoiceChannelButton({
           <FormError message={error} />
           <FormActions
             onCancel={() => setOpen(false)}
-            submitLabel="Create Channel"
+            submitLabel="Create channel"
             loading={loading}
           />
         </form>
@@ -241,7 +241,7 @@ export function VoiceChannelActions({
 
       <FormShell
         open={editOpen}
-        title="Edit Voice Channel"
+        title="Edit voice channel"
         onClose={() => !loading && setEditOpen(false)}
       >
         <form onSubmit={handleEdit} className="flex flex-col gap-4">
@@ -265,7 +265,7 @@ export function VoiceChannelActions({
 
       <FormShell
         open={deleteOpen}
-        title="Delete Voice Channel"
+        title="Delete voice channel"
         description={`Delete "${channel.title}"?`}
         onClose={() => !loading && setDeleteOpen(false)}
         className="max-w-md"

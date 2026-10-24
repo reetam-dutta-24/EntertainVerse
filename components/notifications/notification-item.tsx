@@ -226,7 +226,7 @@ export function NotificationItem({
               onClick={() => void markNotificationRead(notification.id)}
               className="flex items-center gap-1 rounded-full border border-brand-magenta px-3 py-1 text-micro font-semibold text-white transition-colors hover:bg-brand-magenta/15"
             >
-              View Profile
+              View profile
               <ArrowRight className="size-3.5 text-brand-magenta" />
             </Link>
           ) : null}

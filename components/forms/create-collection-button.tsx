@@ -127,7 +127,7 @@ export function CreateCollectionButton() {
 
       <FormShell
         open={open}
-        title="Create Collection"
+        title="Create collection"
         description="Organize anime, movies, shows, and music into a personal list."
         onClose={() => setOpen(false)}
         className="max-w-xl"
@@ -262,7 +262,7 @@ export function CreateCollectionButton() {
           <FormError message={error} />
           <FormActions
             onCancel={() => setOpen(false)}
-            submitLabel="Create Collection"
+            submitLabel="Create collection"
             loading={loading}
           />
         </form>

@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "recharts";
 import { chartAxis, chartColors, chartTooltipStyle } from "./chart-theme";
+import { ChartEmpty, isChartDataEmpty } from "./chart-empty";
 
 export interface AniPieChartDatum {
   name: string;
@@ -31,6 +32,8 @@ export function AniPieChart({
   innerRadius = 0,
   className,
 }: AniPieChartProps) {
+  if (isChartDataEmpty(data as unknown as Record<string, unknown>[])) return <ChartEmpty />;
+
   return (
     <div className={className} style={{ width: "100%", height }}>
       <ResponsiveContainer>

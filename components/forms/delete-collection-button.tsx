@@ -75,7 +75,7 @@ export function DeleteCollectionButton({
 
       <FormShell
         open={open}
-        title="Delete Collection"
+        title="Delete collection"
         description={`Permanently remove "${collectionName}" and all of its items.`}
         onClose={() => !loading && setOpen(false)}
         className="max-w-md"
@@ -101,7 +101,7 @@ export function DeleteCollectionButton({
               disabled={loading}
               onClick={handleDelete}
             >
-              {loading ? "Deleting…" : "Delete Collection"}
+              {loading ? "Deleting…" : "Delete collection"}
             </GradientButton>
           </div>
         </div>

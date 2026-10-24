@@ -134,13 +134,13 @@ export function EditCommunityButton({
       ) : (
         <GradientButton size="sm" className="gap-1.5 rounded-full px-4" onClick={() => setOpen(true)}>
           <Pencil className="size-3.5" />
-          Edit Community
+          Edit community
         </GradientButton>
       )}
 
       <FormShell
         open={open}
-        title="Edit Community"
+        title="Edit community"
         description="Update community metadata, visibility, and images."
         onClose={() => setOpen(false)}
         className="max-w-xl"
@@ -220,7 +220,7 @@ export function EditCommunityButton({
           ) : null}
 
           <FormError message={error} />
-          <FormActions onCancel={() => setOpen(false)} submitLabel="Save Changes" loading={loading} />
+          <FormActions onCancel={() => setOpen(false)} submitLabel="Save changes" loading={loading} />
         </form>
       </FormShell>
     </>

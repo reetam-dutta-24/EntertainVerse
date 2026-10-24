@@ -92,42 +92,42 @@ export default async function DashboardHomePage() {
       <HomeQuickLinks />
 
       <ContentCarouselSection
-        title="⏳ Continue Watching"
+        title="⏳ Continue watching"
         subtitle="Pick up where you left off"
         searchPlaceholder="Search Watching Content……. "
         items={continueWatching}
       />
 
       <ContentCarouselSection
-        title="🎯 Recommended For You"
+        title="🎯 Recommended for you"
         subtitle="Hand-picked from your genres, ratings, and watch history"
         searchPlaceholder="Search Recommended Content……. "
         items={recommended}
       />
 
       <ContentCarouselSection
-        title="🚀 Trending This Week"
+        title="🚀 Trending this week"
         subtitle="What everyone is watching across AniVerse"
         searchPlaceholder="Search Trending Content……. "
         items={trending}
       />
 
       <MusicCarouselSection
-        title="🎵 Continue Listening"
+        title="🎵 Continue listening"
         subtitle="Resume tracks, albums, and playlists you recently played"
         searchPlaceholder="Search Listening Content……. "
         tracks={continueListening}
       />
 
       <CommunityGridSection
-        title="👥 Communities For You"
+        title="👥 Communities for you"
         searchPlaceholder="Search Communities……. "
         communities={communities}
         ctaMode="join"
       />
 
       <CollectionGridSection
-        title="📒 Recently Used Collections"
+        title="📒 Recently used collections"
         searchPlaceholder="Search Collections……. "
         collections={collections}
       />

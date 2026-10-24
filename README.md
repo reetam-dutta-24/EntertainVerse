@@ -403,7 +403,18 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Design System (brief)
 
-Tokens live in `app/globals.css` (Tailwind v4 `@theme`): dark purple base, magenta brand accents, glass surfaces, card radii, glow shadows. Shared cards/carousels power hubs, search, and detail sections.
+Tokens live in `app/globals.css` (Tailwind v4 `@theme`). Use them instead of arbitrary values.
+
+| Token | Scale / rule |
+|---|---|
+| **Radius** | `lg` 8 · `xl` 12 · `2xl` 16 · `card` 20 · `3xl` 24 · `full`. Same component type = same radius (every card is `rounded-card`). |
+| **Type** | `micro` 11 (chip/badge labels only) · `caption` 12 · `small` 13 · `body` 15 · `subtitle` 16 · `lead` 18 · `heading` 24 · `title` 32 · `display` 64 (landing hero only). Nothing readable below 12px. |
+| **Font** | Geist (via `next/font`) on every platform. |
+| **Colour** | Brand `brand-purple → brand-fuchsia → brand-magenta`, accent text `brand-pink`; surfaces `background`, `surface`, `night`, `popover`, `popover-deep`; status `online`, `gold`, `teal`. Raw values for JS live in `lib/brand-colors.ts`; chart series in `components/charts/chart-theme.ts`. Genre chip gradients are tuned for WCAG AA text contrast. |
+| **Glow** | One soft 32px halo. Reserved for the primary CTA, active nav item, now-playing state and card hover — everything else uses `shadow-card-lift` or plain elevation. |
+| **Spacing** | Dashboard pages: `max-w-[1200px]` column, `gap-5 sm:gap-6` between sections, `px-4 sm:px-6 lg:px-8` padding. |
+
+Shared building blocks: `Button` / `GradientButton` (primary · secondary · ghost · destructive, `loading` prop), `EmptyState` (with `compact` + link action), `useConfirm()` / `useToast()` from `FeedbackProvider`, `ComingSoonNotice` for unfinished features, route skeletons in `components/skeletons/`. Focus rings and `prefers-reduced-motion` handling are global.
 
 ---
 

@@ -53,7 +53,7 @@ export function ContentMovieSection({
 
   return (
     <ContentPageSection
-      title="🎬 Watch This Movie"
+      title="🎬 Watch this movie"
       variant="episode"
       overflowVisible
       itemsCenter
@@ -81,7 +81,7 @@ export function ContentMovieSection({
                       className="flex cursor-pointer items-center gap-2 rounded-full border border-brand-magenta bg-black/80 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-magenta/20"
                     >
                       <PlayCircle className="size-5 text-brand-magenta" />
-                      Watch Now
+                      Watch now
                     </ContentWatchNowLink>
                     <GradientButton
                       size="sm"

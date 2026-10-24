@@ -61,7 +61,7 @@ export function ArtistHeroActions({ accent = "pink" }: ArtistHeroActionsProps) {
         className={cn(detailHeroBtnBase("min-w-0"), cta.play)}
       >
         <PlayCircle className="size-4 shrink-0" />
-        <span className="truncate">Play All Songs</span>
+        <span className="truncate">Play all songs</span>
       </Button>
       <Button
         size="sm"

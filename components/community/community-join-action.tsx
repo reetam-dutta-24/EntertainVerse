@@ -53,7 +53,7 @@ export function CommunityJoinAction({
         "mx-auto border-transparent bg-gradient-to-r from-red-600 to-rose-600 font-bold text-white",
       )}
     >
-      {loading ? "Joining…" : "Join Community"}
+      {loading ? "Joining…" : "Join community"}
     </button>
   );
 }

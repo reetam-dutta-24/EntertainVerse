@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from "recharts";
 import { chartAxis, chartGrid, chartTooltipStyle, chartPalette } from "./chart-theme";
+import { ChartEmpty, isChartDataEmpty } from "./chart-empty";
 
 export interface AniRadarChartDatum {
   axis: string;
@@ -35,6 +36,8 @@ export function AniRadarChart({
   height = 320,
   className,
 }: AniRadarChartProps) {
+  if (isChartDataEmpty(data as unknown as Record<string, unknown>[])) return <ChartEmpty />;
+
   return (
     <div className={className} style={{ width: "100%", height }}>
       <ResponsiveContainer>

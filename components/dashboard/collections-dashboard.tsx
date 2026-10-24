@@ -121,7 +121,7 @@ export function CollectionsDashboard({
 
       <section className="flex flex-col gap-4 rounded-2xl bg-surface/40 px-4 py-5 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-8">
-          <span className="text-sm font-bold text-white">Select Genre</span>
+          <span className="text-sm font-bold text-white">Select genre</span>
           <div className="flex flex-wrap items-center gap-4">
             {genres.map((genre) => (
               <FilterChip
@@ -163,7 +163,7 @@ export function CollectionsDashboard({
       />
 
       <CollectionGridSection
-        title="🕐 Recently Used"
+        title="🕐 Recently used"
         searchPlaceholder="Search Recent Collection……. "
         collections={filteredRecentlyUsed}
         editable

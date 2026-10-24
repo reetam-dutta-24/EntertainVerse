@@ -57,7 +57,7 @@ export function SongHeroPosterPanel({
   const theme = useMemo(() => getPlayAccentTheme(accent), [accent]);
   const fairyGlow = useMemo(() => getPlayFairyInnerGlow(accent), [accent]);
   const previewUrl = getTrackPreviewUrl(songSlug, audioUrl);
-  const playLabel = resumeLabel ? `Continue from ${resumeLabel}` : "Play Now";
+  const playLabel = resumeLabel ? `Continue from ${resumeLabel}` : "Play now";
   const progressMax = duration || durationSeconds || 1;
   const effectiveVolume = muted ? 0 : volume;
 
@@ -262,7 +262,7 @@ export function SongHeroPosterPanel({
             )}
           >
             <Plus className="size-3.5 shrink-0" />
-            <span className="truncate">Add To Collection</span>
+            <span className="truncate">Add to collection</span>
           </button>
         </div>
 

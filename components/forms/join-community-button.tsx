@@ -109,12 +109,12 @@ export function JoinCommunityButton() {
         onClick={() => setOpen(true)}
       >
         <KeyRound className="me-1.5 size-4 text-brand-magenta" />
-        Join Community
+        Join community
       </Button>
 
       <FormShell
         open={open}
-        title="Join Community"
+        title="Join community"
         description="Enter a private room code from an admin, or browse public communities."
         onClose={() => {
           setOpen(false);
@@ -203,7 +203,7 @@ export function JoinCommunityButton() {
                 setOpen(false);
                 resetForm();
               }}
-              submitLabel="Join Community"
+              submitLabel="Join community"
               loading={loading}
             />
           </form>

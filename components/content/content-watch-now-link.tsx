@@ -8,7 +8,7 @@ export interface ContentWatchNowLinkProps extends ComponentProps<typeof Link> {
   contentSlug: string;
 }
 
-/** Watch Now link — records global "currently watching" before navigation. */
+/** Watch now link — records global "currently watching" before navigation. */
 export function ContentWatchNowLink({
   contentSlug,
   onClick,

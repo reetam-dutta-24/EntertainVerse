@@ -183,7 +183,7 @@ export function AddReviewButton({
         open={open}
         title="Write a Review"
         description="Share your take with the AniVerse community."
-        submitLabel="Publish Review"
+        submitLabel="Publish review"
         onClose={() => setOpen(false)}
         onSubmit={handleSubmit}
       />
@@ -248,9 +248,9 @@ export function EditReviewButton({
 
       <ReviewFormShell
         open={open}
-        title="Edit Review"
+        title="Edit review"
         description="Update your rating or review text."
-        submitLabel="Save Changes"
+        submitLabel="Save changes"
         initialValues={valuesFromReview(review)}
         onClose={() => setOpen(false)}
         onSubmit={handleSubmit}
@@ -306,7 +306,7 @@ export function DeleteReviewButton({
 
       <FormShell
         open={open}
-        title="Delete Review"
+        title="Delete review"
         description="This permanently removes your review from the carousel."
         onClose={() => !loading && setOpen(false)}
         className="max-w-md"

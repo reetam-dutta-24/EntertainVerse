@@ -78,10 +78,10 @@ export function CommunityWallpaperPanel({
               )}
             >
               <Pencil className="size-3.5 shrink-0" />
-              <span className="truncate">Edit Wallpaper</span>
+              <span className="truncate">Edit wallpaper</span>
             </button>
             <ShareUrlButton
-              label="Share Community"
+              label="Share community"
               title={communityName}
               text={`Join ${communityName} on AniVerse`}
             />
@@ -141,7 +141,7 @@ export function CommunityWallpaperPanel({
                 "border-transparent bg-gradient-to-r from-fuchsia-600 to-violet-600 text-white",
               )}
             >
-              <span className="truncate">View Community Background</span>
+              <span className="truncate">View community Background</span>
             </button>
           </div>
         </div>

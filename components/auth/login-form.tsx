@@ -95,7 +95,7 @@ export function LoginForm({
       {error ? <p className="text-xs text-red-400">{error}</p> : null}
 
       <GradientButton type="submit" size="md" disabled={pending} className="w-full">
-        {pending ? "Signing In..." : "Sign In"}
+        {pending ? "Signing in…" : "Sign in"}
       </GradientButton>
 
       <SocialButtons
@@ -110,7 +110,7 @@ export function LoginForm({
           href="/signup"
           className="font-semibold text-brand-magenta transition-colors hover:text-brand-pink"
         >
-          Sign Up
+          Sign up
         </Link>
       </p>
     </form>

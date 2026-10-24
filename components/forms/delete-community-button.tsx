@@ -71,7 +71,7 @@ export function DeleteCommunityButton({
 
       <FormShell
         open={open}
-        title="Delete Community"
+        title="Delete community"
         description={`Permanently remove "${communityName}" and all of its posts.`}
         onClose={() => !loading && setOpen(false)}
         className="max-w-md"
@@ -96,7 +96,7 @@ export function DeleteCommunityButton({
               disabled={loading}
               onClick={handleDelete}
             >
-              {loading ? "Deleting…" : "Delete Community"}
+              {loading ? "Deleting…" : "Delete community"}
             </GradientButton>
           </div>
         </div>

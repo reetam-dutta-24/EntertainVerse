@@ -21,6 +21,7 @@ export function SignupForm({
   const router = useAppRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [confirmError, setConfirmError] = useState<string>();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,9 +32,10 @@ export function SignupForm({
     const confirm = String(form.get("confirmPassword") ?? "");
 
     if (password !== confirm) {
-      setError("Passwords do not match.");
+      setConfirmError("Passwords don't match.");
       return;
     }
+    setConfirmError(undefined);
 
     setPending(true);
 
@@ -85,7 +87,7 @@ export function SignupForm({
       <AuthInput
         icon={User}
         name="fullName"
-        placeholder="Full Name"
+        placeholder="Full name"
         autoComplete="name"
         required
       />
@@ -100,7 +102,7 @@ export function SignupForm({
         icon={Mail}
         type="email"
         name="email"
-        placeholder="Email Address"
+        placeholder="Email address"
         autoComplete="email"
         required
       />
@@ -116,7 +118,8 @@ export function SignupForm({
         icon={Lock}
         type="password"
         name="confirmPassword"
-        placeholder="Confirm Password"
+        placeholder="Confirm password"
+        error={confirmError}
         autoComplete="new-password"
         required
       />
@@ -143,7 +146,7 @@ export function SignupForm({
       {error ? <p className="text-xs text-red-400">{error}</p> : null}
 
       <GradientButton type="submit" size="md" disabled={pending} className="w-full">
-        {pending ? "Creating Account..." : "Create Account"}
+        {pending ? "Creating account…" : "Create account"}
       </GradientButton>
 
       {/* Dashboard layout sends brand-new Google users on to onboarding,
@@ -160,7 +163,7 @@ export function SignupForm({
           href="/login"
           className="font-semibold text-brand-magenta transition-colors hover:text-brand-pink"
         >
-          Log In
+          Log in
         </Link>
       </p>
     </form>

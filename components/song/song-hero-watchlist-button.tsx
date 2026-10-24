@@ -105,7 +105,7 @@ export function SongHeroWatchlistButton({
   const label = onWatchlist
     ? "On Watchlist"
     : sourceContentSlug
-      ? "Add To Watchlist"
+      ? "Add to watchlist"
       : "Add Show To Watchlist";
 
   return (
@@ -138,7 +138,7 @@ export function SongHeroWatchlistButton({
 
       <FormShell
         open={dialogOpen}
-        title="Add to Watchlist"
+        title="Add to watchlist"
         description="Pick the anime, movie, or show this track belongs to."
         onClose={() => {
           setDialogOpen(false);
@@ -162,7 +162,7 @@ export function SongHeroWatchlistButton({
               setDialogOpen(false);
               setPick(null);
             }}
-            submitLabel="Add to Watchlist"
+            submitLabel="Add to watchlist"
             loading={dialogLoading}
           />
         </form>

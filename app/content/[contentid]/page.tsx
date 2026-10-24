@@ -132,7 +132,7 @@ export default async function ContentDetailPage({ params }: ContentPageProps) {
       />
 
       <ContentPageSection
-        title="💡 You May Also Like"
+        title="💡 You may also like"
         variant="content"
         autoAdvanceMs={relatedAutoMs}
         emptyMessage="No related titles to suggest yet."
@@ -144,7 +144,7 @@ export default async function ContentDetailPage({ params }: ContentPageProps) {
       />
 
       <ContentPageSection
-        title="📒 Included in Collections"
+        title="📒 Included in collections"
         variant="community"
         emptyMessage={`${content.title} is not in any collections yet.`}
         slides={content.collections.map((collection) => ({

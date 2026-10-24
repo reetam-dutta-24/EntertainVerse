@@ -341,7 +341,7 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
             }}
           />
           <SettingsToggle
-            label="Show Activity"
+            label="Show activity"
             description="Display what you're watching or listening to"
             checked={privacy.showActivity}
             onChange={(v) => {
@@ -350,7 +350,7 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
             }}
           />
           <SettingsToggle
-            label="Show Watch History"
+            label="Show watch history"
             description="Let others see your completed titles"
             checked={privacy.showWatchHistory}
             onChange={(v) => {

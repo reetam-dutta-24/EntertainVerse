@@ -89,7 +89,7 @@ export function AddWatchlistButton() {
   const submitLabel =
     selections.length > 1
       ? `Add ${selections.length} to Watchlist`
-      : "Add to Watchlist";
+      : "Add to watchlist";
 
   return (
     <>
@@ -99,12 +99,12 @@ export function AddWatchlistButton() {
         onClick={() => setOpen(true)}
       >
         <Plus className="me-1.5 size-4" />
-        Add To Watchlist
+        Add to watchlist
       </GradientButton>
 
       <FormShell
         open={open}
-        title="Add to Watchlist"
+        title="Add to watchlist"
         description="Search and pick multiple titles — keep searching to add more before submitting."
         onClose={() => {
           setOpen(false);

@@ -355,20 +355,17 @@ body {
   background: linear-gradient(180deg, #d500dd, #ff00cc);
 }
 
-/* Detail-route hero: visible space between consecutive side-by-side CTAs */
+/* Detail-route hero: paired CTAs sit close enough to read as one group */
 .detail-hero-btn-pair {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-}
-
-.detail-hero-btn-pair > :not(:last-child) {
-  margin-inline-end: 3.5rem;
+  gap: 0.75rem;
 }
 
 @media (min-width: 640px) {
-  .detail-hero-btn-pair > :not(:last-child) {
-    margin-inline-end: 4rem;
+  .detail-hero-btn-pair {
+    gap: 1rem;
   }
 }
 

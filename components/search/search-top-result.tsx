@@ -100,7 +100,7 @@ export function SearchTopResult({ data }: SearchTopResultProps) {
             className="rounded-full px-8"
             onClick={() => router.push(getProfilePath(profile.id))}
           >
-            View Profile
+            View profile
           </GradientButton>
         </div>
       </section>

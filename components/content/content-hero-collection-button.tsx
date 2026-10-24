@@ -55,7 +55,7 @@ export function ContentHeroCollectionButton({
         )}
       >
         <Plus className="size-3.5 shrink-0" />
-        <span className="truncate">Add To Collection</span>
+        <span className="truncate">Add to collection</span>
       </button>
 
       <AddToCollectionDialog

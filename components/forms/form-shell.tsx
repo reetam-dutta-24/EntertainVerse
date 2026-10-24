@@ -69,7 +69,8 @@ export function FormShell({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-1 text-white/60 transition hover:bg-white/10 hover:text-white"
+            aria-label="Close"
+            className="-m-1 rounded-full p-2 text-white/60 transition hover:bg-white/10 hover:text-white"
           >
             <X className="size-5" />
           </button>

@@ -32,7 +32,7 @@ export function SongRelatedCatalogSection({
 
   return (
     <ContentPageSection
-      title="🎤 Artists, Album And Show/Anime/Movie"
+      title="🎤 Artists, album and show/anime/movie"
       variant="content"
       rowHover={false}
       overflowVisible

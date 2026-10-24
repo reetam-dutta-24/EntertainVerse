@@ -107,7 +107,7 @@ export function SearchResultsView({ data }: SearchResultsViewProps) {
       {data.primaryType === "artist" ? (
         <>
           <MusicGridSection
-            title="🎧 From Music/OSTs"
+            title="🎧 From music/OSTs"
             searchPlaceholder="Search tracks…"
             tracks={data.artistSongs}
           />
@@ -122,7 +122,7 @@ export function SearchResultsView({ data }: SearchResultsViewProps) {
       {data.primaryType === "profile" ? (
         <>
           <ContentCarouselSection
-            title="❤️ Content They Love"
+            title="❤️ Content they love"
             searchPlaceholder="Search titles…"
             items={data.similarContent}
           />
@@ -131,13 +131,13 @@ export function SearchResultsView({ data }: SearchResultsViewProps) {
       ) : null}
 
       <CollectionGridSection
-        title="📒 From Your And Other Public Collections"
+        title="📒 From your and other public collections"
         searchPlaceholder="Search collections…"
         collections={data.collections}
       />
 
       <CommunityGridSection
-        title="👥 From Your And Other Global Communities"
+        title="👥 From your and other global communities"
         searchPlaceholder="Search communities…"
         communities={data.communities}
         ctaMode="view"

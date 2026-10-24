@@ -32,21 +32,21 @@ export function ProfileAnalyticsSection({
 
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartPanel
-          title="🎭 Genre Distribution"
+          title="🎭 Genre distribution"
           subtitle="Hours watched per genre this year"
         >
           <AniPieChart data={data.genreDistribution} height={280} />
         </ChartPanel>
 
         <ChartPanel
-          title="🎬 Content Type Split"
+          title="🎬 Content type split"
           subtitle="Share of watch time by format"
         >
           <AniPieChart data={data.contentTypes} innerRadius={60} height={280} />
         </ChartPanel>
 
         <ChartPanel
-          title="📅 Weekly Activity"
+          title="📅 Weekly activity"
           subtitle="Average daily hours by weekday"
           className="lg:col-span-2"
         >
@@ -62,14 +62,14 @@ export function ProfileAnalyticsSection({
         </ChartPanel>
 
         <ChartPanel
-          title="🏆 Most Watched Content"
+          title="🏆 Most watched content"
           subtitle="Top titles by hours watched"
         >
           <RankingList items={data.topTitles} />
         </ChartPanel>
 
         <ChartPanel
-          title="🎤 Most Played Artists"
+          title="🎤 Most played artists"
           subtitle="Top artists by listening hours"
         >
           <RankingList items={data.topArtists} />

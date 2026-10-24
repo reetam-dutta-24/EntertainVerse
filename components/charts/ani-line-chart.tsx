@@ -16,6 +16,7 @@ import {
   chartGrid,
   chartTooltipStyle,
 } from "./chart-theme";
+import { ChartEmpty, isChartDataEmpty } from "./chart-empty";
 
 export interface AniLineChartSeries {
   /** Key in each data row holding this series' value. */
@@ -41,6 +42,8 @@ export function AniLineChart({
   height = 320,
   className,
 }: AniLineChartProps) {
+  if (isChartDataEmpty(data as unknown as Record<string, unknown>[])) return <ChartEmpty />;
+
   return (
     <div className={className} style={{ width: "100%", height }}>
       <ResponsiveContainer>

@@ -241,10 +241,10 @@ export function ProfileListeningPanel({
                   )}
                 >
                   <Pencil className="size-3.5 shrink-0" />
-                  <span className="truncate">Edit Profile</span>
+                  <span className="truncate">Edit profile</span>
                 </button>
                 <ShareUrlButton
-                  label="Share Profile"
+                  label="Share profile"
                   title={`${userName} on AniVerse`}
                   text={`Check out ${userName}'s profile on AniVerse`}
                 />

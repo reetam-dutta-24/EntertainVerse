@@ -28,13 +28,13 @@ interface CommunityPostFormButtonProps {
 export function CommunityPostFormButton({
   communitySlug,
   kind = "POST",
-  triggerLabel = kind === "ANNOUNCEMENT" ? "Post Announcement" : "Create Post",
-  dialogTitle = kind === "ANNOUNCEMENT" ? "Post Announcement" : "Create Post",
+  triggerLabel = kind === "ANNOUNCEMENT" ? "Post announcement" : "Create post",
+  dialogTitle = kind === "ANNOUNCEMENT" ? "Post announcement" : "Create post",
   dialogDescription =
     kind === "ANNOUNCEMENT"
       ? "Share an official announcement with the community."
       : "Share an update with the community.",
-  submitLabel = kind === "ANNOUNCEMENT" ? "Publish Announcement" : "Publish Post",
+  submitLabel = kind === "ANNOUNCEMENT" ? "Publish announcement" : "Publish post",
 }: CommunityPostFormButtonProps) {
   const router = useAppRouter();
   const [open, setOpen] = useState(false);
@@ -137,7 +137,7 @@ export function CreateAnnouncementButton({
     <CommunityPostFormButton
       communitySlug={communitySlug}
       kind="ANNOUNCEMENT"
-      triggerLabel="Post Announcement"
+      triggerLabel="Post announcement"
     />
   );
 }
@@ -197,7 +197,7 @@ export function EditCommunityPostButton({
 
       <FormShell
         open={open}
-        title="Edit Post"
+        title="Edit post"
         description="Update the post title or image."
         onClose={() => !loading && setOpen(false)}
       >
@@ -216,7 +216,7 @@ export function EditCommunityPostButton({
           <FormError message={error} />
           <FormActions
             onCancel={() => setOpen(false)}
-            submitLabel="Save Changes"
+            submitLabel="Save changes"
             loading={loading}
           />
         </form>
@@ -272,7 +272,7 @@ export function DeleteCommunityPostButton({
 
       <FormShell
         open={open}
-        title="Delete Post"
+        title="Delete post"
         description={`Do you want to delete "${post.title}"?`}
         onClose={() => !loading && setOpen(false)}
         className="max-w-md"

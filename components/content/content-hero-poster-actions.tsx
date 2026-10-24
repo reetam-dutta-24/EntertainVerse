@@ -42,12 +42,12 @@ export function ContentHeroPosterActions({
   const watchLabel = songMedia
     ? content.resumeLabel
       ? `Continue from ${content.resumeLabel}`
-      : "Play Now"
+      : "Play now"
     : isMovie
-      ? "Watch Movie"
+      ? "Watch movie"
       : isWatching
         ? `Continue S${season} E${episodeNum}`
-        : "Watch Now";
+        : "Watch now";
 
   const watchHref = songMedia
     ? `#player`

@@ -91,7 +91,7 @@ export function ToggleArtistFavoriteButton({
           )}
         />
         <span className="truncate">
-          {favorited ? "Added to Favourites" : "Add To Favourites"}
+          {favorited ? "Added to Favourites" : "Add to favourites"}
         </span>
       </button>
       {error ? (

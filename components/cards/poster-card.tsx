@@ -262,14 +262,14 @@ export function PosterCard({
                         className="flex cursor-pointer items-center gap-1 rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                       >
                         <PlayCircle className="size-3.5 text-brand-magenta" />
-                        Watch Now
+                        Watch now
                       </button>
                       <button
                         type="button"
                         onClick={handleViewDetails}
                         className="cursor-pointer rounded-full border border-brand-magenta px-2 py-0.5 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
                       >
-                        View Details
+                        View details
                       </button>
                     </div>
                     {collectionItemKind ? (

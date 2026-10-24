@@ -99,7 +99,7 @@ export async function getForYouFeed(userId: string): Promise<ForYouFeed> {
     {
       key: "recommended",
       kind: "content",
-      title: "🎯 Recommended For You",
+      title: "🎯 Recommended for you",
       subtitle: signals.hasProfile
         ? "Ranked from your genres, moods, favorites, and watchlist"
         : "Top-rated picks — take the taste test to personalize this",
@@ -108,7 +108,7 @@ export async function getForYouFeed(userId: string): Promise<ForYouFeed> {
     {
       key: "music",
       kind: "music",
-      title: "🎧 Music Matched To Your Taste",
+      title: "🎧 Music matched to your taste",
       subtitle: "Songs and OSTs from the sounds, languages, and artists you love",
       tracks: music,
     },
@@ -118,7 +118,7 @@ export async function getForYouFeed(userId: string): Promise<ForYouFeed> {
     shelves.push({
       key: "because",
       kind: "content",
-      title: `🎬 Because You Love ${anchor.title}`,
+      title: `🎬 Because you love ${anchor.title}`,
       subtitle: "Titles that share its genres and feel",
       items: becauseYouLoved,
     });
@@ -127,7 +127,7 @@ export async function getForYouFeed(userId: string): Promise<ForYouFeed> {
   shelves.push({
     key: "artists",
     kind: "content",
-    title: "🎤 Artists For You",
+    title: "🎤 Artists for you",
     subtitle: "Matched to your music genres and languages",
     items: artists,
   });
@@ -139,7 +139,7 @@ export async function getForYouFeed(userId: string): Promise<ForYouFeed> {
     shelves.push({
       key: `genre-${genre}`,
       kind: "content",
-      title: `${emoji} Top ${label} Picks`,
+      title: `${emoji} Top ${label.toLowerCase()} picks`,
       subtitle: `Best-matched ${label.toLowerCase()} titles for your taste`,
       items,
     });
@@ -149,7 +149,7 @@ export async function getForYouFeed(userId: string): Promise<ForYouFeed> {
     shelves.push({
       key: "mood",
       kind: "content",
-      title: `${moodInfo.emoji} For Your ${moodInfo.label} Mood`,
+      title: `${moodInfo.emoji} For your ${moodInfo.label.toLowerCase()} mood`,
       subtitle: "Leaning into the vibe you picked",
       items: moodPicks,
     });
@@ -159,7 +159,7 @@ export async function getForYouFeed(userId: string): Promise<ForYouFeed> {
     shelves.push({
       key: "relaxing",
       kind: "music",
-      title: "🌙 Relaxing Music For Night",
+      title: "🌙 Relaxing music for night",
       subtitle: "Calm OSTs and tracks for winding down",
       tracks: relaxing,
     });
@@ -169,7 +169,7 @@ export async function getForYouFeed(userId: string): Promise<ForYouFeed> {
     shelves.push({
       key: "gems",
       kind: "content",
-      title: "✨ Hidden Gems",
+      title: "✨ Hidden gems",
       subtitle: "Underrated picks your profile says you will love",
       items: hiddenGems,
     });

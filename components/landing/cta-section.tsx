@@ -38,7 +38,7 @@ export function CtaSection() {
             "w-[132px] border-brand-fuchsia",
           )}
         >
-          Log In
+          Log in
         </Link>
       </div>
       </ScrollFadeIn>

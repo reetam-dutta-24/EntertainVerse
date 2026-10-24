@@ -114,12 +114,12 @@ export function CreateCommunityButton() {
         onClick={() => setOpen(true)}
       >
         <Plus className="me-1.5 size-4" />
-        Create Community
+        Create community
       </GradientButton>
 
       <FormShell
         open={open}
-        title="Create Community"
+        title="Create community"
         description="Launch a fan space with posts, members, and discovery metadata."
         onClose={handleClose}
       >
@@ -282,7 +282,7 @@ export function CreateCommunityButton() {
           <FormError message={error} />
           <FormActions
             onCancel={handleClose}
-            submitLabel="Create Community"
+            submitLabel="Create community"
             loading={loading}
           />
         </form>

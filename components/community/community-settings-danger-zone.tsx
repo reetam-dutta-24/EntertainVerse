@@ -118,7 +118,7 @@ export function CommunitySettingsDangerZone({
             className="flex items-center justify-center gap-2 rounded-full border border-red-400/40 px-4 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-500/10 disabled:opacity-50"
           >
             <LogOut className="size-3.5" />
-            {busy === "leave" ? "Leaving…" : "Leave Community"}
+            {busy === "leave" ? "Leaving…" : "Leave community"}
           </button>
         ) : null}
         {canLeave && canDelete ? (
@@ -130,7 +130,7 @@ export function CommunitySettingsDangerZone({
               className="flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white/85 transition hover:bg-white/10 disabled:opacity-50"
             >
               <LogOut className="size-3.5" />
-              {busy === "leave" ? "Leaving…" : "Leave Community"}
+              {busy === "leave" ? "Leaving…" : "Leave community"}
             </button>
             <button
               type="button"
@@ -139,7 +139,7 @@ export function CommunitySettingsDangerZone({
               className="flex items-center justify-center gap-2 rounded-full border border-red-400/40 bg-red-500/10 px-4 py-2 text-xs font-semibold text-red-200 transition hover:bg-red-500/20 disabled:opacity-50"
             >
               <Trash2 className="size-3.5" />
-              {busy === "delete" ? "Deleting…" : "Delete Community"}
+              {busy === "delete" ? "Deleting…" : "Delete community"}
             </button>
           </>
         ) : null}

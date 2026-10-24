@@ -446,7 +446,7 @@ export function OnboardingFlow({
 
         <GoalLinksRow links={recommendations.goalLinks} />
 
-        <CardRow title="📋 Your Starter Watchlist">
+        <CardRow title="📋 Your starter watchlist">
           {recommendations.starterWatchlist.map((item) => (
             <div key={item.id} className="relative shrink-0">
               <PosterCard item={item} tintSeed={tintSeed} />
@@ -457,7 +457,7 @@ export function OnboardingFlow({
           ))}
         </CardRow>
 
-        <CardRow title="🎯 Matched To Your Taste">
+        <CardRow title="🎯 Matched to your taste">
           {recommendations.content.map((item) => (
             <PosterCard key={item.id} item={item} tintSeed={tintSeed} />
           ))}
@@ -471,19 +471,19 @@ export function OnboardingFlow({
           </CardRow>
         ) : null}
 
-        <CardRow title="🎵 Songs & OSTs For You">
+        <CardRow title="🎵 Songs & OSTs for you">
           {recommendations.tracks.map((track) => (
             <MusicCard key={track.id} track={track} tintSeed={tintSeed} />
           ))}
         </CardRow>
 
-        <CardRow title="🎤 Artists For You">
+        <CardRow title="🎤 Artists for you">
           {recommendations.artists.map((artist) => (
             <ArtistCard key={artist.id} item={artist} tintSeed={tintSeed} />
           ))}
         </CardRow>
 
-        <CardRow title="📒 Collections To Explore">
+        <CardRow title="📒 Collections to explore">
           {recommendations.collections.map((collection) => (
             <CollectionCard
               key={collection.id}
@@ -493,7 +493,7 @@ export function OnboardingFlow({
           ))}
         </CardRow>
 
-        <CardRow title="👥 Communities You'll Love">
+        <CardRow title="👥 Communities you'll love">
           {recommendations.communities.map((community) => (
             <CommunityCard
               key={community.id}
@@ -509,7 +509,7 @@ export function OnboardingFlow({
           className="mt-2 w-full max-w-[320px] rounded-full"
           onClick={() => goToDashboard(recommendations)}
         >
-          Enter Your Universe
+          Enter your universe
           <ArrowRight className="ms-1.5 size-4" />
         </GradientButton>
       </div>
@@ -607,7 +607,7 @@ export function OnboardingFlow({
           className={cn("flex-1 rounded-full", !canContinue && "opacity-50")}
         >
           {isLastStep
-            ? "Build My Universe"
+            ? "Build my universe"
             : isOptional && picked.length === 0
               ? "Skip"
               : "Continue"}

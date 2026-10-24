@@ -191,7 +191,7 @@ export default async function CollectionDetailPage({
         )}
 
         <ContentPageSection
-          title="📒 Similar Collections"
+          title="📒 Similar collections"
           variant="community"
           emptyMessage="No similar collections found yet."
           slides={collection.similarCollections.map((entry) => ({

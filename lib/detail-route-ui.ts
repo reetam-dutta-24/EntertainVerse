@@ -33,7 +33,7 @@ export const DETAIL_HERO_BTN_ACCENT_PLAY = DETAIL_HERO_BTN_ACCENT_SOLID;
 
 /**
  * Horizontal space between two side-by-side hero CTAs.
- * Uses `.detail-hero-btn-pair` in globals.css so spacing survives glow/shadow bleed.
+ * Uses `.detail-hero-btn-pair` in globals.css — a 12–16px gap so paired CTAs read as a group.
  */
 export const DETAIL_HERO_BTN_PAIR_GAP = "detail-hero-btn-pair";
 
