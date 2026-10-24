@@ -37,6 +37,8 @@ export interface ContentItem {
   rating?: number;
   /** AI compatibility score, 0–100. */
   matchScore?: number;
+  /** Recommender "why this", e.g. "Because you loved Mushishi · Fantasy & Mystery". */
+  reason?: string;
   /** e.g. "4 Seasons", "2019", "Chase Atlantic". */
   meta?: string;
   year?: number;
@@ -60,6 +62,8 @@ export interface MusicTrack {
   rating?: number;
   /** AI compatibility score, 0–100. */
   matchScore?: number;
+  /** Recommender "why this", e.g. "Because you follow YOASOBI". */
+  reason?: string;
   imageUrl?: string;
   /** Admin CMS accent — drives card background tint. */
   accent?: AccentColor;

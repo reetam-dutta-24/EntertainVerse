@@ -14,11 +14,31 @@ import {
   normalizeOnboardingSelection,
   type OnboardingSelection,
 } from "@/lib/data/onboarding-config";
+import { labelForSongGenre } from "@/lib/catalog-enums";
+import { dot, embeddingKey, loadEmbeddingIndex, type Vector } from "@/lib/recommender/embeddings";
+import {
+  RELATED_SIMILARITY,
+  blendScore,
+  buildAnchors,
+  closestAnchor,
+  coOccurrence,
+  decayedWeight,
+  loadInteractionGraph,
+  minMax,
+  tasteCentroid,
+  type Anchor,
+  type AnchorInput,
+} from "@/lib/recommender/hybrid";
 import type { ContentItem, MusicTrack } from "@/types";
 
 /**
  * Taste engine — scores the whole catalog against a user's taste profile
- * (onboarding answers) plus live signals (favorites, watchlist, follows).
+ * (onboarding answers) plus live signals (favorites, watchlist, follows,
+ * watch/listen history).
+ *
+ * Hybrid ranking: these explicit-preference scores are blended with semantic
+ * similarity from a pre-trained embedding model and item-item collaborative
+ * filtering (see lib/recommender). Every pick carries a "why this" reason.
  *
  * The catalog is small, so we load it once per request and rank in memory.
  * Every score is 0–1; matchScore shown on cards is derived from it.
@@ -45,6 +65,12 @@ export interface TasteSignals {
   watchlist: Set<string>;
   followedArtists: Set<string>;
   favoriteTracks: Set<string>;
+  /** Signed-in user — left out of "fans also like" counts. */
+  userId?: string;
+  /** Recent viewing by content slug, 0–1 (decayed, half-life 30 days). */
+  watched: Map<string, number>;
+  /** Recent listening by track slug, 0–1 (decayed, half-life 30 days). */
+  listened: Map<string, number>;
 }
 
 interface TasteVector {
@@ -98,11 +124,22 @@ export function signalsFromSelection(selection: OnboardingSelection): TasteSigna
     watchlist: new Set(),
     followedArtists: new Set(),
     favoriteTracks: new Set(),
+    watched: new Map(),
+    listened: new Map(),
   };
 }
 
+/** Sum decayed minutes per slug, scaled so the most-played item is 1. */
+function historyWeights(rows: { slug: string; minutes: number; at: Date }[]): Map<string, number> {
+  const totals = new Map<string, number>();
+  for (const row of rows) totals.set(row.slug, (totals.get(row.slug) ?? 0) + decayedWeight(row.minutes, row.at));
+  const max = Math.max(0, ...totals.values());
+  return max ? new Map([...totals].map(([slug, total]) => [slug, total / max])) : totals;
+}
+
 export const loadTasteSignals = cache(async (userId: string): Promise<TasteSignals> => {
-  const [profile, favorites, watchlist, follows, trackFavorites] = await Promise.all([
+  const since = new Date(Date.now() - 180 * 86_400_000);
+  const [profile, favorites, watchlist, follows, trackFavorites, watches, listens] = await Promise.all([
     prisma.tasteProfile.findUnique({ where: { userId }, select: { selections: true } }),
     prisma.contentFavorite.findMany({
       where: { userId },
@@ -120,6 +157,14 @@ export const loadTasteSignals = cache(async (userId: string): Promise<TasteSigna
       where: { userId },
       select: { track: { select: { slug: true } } },
     }),
+    prisma.watchEvent.findMany({
+      where: { userId, watchedAt: { gte: since } },
+      select: { minutes: true, watchedAt: true, content: { select: { slug: true } } },
+    }),
+    prisma.listenEvent.findMany({
+      where: { userId, listenedAt: { gte: since } },
+      select: { minutes: true, listenedAt: true, track: { select: { slug: true } } },
+    }),
   ]);
 
   return {
@@ -131,6 +176,9 @@ export const loadTasteSignals = cache(async (userId: string): Promise<TasteSigna
     watchlist: new Set(watchlist.map((row) => row.content.slug)),
     followedArtists: new Set(follows.map((row) => row.artist.slug)),
     favoriteTracks: new Set(trackFavorites.map((row) => row.track.slug)),
+    userId,
+    watched: historyWeights(watches.map((row) => ({ slug: row.content.slug, minutes: row.minutes, at: row.watchedAt }))),
+    listened: historyWeights(listens.map((row) => ({ slug: row.track.slug, minutes: row.minutes, at: row.listenedAt }))),
   };
 });
 
@@ -165,7 +213,7 @@ function buildVector(signals: TasteSignals, catalog: ContentRow[]): TasteVector 
     artists: new Set([...selection.artists, ...signals.followedArtists]),
     anchors,
     anchorGenres,
-    known: new Set([...anchors, ...signals.watchlist]),
+    known: new Set([...anchors, ...signals.watchlist, ...signals.watched.keys()]),
   };
 }
 
@@ -208,6 +256,165 @@ function diversify<T extends { row: ContentRow; score: number }>(scored: T[], ta
     picked.push(next);
   }
   return picked;
+}
+
+const TYPE_WORDS: Record<string, string> = {
+  anime: "anime",
+  show: "show",
+  movie: "film",
+  documentary: "documentary",
+  kdrama: "K-drama",
+};
+
+const titleCase = (text: string) => text.replace(/\b\w/g, (char) => char.toUpperCase());
+const genreWord = (genre: string) => genreLabel(genre).label || titleCase(genre);
+
+interface ContentContext {
+  anchors: Anchor[];
+  profile: Vector | null;
+  vectorOf: (row: ContentRow) => Vector | undefined;
+  rowOf: (slug: string) => ContentRow | undefined;
+  collab: ReturnType<typeof coOccurrence>;
+}
+
+/** What the user has shown interest in, placed in embedding space. */
+async function contentContext(signals: TasteSignals, content: ContentRow[]): Promise<ContentContext> {
+  const [index, graph] = await Promise.all([loadEmbeddingIndex(), loadInteractionGraph()]);
+  const bySlug = new Map(content.map((row) => [row.slug, row]));
+  const inputs: AnchorInput[] = [];
+  const push = (slug: string, verb: string, weight: number) => {
+    const row = bySlug.get(slug);
+    if (row) inputs.push({ kind: "content", itemId: row.id, slug, title: row.title, verb, weight });
+  };
+  for (const slug of signals.favoriteContent) push(slug, "loved", 1);
+  for (const slug of signals.selection.favoriteTitles) push(slug, "picked", 0.9);
+  for (const [slug, weight] of signals.watched) push(slug, "watched", 0.3 + 0.55 * weight);
+  for (const slug of signals.watchlist) push(slug, "saved", 0.35);
+  const anchors = buildAnchors(index, inputs);
+  return {
+    anchors,
+    profile: tasteCentroid(anchors),
+    vectorOf: (row) => index.vectors.get(embeddingKey("content", row.id)),
+    rowOf: (slug) => bySlug.get(slug),
+    collab: coOccurrence(anchors, graph.content, signals.userId),
+  };
+}
+
+/** Spoiler-free "why this": the closest thing the user liked, what they share, or the taste it fits. */
+function explainContent(row: ContentRow, v: TasteVector, ctx: ContentContext, similarRow?: ContentRow): string {
+  const genres = contentGenres(row);
+  const sharedWith = (other: ContentRow | undefined) => {
+    if (!other) return "";
+    const otherGenres = new Set(contentGenres(other));
+    const shared = genres.filter((genre) => otherGenres.has(genre)).slice(0, 2).map(genreWord);
+    return shared.length ? ` · ${shared.join(" & ")}` : "";
+  };
+
+  if (similarRow) return `Similar in feel to ${similarRow.title}${sharedWith(similarRow)}`;
+
+  const near = closestAnchor(ctx.vectorOf(row), ctx.anchors, row.slug);
+  if (near && near.similarity >= RELATED_SIMILARITY) {
+    return `Because you ${near.anchor.verb} ${near.anchor.title}${sharedWith(ctx.rowOf(near.anchor.slug))}`;
+  }
+  const fans = ctx.collab.get(row.slug);
+  if (fans) return `Fans of ${fans.via.title} also watch this`;
+
+  const liked = genres.filter((genre) => (v.genreWeights.get(genre) ?? 0) >= 0.6).slice(0, 2).map(genreWord);
+  if (liked.length) return `Matches your love of ${liked.join(" & ")}`;
+  const typeWord = TYPE_WORDS[prismaMediaTypeToApp(row.type)] ?? "pick";
+  if ((row.rating ?? 0) >= 8) return `Top-rated ${typeWord} · ${row.rating!.toFixed(1)}/10`;
+  return genres.length ? `A ${genreWord(genres[0]!)} ${typeWord} to widen your taste` : "Picked to widen your taste";
+}
+
+interface MusicContext {
+  anchors: Anchor[];
+  profile: Vector | null;
+  trackVector: (row: TrackRow) => Vector | undefined;
+  artistVector: (row: ArtistRow) => Vector | undefined;
+  collab: ReturnType<typeof coOccurrence>;
+}
+
+/** Music taste: loved/played tracks, followed artists, and (lightly) loved shows for OSTs. */
+async function musicContext(
+  signals: TasteSignals,
+  catalog: Awaited<ReturnType<typeof loadTasteCatalog>>,
+): Promise<MusicContext> {
+  const [index, graph] = await Promise.all([loadEmbeddingIndex(), loadInteractionGraph()]);
+  const trackBySlug = new Map(catalog.tracks.map((row) => [row.slug, row]));
+  const artistBySlug = new Map(catalog.artists.map((row) => [row.slug, row]));
+  const contentBySlug = new Map(catalog.content.map((row) => [row.slug, row]));
+  const inputs: AnchorInput[] = [];
+  const track = (slug: string, verb: string, weight: number) => {
+    const row = trackBySlug.get(slug);
+    if (row) inputs.push({ kind: "track", itemId: row.id, slug, title: row.title, verb, weight });
+  };
+  const artist = (slug: string, verb: string, weight: number) => {
+    const row = artistBySlug.get(slug);
+    if (row) inputs.push({ kind: "artist", itemId: row.id, slug, title: row.title, verb, weight });
+  };
+  for (const slug of signals.favoriteTracks) track(slug, "loved", 1);
+  for (const [slug, weight] of signals.listened) track(slug, "played", 0.3 + 0.55 * weight);
+  for (const slug of signals.followedArtists) artist(slug, "follow", 0.8);
+  for (const slug of signals.selection.artists) artist(slug, "picked", 0.7);
+  for (const slug of signals.favoriteContent) {
+    const row = contentBySlug.get(slug);
+    if (row) inputs.push({ kind: "content", itemId: row.id, slug, title: row.title, verb: "loved", weight: 0.3 });
+  }
+  const anchors = buildAnchors(index, inputs);
+  return {
+    anchors,
+    profile: tasteCentroid(anchors),
+    trackVector: (row) => index.vectors.get(embeddingKey("track", row.id)),
+    artistVector: (row) => index.vectors.get(embeddingKey("artist", row.id)),
+    collab: coOccurrence(
+      anchors.filter((anchor) => anchor.kind === "track"),
+      graph.tracks,
+      signals.userId,
+    ),
+  };
+}
+
+function explainTrack(row: TrackRow, v: TasteVector, ctx: MusicContext): string {
+  const source = row.sourceContent ? ctx.anchors.find((a) => a.kind === "content" && a.slug === row.sourceContent!.slug) : undefined;
+  if (source) return `From ${source.title}, which you ${source.verb}`;
+  if (row.artistRef && v.artists.has(row.artistRef.slug)) return `By ${row.artist}, who you follow`;
+
+  const near = closestAnchor(ctx.trackVector(row), ctx.anchors, row.slug);
+  if (near && near.similarity >= RELATED_SIMILARITY) return `Because you ${near.anchor.verb} ${near.anchor.title}`;
+  const fans = ctx.collab.get(row.slug);
+  if (fans) return `Listeners of ${fans.via.title} also play this`;
+
+  const liked = asStrings(row.genres).filter((genre) => v.musicGenres.has(genre)).slice(0, 2).map(labelForSongGenre);
+  if (liked.length) return `Matches your ${liked.join(" & ")} taste`;
+  const kind = row.kind === "ost" ? "OST" : "song";
+  return (row.rating ?? 0) >= 8 ? `Top-rated ${kind} · ${row.rating!.toFixed(1)}/10` : `A ${kind} to widen your taste`;
+}
+
+function explainArtist(row: ArtistRow, v: TasteVector, ctx: MusicContext): string {
+  if (v.artists.has(row.slug)) return "One of your artists";
+  const near = closestAnchor(ctx.artistVector(row), ctx.anchors, row.slug);
+  if (near && near.similarity >= RELATED_SIMILARITY) return `Because you ${near.anchor.verb} ${near.anchor.title}`;
+  const liked = asStrings(row.genres).filter((genre) => v.musicGenres.has(genre)).slice(0, 2).map(labelForSongGenre);
+  if (liked.length) return `Matches your ${liked.join(" & ")} taste`;
+  return row.isGroup ? "A group to widen your taste" : "An artist to widen your taste";
+}
+
+/** Similarity to `target` for each row, rescaled 0–1; rows without a vector sit just below the middle. */
+function semanticScores<T extends { slug: string }>(rows: T[], vectorOf: (row: T) => Vector | undefined, target: Vector | null) {
+  if (!target) return { get: () => undefined as number | undefined };
+  const raw = new Map<string, number>();
+  for (const row of rows) {
+    const vector = vectorOf(row);
+    if (vector) raw.set(row.slug, dot(vector, target));
+  }
+  const scaled = minMax(raw);
+  return { get: (slug: string) => scaled.get(slug) ?? 0.4 };
+}
+
+/** Collaborative scores rescaled so the strongest candidate is 1. */
+function collabScores(collab: ReturnType<typeof coOccurrence>) {
+  const max = Math.max(0, ...[...collab.values()].map((entry) => entry.score));
+  return (slug: string) => (max ? (collab.get(slug)?.score ?? 0) / max : undefined);
 }
 
 function toMatch(score: number): number {
@@ -317,12 +524,13 @@ export async function rankContent(
 ): Promise<ContentItem[]> {
   const { content } = await loadTasteCatalog();
   const v = buildVector(signals, content);
+  const ctx = await contentContext(signals, content);
   const similarRow = options.similarTo
     ? content.find((row) => row.slug === options.similarTo)
     : undefined;
   const similarGenres = similarRow ? new Set(contentGenres(similarRow)) : null;
 
-  const scored = content
+  const pool = content
     .filter((row) => {
       if (options.excludeKnown && v.known.has(row.slug)) return false;
       if (options.exclude?.has(row.slug)) return false;
@@ -336,22 +544,29 @@ export async function rankContent(
         if (!genres.some((genre) => similarGenres.has(genre))) return false;
       }
       return true;
-    })
-    .map((row) => {
-      let score = scoreContentRow(row, v);
-      if (similarRow && similarGenres) {
-        const genres = contentGenres(row);
-        const shared = genres.filter((genre) => similarGenres.has(genre)).length;
-        const overlap = shared / Math.max(similarGenres.size, genres.length);
-        const sameType = row.type === similarRow.type ? 1 : 0;
-        score = score * 0.4 + overlap * 0.4 + sameType * 0.2;
-      }
-      return { row, score };
     });
+
+  // "More like X" compares against X itself; otherwise against the user's taste centroid.
+  const semantic = semanticScores(pool, ctx.vectorOf, similarRow ? (ctx.vectorOf(similarRow) ?? null) : ctx.profile);
+  const collab = collabScores(ctx.collab);
+
+  const scored = pool.map((row) => {
+    let score = blendScore(scoreContentRow(row, v), semantic.get(row.slug), collab(row.slug));
+    if (similarRow && similarGenres) {
+      const genres = contentGenres(row);
+      const shared = genres.filter((genre) => similarGenres.has(genre)).length;
+      const overlap = shared / Math.max(similarGenres.size, genres.length);
+      const likeness = semantic.get(row.slug) ?? overlap;
+      const sameType = row.type === similarRow.type ? 1 : 0;
+      score = score * 0.35 + likeness * 0.45 + sameType * 0.2;
+    }
+    return { row, score };
+  });
 
   return diversify(scored, options.limit ?? 18).map(({ row, score }) => ({
     ...mapContentToItem(row),
     matchScore: toMatch(score),
+    reason: explainContent(row, v, ctx, similarRow),
   }));
 }
 
@@ -359,27 +574,40 @@ export async function rankTracks(
   signals: TasteSignals,
   options: { limit?: number; kinds?: string[] } = {},
 ): Promise<MusicTrack[]> {
-  const { content, tracks } = await loadTasteCatalog();
-  const v = buildVector(signals, content);
-  return tracks
-    .filter((row) => !options.kinds || options.kinds.includes(row.kind))
-    .map((row) => ({ row, score: scoreTrackRow(row, v, signals) }))
+  const catalog = await loadTasteCatalog();
+  const v = buildVector(signals, catalog.content);
+  const ctx = await musicContext(signals, catalog);
+  const pool = catalog.tracks.filter((row) => !options.kinds || options.kinds.includes(row.kind));
+  const semantic = semanticScores(pool, ctx.trackVector, ctx.profile);
+  const collab = collabScores(ctx.collab);
+  return pool
+    .map((row) => ({ row, score: blendScore(scoreTrackRow(row, v, signals), semantic.get(row.slug), collab(row.slug)) }))
     .sort((a, b) => b.score - a.score)
     .slice(0, options.limit ?? 18)
-    .map(({ row, score }) => ({ ...mapTrackToMusicTrack(row), matchScore: toMatch(score) }));
+    .map(({ row, score }) => ({
+      ...mapTrackToMusicTrack(row),
+      matchScore: toMatch(score),
+      reason: explainTrack(row, v, ctx),
+    }));
 }
 
 export async function rankArtists(
   signals: TasteSignals,
   options: { limit?: number } = {},
 ): Promise<ContentItem[]> {
-  const { content, artists } = await loadTasteCatalog();
-  const v = buildVector(signals, content);
-  return artists
-    .map((row) => ({ row, score: scoreArtistRow(row, v) }))
+  const catalog = await loadTasteCatalog();
+  const v = buildVector(signals, catalog.content);
+  const ctx = await musicContext(signals, catalog);
+  const semantic = semanticScores(catalog.artists, ctx.artistVector, ctx.profile);
+  return catalog.artists
+    .map((row) => ({ row, score: blendScore(scoreArtistRow(row, v), semantic.get(row.slug), undefined) }))
     .sort((a, b) => b.score - a.score)
     .slice(0, options.limit ?? 12)
-    .map(({ row, score }) => ({ ...mapArtistToContentItem(row), matchScore: toMatch(score) }));
+    .map(({ row, score }) => ({
+      ...mapArtistToContentItem(row),
+      matchScore: toMatch(score),
+      reason: explainArtist(row, v, ctx),
+    }));
 }
 
 /** The user's strongest genres, explicit picks first, then moods/favorites. */

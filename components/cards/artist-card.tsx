@@ -11,6 +11,7 @@ import { SLOT_H, SLOT_W } from "@/lib/card-dimensions";
 import type { ContentItem } from "@/types";
 import { Chip, RatingChip } from "@/components/ui/chip";
 import { HdImage } from "@/components/ui/hd-image";
+import { CardBlurb } from "@/components/cards/card-blurb";
 
 const CARD_W = 148;
 const CARD_H = 224;
@@ -206,9 +207,7 @@ export function ArtistCard({
                 </button>
               </div>
 
-              <p className="h-8 w-full overflow-hidden text-left text-caption font-normal leading-4 text-white/85 line-clamp-2">
-                {artistDescription(item)}
-              </p>
+              <CardBlurb reason={item.reason} text={artistDescription(item)} className="text-left" />
             </div>
           </div>
         </div>

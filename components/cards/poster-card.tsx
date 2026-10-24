@@ -13,6 +13,7 @@ import { CardAddToCollectionButton } from "@/components/forms/add-to-collection-
 import type { ContentItem } from "@/types";
 import { Chip, RatingChip } from "@/components/ui/chip";
 import { HdImage } from "@/components/ui/hd-image";
+import { CardBlurb } from "@/components/cards/card-blurb";
 
 const typeLabels: Record<ContentItem["type"], string> = {
   anime: "Anime",
@@ -243,9 +244,7 @@ export function PosterCard({
                 {item.title}
               </p>
 
-              <p className="h-8 w-full overflow-hidden text-center text-caption font-normal leading-4 text-white/80 line-clamp-2">
-                {description}
-              </p>
+              <CardBlurb reason={item.reason} text={description} className="text-center" />
 
               <p className="flex w-full justify-between gap-2 whitespace-nowrap text-caption font-normal text-white/75">
                 <span className="truncate">{meta}</span>

@@ -1,3 +1,4 @@
+import { scheduleEmbeddingSync } from "@/lib/recommender/embeddings";
 import { NextResponse } from "next/server";
 import { requireContentAdminApi } from "@/lib/admin-auth";
 import { mapContentToItem } from "@/lib/mappers/content.mapper";
@@ -35,6 +36,8 @@ export async function GET(_request: Request, context: RouteContext) {
 export async function PATCH(request: Request, context: RouteContext) {
   const denied = await requireContentAdminApi();
   if (denied) return denied;
+  // Keep recommender embeddings in step with the catalog (runs after the response).
+  scheduleEmbeddingSync();
 
   const { id } = await context.params;
 
@@ -70,6 +73,8 @@ export async function PATCH(request: Request, context: RouteContext) {
 export async function DELETE(_request: Request, context: RouteContext) {
   const denied = await requireContentAdminApi();
   if (denied) return denied;
+  // Keep recommender embeddings in step with the catalog (runs after the response).
+  scheduleEmbeddingSync();
 
   const { id } = await context.params;
 

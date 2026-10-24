@@ -104,6 +104,33 @@ export async function geminiStructured<S extends z.ZodType>(request: StructuredR
   }
 }
 
+/** Pre-trained text-embedding model (free tier) used by the recommender. */
+export const GEMINI_EMBEDDING_MODEL = "gemini-embedding-001";
+
+/** One vector per text. Documents (catalog items) and queries (user taste) use different task types. */
+export async function geminiEmbed(
+  texts: string[],
+  taskType: "RETRIEVAL_DOCUMENT" | "RETRIEVAL_QUERY",
+  dimensions: number,
+): Promise<number[][]> {
+  try {
+    const response = await withRetry(() =>
+      gemini().models.embedContent({
+        model: GEMINI_EMBEDDING_MODEL,
+        contents: texts,
+        config: { taskType, outputDimensionality: dimensions },
+      }),
+    );
+    const vectors = response.embeddings?.map((embedding) => embedding.values ?? []) ?? [];
+    if (vectors.length !== texts.length || vectors.some((vector) => vector.length !== dimensions)) {
+      throw new CatalogAiError("Gemini returned an unexpected embedding shape.");
+    }
+    return vectors;
+  } catch (error) {
+    throw toError(error);
+  }
+}
+
 export async function geminiResearch(system: string, instructions: string): Promise<WebResearch> {
   try {
     const response = await withRetry(() =>

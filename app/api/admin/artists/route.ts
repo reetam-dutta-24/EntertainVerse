@@ -1,3 +1,4 @@
+import { scheduleEmbeddingSync } from "@/lib/recommender/embeddings";
 import { NextResponse } from "next/server";
 import { requireArtistAdminApi } from "@/lib/admin-auth";
 import {
@@ -26,6 +27,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const denied = await requireArtistAdminApi();
   if (denied) return denied;
+  // Keep recommender embeddings in step with the catalog (runs after the response).
+  scheduleEmbeddingSync();
 
   try {
     const body = await request.json();

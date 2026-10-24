@@ -12,6 +12,7 @@ import { CardAddToCollectionButton } from "@/components/forms/add-to-collection-
 import type { MusicTrack } from "@/types";
 import { Chip, RatingChip } from "@/components/ui/chip";
 import { HdImage } from "@/components/ui/hd-image";
+import { CardBlurb } from "@/components/cards/card-blurb";
 
 const CARD_W = 148;
 const CARD_H = 224;
@@ -252,9 +253,7 @@ export function MusicCard({
                 </p>
               </div>
 
-              <p className="h-8 w-full overflow-hidden text-center text-caption font-normal leading-4 text-white/80 line-clamp-2">
-                {trackDescription(track)}
-              </p>
+              <CardBlurb reason={track.reason} text={trackDescription(track)} className="text-center" />
 
               <div className="mt-auto flex w-full flex-col items-center gap-1.5 pt-1">
                 <div className="flex w-full items-center justify-center gap-1.5">

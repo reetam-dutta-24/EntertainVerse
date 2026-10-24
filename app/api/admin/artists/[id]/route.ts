@@ -1,3 +1,4 @@
+import { scheduleEmbeddingSync } from "@/lib/recommender/embeddings";
 import { NextResponse } from "next/server";
 import { requireArtistAdminApi } from "@/lib/admin-auth";
 import {
@@ -24,6 +25,8 @@ export async function GET(_request: Request, context: RouteContext) {
 export async function PATCH(request: Request, context: RouteContext) {
   const denied = await requireArtistAdminApi();
   if (denied) return denied;
+  // Keep recommender embeddings in step with the catalog (runs after the response).
+  scheduleEmbeddingSync();
   const { id } = await context.params;
   try {
     const body = await request.json();
@@ -54,6 +57,8 @@ export async function PATCH(request: Request, context: RouteContext) {
 export async function DELETE(_request: Request, context: RouteContext) {
   const denied = await requireArtistAdminApi();
   if (denied) return denied;
+  // Keep recommender embeddings in step with the catalog (runs after the response).
+  scheduleEmbeddingSync();
   const { id } = await context.params;
   try {
     await deleteCatalogArtist(id);

@@ -970,3 +970,22 @@ model ListenEvent {
 
   @@index([userId, listenedAt])
 }
+
+// ─── Recommender ─────────────────────────────────────────────────────────────
+
+/// Semantic vector for one catalog item from a pre-trained embedding model
+/// (Gemini `gemini-embedding-001`). Re-embedded only when the item's text changes.
+model CatalogEmbedding {
+  id        String   @id @default(cuid())
+  /// content | track | artist | collection | community
+  kind      String
+  /// Database id of the item (stable across slug renames).
+  itemId    String
+  model     String
+  /// Hash of the text that was embedded — unchanged text is never re-sent.
+  textHash  String
+  vector    Float[]
+  updatedAt DateTime @updatedAt
+
+  @@unique([kind, itemId])
+}

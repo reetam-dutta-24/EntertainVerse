@@ -15,6 +15,7 @@
     "db:seed": "npx tsx prisma/seed.ts",
     "db:recovery": "npx tsx scripts/seed-recovery.ts",
     "db:reset": "npx tsx prisma/seed.ts --wipe",
+    "embed:catalog": "tsx --conditions=react-server --env-file=.env.local scripts/embed-catalog.ts",
     "postinstall": "prisma generate"
   },
   "prisma": {
