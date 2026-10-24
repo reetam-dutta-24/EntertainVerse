@@ -54,7 +54,7 @@ export default async function DashboardHomePage() {
   ] = await Promise.all([
     getHomeStats(user.id),
     getHomeContinueWatching(user.id),
-    getHomeRecommended(),
+    getHomeRecommended(user.id),
     getHomeTrending(),
     getHomeContinueListening(user.id),
     getHomeCommunities(user.id),

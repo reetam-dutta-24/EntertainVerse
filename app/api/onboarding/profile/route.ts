@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import type { OnboardingSelection } from "@/lib/data/onboarding-config";
+import { normalizeOnboardingSelection } from "@/lib/data/onboarding-config";
 import { getTasteProfileForUser } from "@/lib/services/onboarding.service";
 
 /** GET /api/onboarding/profile — saved taste-test answers for the current user. */
@@ -17,7 +17,7 @@ export async function GET() {
 
   return NextResponse.json({
     profile: {
-      selection: profile.selections as unknown as OnboardingSelection,
+      selection: normalizeOnboardingSelection(profile.selections),
       recommendations: {
         tasteScore: profile.tasteScore,
         tasteBreakdown: profile.tasteBreakdown,

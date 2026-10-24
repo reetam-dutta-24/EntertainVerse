@@ -37,10 +37,10 @@ export default async function DiscoverPage() {
   ] = await Promise.all([
     getActiveFilters(user.id),
     getTrendingThisWeek(),
-    getRecommendedForYou(),
+    getRecommendedForYou(user.id),
     getNewReleases(),
     getContinueWatching(user.id),
-    getMusicForYourTaste(),
+    getMusicForYourTaste(user.id),
     getTrendingMusic(),
     getContinueListening(user.id),
   ]);

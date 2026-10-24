@@ -11,6 +11,11 @@ import {
   getTrendingContent,
   getTrendingMusic as getTrendingMusicFromDb,
 } from "@/lib/services/feed.service";
+import {
+  loadTasteSignals,
+  rankContent,
+  rankTracks,
+} from "@/lib/services/taste-engine.service";
 
 /**
  * Discover feeds — backed by PostgreSQL catalog.
@@ -38,8 +43,11 @@ export async function getTrendingThisWeek(): Promise<ContentItem[]> {
   return getTrendingContent(18);
 }
 
-export async function getRecommendedForYou(): Promise<ContentItem[]> {
-  return getRecommendedContent(18);
+/** Taste-ranked picks for a signed-in user; global top-rated otherwise. */
+export async function getRecommendedForYou(userId?: string): Promise<ContentItem[]> {
+  if (!userId) return getRecommendedContent(18);
+  const signals = await loadTasteSignals(userId);
+  return rankContent(signals, { limit: 18, excludeKnown: true });
 }
 
 export async function getNewReleases(): Promise<ContentItem[]> {
@@ -50,8 +58,10 @@ export async function getContinueWatching(userId?: string): Promise<ContentItem[
   return getContinueWatchingContent(userId, 8);
 }
 
-export async function getMusicForYourTaste(): Promise<MusicTrack[]> {
-  return getMusicForTaste(18);
+export async function getMusicForYourTaste(userId?: string): Promise<MusicTrack[]> {
+  if (!userId) return getMusicForTaste(18);
+  const signals = await loadTasteSignals(userId);
+  return rankTracks(signals, { limit: 18 });
 }
 
 export async function getTrendingMusic(): Promise<MusicTrack[]> {

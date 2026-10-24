@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { OnboardingFlow } from "@/components/onboarding";
 import { requireOnboardingAccess } from "@/lib/auth-guards";
+import { buildOnboardingSteps } from "@/lib/data/onboarding-config";
 import { isOnboardingRetake } from "@/lib/onboarding-routes";
+import { getOnboardingCatalog } from "@/lib/services/onboarding-recommendations.service";
 import { getUserById } from "@/lib/services/user.service";
 
 export const metadata: Metadata = {
   title: "Set Up Your Universe — AniVerse",
   description:
-    "Tell AniVerse your taste — genres, content, and music — and get instant AI-matched recommendations.",
+    "Tell AniVerse your taste — genres, favorites, music, and artists — and get instant AI-matched recommendations.",
 };
 
 export default async function OnboardingPage({
@@ -16,9 +18,12 @@ export default async function OnboardingPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const userId = await requireOnboardingAccess();
-  const user = await getUserById(userId);
+  const [user, catalog, params] = await Promise.all([
+    getUserById(userId),
+    getOnboardingCatalog(),
+    searchParams,
+  ]);
   const userName = user?.name ?? "there";
-  const params = await searchParams;
   const isRetake = isOnboardingRetake(params);
 
   return (
@@ -32,6 +37,7 @@ export default async function OnboardingPage({
         userId={userId}
         userName={userName}
         isRetake={isRetake}
+        steps={buildOnboardingSteps(catalog)}
       />
     </main>
   );

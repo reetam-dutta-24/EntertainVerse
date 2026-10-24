@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { useSession } from "next-auth/react";
 import {
@@ -16,15 +16,23 @@ import { CommunityCard } from "@/components/cards/community-card";
 import { MusicCard } from "@/components/cards/music-card";
 import { PosterCard } from "@/components/cards/poster-card";
 import { GoalLinksRow } from "@/components/onboarding/goal-links-row";
+import {
+  ArtistPickGrid,
+  ChipPickGrid,
+  PosterPickGrid,
+} from "@/components/onboarding/onboarding-pick-grid";
 import { OnboardingProfileStep } from "@/components/onboarding/onboarding-profile-step";
 import { TasteBreakdownPanel } from "@/components/onboarding/taste-breakdown-panel";
 import { Chip } from "@/components/ui/chip";
 import { GradientButton } from "@/components/ui/gradient-button";
 import {
+  MOOD_GENRES,
+  SECTION_LABELS,
   emptyOnboardingSelection,
-  onboardingSteps,
+  normalizeOnboardingSelection,
   type OnboardingRecommendations,
   type OnboardingSelection,
+  type OnboardingStepConfig,
 } from "@/lib/data/onboarding-config";
 import {
   clearLegacyOnboardingProfile,
@@ -38,12 +46,43 @@ import { cn } from "@/lib/utils";
 type Phase = "intro" | "profile" | "quiz" | "building" | "results";
 
 const buildingSteps = [
-  "Reading your genre picks…",
-  "Matching anime & shows…",
-  "Tuning music & OSTs…",
-  "Finding communities…",
+  "Weighing your genres & moods…",
+  "Learning from your favorite titles…",
+  "Matching songs, OSTs & languages…",
+  "Ranking artists for your sound…",
+  "Finding communities & collections…",
   "Building your taste profile…",
 ];
+
+/** Drop saved picks that no longer exist in the catalog (e.g. removed titles). */
+function sanitizeSelection(
+  selection: OnboardingSelection,
+  steps: OnboardingStepConfig[],
+): OnboardingSelection {
+  const next = { ...emptyOnboardingSelection };
+  for (const step of steps) {
+    const valid = new Set(step.options.map((option) => option.id));
+    const kept = selection[step.id].filter((id) => valid.has(id));
+    next[step.id] = step.max ? kept.slice(0, step.max) : kept;
+  }
+  return next;
+}
+
+/** Earlier answers that visual steps use to float the best matches to the top. */
+function relevanceTagsFor(step: OnboardingStepConfig, selection: OnboardingSelection) {
+  if (step.kind === "posters") {
+    return [
+      ...selection.contentTypes,
+      ...selection.genres,
+      ...selection.moods.flatMap((mood) => MOOD_GENRES[mood] ?? []),
+      ...selection.languages,
+    ];
+  }
+  if (step.kind === "artists") {
+    return [...selection.musicTastes, ...selection.languages];
+  }
+  return [];
+}
 
 function CardRow({
   title,
@@ -67,10 +106,13 @@ export function OnboardingFlow({
   userId,
   userName,
   isRetake: retakeMode = false,
+  steps,
 }: {
   userId: string;
   userName: string;
   isRetake?: boolean;
+  /** Catalog-backed taste-test steps, built on the server. */
+  steps: OnboardingStepConfig[];
 }) {
   const router = useAppRouter();
   const { update } = useSession();
@@ -85,11 +127,14 @@ export function OnboardingFlow({
     useState<OnboardingRecommendations | null>(null);
   const [buildError, setBuildError] = useState<string>();
 
-  const step = onboardingSteps[stepIndex];
+  // Retake loading reads steps once — a server refresh must not reset picks.
+  const stepsRef = useRef(steps);
+  const step = steps[stepIndex];
   const picked = selection[step?.id ?? "contentTypes"] ?? [];
-  const isOptional = step?.min === 0;
-  const canContinue = isOptional || picked.length >= (step?.min ?? 1);
-  const isLastStep = stepIndex === onboardingSteps.length - 1;
+  const minPicks = step ? Math.min(step.min, step.options.length) : 1;
+  const isOptional = minPicks === 0;
+  const canContinue = isOptional || picked.length >= minPicks;
+  const isLastStep = stepIndex === steps.length - 1;
   const tintSeed = sectionTintSeed("onboarding-recommendations");
 
   async function markOnboardingComplete(
@@ -155,11 +200,8 @@ export function OnboardingFlow({
   useEffect(() => {
     clearLegacyOnboardingProfile();
 
-    if (!retakeMode) {
-      setSelection(emptyOnboardingSelection);
-      setPhase("profile");
-      return;
-    }
+    // First-time setup starts empty on the profile step (initial state).
+    if (!retakeMode) return;
 
     let cancelled = false;
 
@@ -172,7 +214,7 @@ export function OnboardingFlow({
           };
           if (!cancelled && data.profile?.selection) {
             setIsRetake(true);
-            setSelection(data.profile.selection);
+            setSelection(sanitizeSelection(normalizeOnboardingSelection(data.profile.selection), stepsRef.current));
             setPhase("intro");
             return;
           }
@@ -184,7 +226,7 @@ export function OnboardingFlow({
       const saved = getOnboardingProfileWithLegacyMigration(userId);
       if (!cancelled && saved?.selection) {
         setIsRetake(true);
-        setSelection(saved.selection);
+        setSelection(sanitizeSelection(normalizeOnboardingSelection(saved.selection), stepsRef.current));
         setPhase("intro");
       }
     }
@@ -197,13 +239,17 @@ export function OnboardingFlow({
   }, [retakeMode, userId]);
 
   useEffect(() => {
+    if (phase === "quiz") window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [phase, stepIndex]);
+
+  useEffect(() => {
     if (phase !== "building") return;
     let cancelled = false;
     const started = Date.now();
 
     const stepInterval = window.setInterval(() => {
       setBuildingStep((i) => Math.min(i + 1, buildingSteps.length - 1));
-    }, 420);
+    }, 380);
 
     async function loadRecommendations() {
       try {
@@ -229,7 +275,7 @@ export function OnboardingFlow({
           error instanceof Error ? error.message : "Could not build recommendations.",
         );
         setPhase("quiz");
-        setStepIndex(onboardingSteps.length - 1);
+        setStepIndex(steps.length - 1);
       }
     }
 
@@ -239,7 +285,7 @@ export function OnboardingFlow({
       cancelled = true;
       window.clearInterval(stepInterval);
     };
-  }, [phase, selection, userId]);
+  }, [phase, selection, userId, steps.length]);
 
   if (phase === "profile") {
     return (
@@ -383,6 +429,21 @@ export function OnboardingFlow({
 
         <TasteBreakdownPanel items={recommendations.tasteBreakdown} />
 
+        {selection.favoriteTitles.length || selection.artists.length ? (
+          <p className="px-2 text-center text-xs text-white/70 sm:text-sm">
+            {[
+              selection.favoriteTitles.length
+                ? `❤️ ${selection.favoriteTitles.length} favorite${selection.favoriteTitles.length === 1 ? "" : "s"} will be added to your profile`
+                : null,
+              selection.artists.length
+                ? `🎤 you'll follow ${selection.artists.length} artist${selection.artists.length === 1 ? "" : "s"}`
+                : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        ) : null}
+
         <GoalLinksRow links={recommendations.goalLinks} />
 
         <CardRow title="📋 Your Starter Watchlist">
@@ -401,6 +462,14 @@ export function OnboardingFlow({
             <PosterCard key={item.id} item={item} tintSeed={tintSeed} />
           ))}
         </CardRow>
+
+        {recommendations.becauseYouLoved ? (
+          <CardRow title={`🎬 Because You Love ${recommendations.becauseYouLoved.anchorTitle}`}>
+            {recommendations.becauseYouLoved.items.map((item) => (
+              <PosterCard key={item.id} item={item} tintSeed={tintSeed} />
+            ))}
+          </CardRow>
+        ) : null}
 
         <CardRow title="🎵 Songs & OSTs For You">
           {recommendations.tracks.map((track) => (
@@ -457,23 +526,37 @@ export function OnboardingFlow({
         : isOptional
           ? "Optional — skip or pick"
           : null;
+  const isVisualStep = step.kind !== "chips";
+  const gridProps = {
+    step,
+    picked,
+    relevanceTags: relevanceTagsFor(step, selection),
+    onToggle: toggleOption,
+  };
 
   return (
-    <div className="flex w-full max-w-[760px] flex-col items-center gap-8">
-      <div className="flex w-full max-w-[480px] flex-col items-center gap-2">
+    <div
+      className={cn(
+        "flex w-full flex-col items-center gap-6 sm:gap-8",
+        isVisualStep ? "max-w-[960px]" : "max-w-[760px]",
+      )}
+    >
+      <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
         <div className="flex w-full items-center gap-1.5">
-          {onboardingSteps.map((s, i) => (
+          {steps.map((s, i) => (
             <span
               key={s.id}
               className={cn(
                 "h-1.5 flex-1 rounded-full transition-colors duration-500",
                 i <= stepIndex ? "bg-gradient-brand" : "bg-white/15",
+                i > 0 && steps[i - 1].section !== s.section && "ms-2",
               )}
             />
           ))}
         </div>
         <p className="text-xs text-muted">
-          Step {stepIndex + 1} of {onboardingSteps.length}
+          <span className="font-semibold text-brand-pink">{SECTION_LABELS[step.section]}</span>
+          {" · "}Step {stepIndex + 1} of {steps.length}
           {selectionHint ? ` · ${selectionHint}` : ""}
         </p>
       </div>
@@ -487,52 +570,17 @@ export function OnboardingFlow({
         </p>
       </div>
 
-      <div
-        className={cn(
-          "grid w-full gap-3 sm:gap-4",
-          step.options.length <= 5 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-4",
-        )}
-      >
-        {step.options.map((option) => {
-          const selected = picked.includes(option.id);
-          const atMax =
-            step.max != null &&
-            step.max > 1 &&
-            picked.length >= step.max &&
-            !selected;
-          return (
-            <button
-              key={option.id}
-              type="button"
-              onClick={() => toggleOption(option.id)}
-              aria-pressed={selected}
-              disabled={atMax}
-              className={cn(
-                "relative flex cursor-pointer flex-col items-center gap-1.5 rounded-card px-3 py-5 text-center transition-all duration-300",
-                selected
-                  ? "border border-brand-magenta bg-glass-magenta shadow-glow-pink-soft"
-                  : "border border-white/10 bg-glass-purple hover:border-white/30 hover:shadow-glow-pink-soft",
-                atMax && "cursor-not-allowed opacity-40",
-              )}
-            >
-              {selected ? (
-                <span className="absolute right-2.5 top-2.5 flex size-5 items-center justify-center rounded-full bg-gradient-brand">
-                  <Check className="size-3 text-white" strokeWidth={3} />
-                </span>
-              ) : null}
-              <span className="text-2xl" aria-hidden>
-                {option.emoji}
-              </span>
-              <span className="text-sm font-semibold text-white">
-                {option.label}
-              </span>
-              {option.hint ? (
-                <span className="text-[11px] text-muted">{option.hint}</span>
-              ) : null}
-            </button>
-          );
-        })}
-      </div>
+      {step.kind === "posters" ? (
+        <PosterPickGrid key={step.id} {...gridProps} />
+      ) : step.kind === "artists" ? (
+        <ArtistPickGrid key={step.id} {...gridProps} />
+      ) : (
+        <ChipPickGrid key={step.id} {...gridProps} />
+      )}
+
+      {step.note && picked.length > 0 ? (
+        <p className="text-center text-xs text-white/60">{step.note}</p>
+      ) : null}
 
       {buildError ? (
         <p className="w-full max-w-[420px] text-center text-sm text-red-400">
@@ -540,6 +588,7 @@ export function OnboardingFlow({
         </p>
       ) : null}
 
+      <div className="sticky bottom-0 z-10 flex w-full justify-center bg-gradient-to-t from-[#0a0416] via-[#0a0416]/95 to-transparent pb-4 pt-6">
       <div className="flex w-full max-w-[420px] items-center gap-3">
         {stepIndex > 0 ? (
           <button
@@ -564,6 +613,7 @@ export function OnboardingFlow({
               : "Continue"}
           <ArrowRight className="ms-1.5 size-4" />
         </GradientButton>
+      </div>
       </div>
 
       <button

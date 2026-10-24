@@ -75,8 +75,8 @@ export async function getHomeContinueWatching(userId?: string) {
   return getContinueWatching(userId);
 }
 
-export async function getHomeRecommended() {
-  return getRecommendedForYou();
+export async function getHomeRecommended(userId?: string) {
+  return getRecommendedForYou(userId);
 }
 
 export async function getHomeTrending() {

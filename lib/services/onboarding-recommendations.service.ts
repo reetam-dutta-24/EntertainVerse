@@ -1,139 +1,123 @@
 import "server-only";
 
-import type { Collection, Community, ContentItem, MusicTrack } from "@/types";
-import { getGlobalPublicCollections } from "@/lib/data/collections";
-import { getGlobalCommunities } from "@/lib/data/community";
+import type { Collection, Community } from "@/types";
+import { prisma } from "@/lib/prisma";
+import { prismaMediaTypeToApp } from "@/lib/mappers/content.mapper";
+import { labelForArtistGenre } from "@/lib/catalog-enums";
 import {
-  getMusicForYourTaste,
-  getNewReleases,
-  getRecommendedForYou,
-  getTrendingMusic,
-  getTrendingThisWeek,
-} from "@/lib/data/discover";
-import {
-  onboardingSteps,
-  type OnboardingGoalLink,
+  GOAL_LINKS,
+  onboardingOption,
+  type OnboardingCatalog,
+  type OnboardingOption,
   type OnboardingRecommendations,
   type OnboardingSelection,
   type TasteBreakdownItem,
 } from "@/lib/data/onboarding-config";
-import { listArtistSearchItems } from "@/lib/services/feed.service";
+import { listDiscoverablePublicCollections } from "@/lib/services/collection.service";
+import { listPublicCommunities } from "@/lib/services/community.service";
+import {
+  loadTasteCatalog,
+  pickAnchorTitle,
+  rankArtists,
+  rankContent,
+  rankTracks,
+  signalsFromSelection,
+} from "@/lib/services/taste-engine.service";
 
-const moodGenreBoost: Record<string, string[]> = {
-  intense: ["action", "thriller"],
-  emotional: ["drama", "romance"],
-  cozy: ["comedy", "fantasy"],
-  lighthearted: ["comedy"],
-  mysterious: ["crime", "psychological", "thriller"],
+const TYPE_EMOJI: Record<string, string> = {
+  anime: "🎌",
+  show: "📺",
+  movie: "🎬",
+  kdrama: "🇰🇷",
+  documentary: "🌍",
 };
 
-const musicLanguageMap: Record<string, string[]> = {
-  kpop: ["kpop", "korean"],
-  jpop: ["jpop", "japanese"],
-  english: ["english", "english pop"],
-};
-
-const goalLinksCatalog: Record<string, OnboardingGoalLink> = {
-  recommendations: {
-    id: "for-you",
-    emoji: "🎯",
-    label: "Explore For You",
-    href: "/dashboard/for-you",
-  },
-  communities: {
-    id: "community",
-    emoji: "👥",
-    label: "Browse Communities",
-    href: "/dashboard/community",
-  },
-  collections: {
-    id: "collections",
-    emoji: "📒",
-    label: "View Collections",
-    href: "/dashboard/collections",
-  },
-  analytics: {
-    id: "analytics",
-    emoji: "📊",
-    label: "Open Analytics",
-    href: "/dashboard/analytics",
-  },
-};
-
-function scoreContent(item: ContentItem, selection: OnboardingSelection) {
-  let score = (item.matchScore ?? 70) / 25;
-  if (selection.contentTypes.includes(item.type)) score += 3;
-  if (selection.favoriteTitles.includes(item.id)) score += 8;
-  for (const genre of item.genres ?? []) {
-    if (selection.genres.includes(genre.id)) score += 2;
-  }
-  for (const mood of selection.moods) {
-    for (const genreId of moodGenreBoost[mood] ?? []) {
-      if (item.genres?.some((g) => g.id === genreId)) score += 1.5;
-    }
-  }
-  return score;
+function strings(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((item): item is string => typeof item === "string")
+    .map((item) => item.toLowerCase());
 }
 
-function scoreTrack(track: MusicTrack, selection: OnboardingSelection) {
-  let score = (track.matchScore ?? 70) / 25;
-  const language = track.language?.toLowerCase() ?? "";
-  for (const taste of selection.musicTastes) {
-    if (musicLanguageMap[taste]?.some((l) => language.includes(l))) score += 3;
-  }
-  if (selection.musicTastes.includes("ost") && track.kind === "ost") score += 3;
-  if (selection.musicTastes.includes("albums") && track.kind === "album") score += 3;
-  if (selection.watchHabits.includes("background")) score += 1;
-  return score;
+function increment(counts: Record<string, number>, key: string) {
+  counts[key] = (counts[key] ?? 0) + 1;
 }
 
-function scoreArtist(artist: ContentItem, selection: OnboardingSelection) {
-  let score = (artist.matchScore ?? 70) / 25;
-  if (selection.artists.includes(artist.id)) score += 10;
-  for (const taste of selection.musicTastes) {
-    if (taste === "kpop" && artist.genres?.some((g) => g.id === "kpop")) score += 3;
-    if (taste === "jpop" && artist.genres?.some((g) => g.id === "jpop")) score += 3;
-    if (taste === "english" && artist.genres?.some((g) => g.id === "english")) score += 3;
+/** Catalog-backed options for the taste test — only offers what really exists. */
+export async function getOnboardingCatalog(): Promise<OnboardingCatalog> {
+  const { content, tracks, artists } = await loadTasteCatalog();
+
+  const contentTypeCounts: Record<string, number> = {};
+  const genreCounts: Record<string, number> = {};
+  const musicGenreCounts: Record<string, number> = {};
+  const languageCounts: Record<string, number> = {};
+
+  const titles: OnboardingOption[] = content.map((row) => {
+    const type = prismaMediaTypeToApp(row.type);
+    const genres = row.genres.map((g) => g.genre.label.toLowerCase());
+    const languages = strings(row.languages);
+    increment(contentTypeCounts, type);
+    genres.forEach((genre) => increment(genreCounts, genre));
+    languages.forEach((language) => increment(languageCounts, language));
+    return {
+      id: row.slug,
+      emoji: TYPE_EMOJI[type] ?? "🎞️",
+      label: row.title,
+      hint: [onboardingOption("contentTypes", type)?.label, row.year].filter(Boolean).join(" · "),
+      imageUrl: row.imageUrl ?? `/images/posters/${row.slug}.jpg`,
+      tags: [type, ...genres, ...languages],
+    };
+  });
+
+  for (const track of tracks) {
+    const genres = strings(track.genres);
+    if (track.kind === "ost" && !genres.includes("ost")) genres.push("ost");
+    genres.forEach((genre) => increment(musicGenreCounts, genre));
+    if (track.language) increment(languageCounts, track.language.toLowerCase());
   }
-  return score;
+
+  const artistOptions: OnboardingOption[] = artists.map((row) => {
+    const genres = [...new Set(strings(row.genres))];
+    return {
+      id: row.slug,
+      emoji: "🎤",
+      label: row.title,
+      hint: genres.slice(0, 2).map(labelForArtistGenre).join(" · ") || undefined,
+      imageUrl: row.imageUrl ?? undefined,
+      tags: [...genres, ...strings(row.languages)],
+    };
+  });
+
+  return {
+    contentTypeCounts,
+    genreCounts,
+    musicGenreCounts,
+    languageCounts,
+    titles,
+    artists: artistOptions,
+  };
 }
 
 function scoreCommunity(community: Community, selection: OnboardingSelection) {
-  let score = (community.avgMatchScore ?? 70) / 25;
   const category = community.category.toLowerCase();
-  if (selection.contentTypes.includes("anime") && category.includes("anime")) score += 3;
-  if (selection.contentTypes.includes("show") && category.includes("show")) score += 3;
-  if (selection.musicTastes.includes("kpop") && category.includes("kpop")) score += 3;
-  if (
-    (selection.musicTastes.includes("english") ||
-      selection.musicTastes.includes("albums")) &&
-    category.includes("pop")
-  )
-    score += 2;
-  if (selection.goals.includes("communities")) score += 2;
-  if (selection.watchHabits.includes("weekly")) score += 1;
+  let score = Math.log10(community.memberCount + 10);
+  const types = new Set(selection.contentTypes);
+  if ((category.includes("anime") || category.includes("manga")) && types.has("anime")) score += 4;
+  if (category.includes("show") && (types.has("show") || types.has("kdrama"))) score += 4;
+  if (category.includes("movie") && types.has("movie")) score += 4;
+  if (category.includes("music") && selection.musicTastes.length > 0) score += 3;
+  if (category.includes("music") && selection.goals.includes("music")) score += 2;
+  if (selection.goals.includes("communities")) score += 1;
   return score;
 }
 
 function scoreCollection(collection: Collection, selection: OnboardingSelection) {
-  let score = 50;
-  if (selection.goals.includes("collections")) score += 4;
-  if (selection.contentTypes.includes("anime")) score += 2;
-  if (selection.musicTastes.length > 0) score += 1;
-  return score + (collection.favoriteCount ?? 0) / 20;
+  let score = (collection.favoriteCount ?? 0) / 10;
+  if (selection.goals.includes("collections")) score += 2;
+  return score;
 }
 
-function dedupeBy<T>(items: T[], key: (item: T) => string): T[] {
-  const seen = new Set<string>();
-  return items.filter((item) => {
-    const k = key(item);
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
-}
-
-function rank<T>(pool: T[], score: (item: T) => number, take: number): T[] {
+function rankBy<T>(pool: T[], score: (item: T) => number, take: number): T[] {
   return pool
     .map((item) => ({ item, score: score(item) }))
     .sort((a, b) => b.score - a.score)
@@ -141,112 +125,146 @@ function rank<T>(pool: T[], score: (item: T) => number, take: number): T[] {
     .map((entry) => entry.item);
 }
 
-function buildTasteBreakdown(
-  selection: OnboardingSelection,
-): TasteBreakdownItem[] {
-  const genreScore = Math.min(100, 55 + selection.genres.length * 7);
-  const musicScore = Math.min(
-    100,
-    50 + selection.musicTastes.length * 10 + selection.artists.length * 8,
-  );
-  const communityScore = Math.min(
-    100,
-    45 + (selection.goals.includes("communities") ? 25 : 0) + selection.moods.length * 5,
-  );
-  const discoveryScore = Math.min(
-    100,
-    50 + selection.contentTypes.length * 8 + selection.favoriteTitles.length * 6,
-  );
+/** Best community per category first, so one category can't take every slot. */
+function rankCommunities(pool: Community[], selection: OnboardingSelection, take: number) {
+  const ranked = rankBy(pool, (c) => scoreCommunity(c, selection), pool.length);
+  const leaders: Community[] = [];
+  const rest: Community[] = [];
+  const categories = new Set<string>();
+  for (const community of ranked) {
+    const key = community.category.toLowerCase();
+    if (categories.has(key)) rest.push(community);
+    else {
+      categories.add(key);
+      leaders.push(community);
+    }
+  }
+  // Leaders of categories that matched the taste come first, then depth.
+  const matched = leaders.filter((c) => scoreCommunity(c, selection) >= 3);
+  const others = leaders.filter((c) => !matched.includes(c));
+  return [...matched, ...rest, ...others].slice(0, take);
+}
 
-  return [
-    { label: "Genre Fit", value: genreScore },
-    { label: "Music Taste", value: musicScore },
-    { label: "Community Vibe", value: communityScore },
-    { label: "Discovery", value: discoveryScore },
-  ];
+function average(values: (number | undefined)[]): number {
+  const nums = values.filter((value): value is number => value != null);
+  if (!nums.length) return 0;
+  return Math.round(nums.reduce((sum, value) => sum + value, 0) / nums.length);
 }
 
 function buildSummaryChips(selection: OnboardingSelection): string[] {
-  const chips: string[] = [];
-  for (const id of selection.contentTypes) {
-    const opt = onboardingSteps[0].options.find((o) => o.id === id);
-    if (opt) chips.push(`${opt.emoji} ${opt.label}`);
-  }
-  for (const id of selection.genres.slice(0, 4)) {
-    const opt = onboardingSteps[1].options.find((o) => o.id === id);
-    if (opt) chips.push(opt.label);
-  }
-  for (const id of selection.moods) {
-    const opt = onboardingSteps.find((s) => s.id === "moods")?.options.find((o) => o.id === id);
-    if (opt) chips.push(`${opt.emoji} ${opt.label}`);
-  }
-  if (selection.watchHabits[0]) {
-    const opt = onboardingSteps
-      .find((s) => s.id === "watchHabits")
-      ?.options.find((o) => o.id === selection.watchHabits[0]);
-    if (opt) chips.push(opt.label);
-  }
-  return chips.slice(0, 10);
+  const chip = (step: keyof OnboardingSelection, id: string, withEmoji = true) => {
+    const option = onboardingOption(step, id);
+    if (!option) return null;
+    return withEmoji ? `${option.emoji} ${option.label}` : option.label;
+  };
+
+  return [
+    ...selection.contentTypes.map((id) => chip("contentTypes", id)),
+    ...selection.genres.slice(0, 4).map((id) => chip("genres", id, false)),
+    ...selection.moods.map((id) => chip("moods", id)),
+    ...selection.musicTastes.slice(0, 3).map((id) => chip("musicTastes", id)),
+    ...selection.languages.slice(0, 2).map((id) => chip("languages", id)),
+    selection.watchHabits[0] ? chip("watchHabits", selection.watchHabits[0], false) : null,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .slice(0, 12);
 }
 
+function profileDepth(selection: OnboardingSelection): number {
+  const answered = [
+    selection.contentTypes,
+    selection.genres,
+    selection.moods,
+    selection.favoriteTitles,
+    selection.musicTastes,
+    selection.languages,
+    selection.artists,
+    selection.watchHabits,
+    selection.goals,
+  ].filter((list) => list.length > 0).length;
+  const richness = Math.min(1, (selection.favoriteTitles.length + selection.artists.length) / 6);
+  return Math.round(40 + (answered / 9) * 45 + richness * 15);
+}
+
+/** Preview the matched universe from fresh taste-test answers. */
 export async function buildOnboardingRecommendations(
   selection: OnboardingSelection,
+  userId: string,
 ): Promise<OnboardingRecommendations> {
-  const [
-    trending,
-    recommended,
-    releases,
-    tasteMusic,
-    trendingMusic,
-    globalCommunities,
-    publicCollections,
-    artistPool,
-  ] = await Promise.all([
-    getTrendingThisWeek(),
-    getRecommendedForYou(),
-    getNewReleases(),
-    getMusicForYourTaste(),
-    getTrendingMusic(),
-    getGlobalCommunities(),
-    getGlobalPublicCollections(),
-    listArtistSearchItems(20),
+  const signals = signalsFromSelection(selection);
+  const picked = new Set(selection.favoriteTitles);
+
+  const [content, tracks, artists, anchor, communities, collections] = await Promise.all([
+    rankContent(signals, { limit: 12, exclude: picked }),
+    rankTracks(signals, { limit: 10 }),
+    rankArtists(signals, { limit: 8 }),
+    pickAnchorTitle(signals),
+    listPublicCommunities(30),
+    listDiscoverablePublicCollections(userId, 15),
   ]);
 
-  const contentPool = dedupeBy(
-    [...trending, ...recommended, ...releases],
-    (item) => item.id,
-  );
-  const trackPool = dedupeBy(
-    [...tasteMusic, ...trendingMusic],
-    (track) => track.id,
-  );
-  const communityPool = dedupeBy(globalCommunities, (community) => community.id);
-  const collectionPool = dedupeBy(publicCollections, (collection) => collection.id);
+  const becauseYouLoved = anchor
+    ? {
+        anchorTitle: anchor.title,
+        items: await rankContent(signals, {
+          limit: 10,
+          similarTo: anchor.slug,
+          exclude: picked,
+        }),
+      }
+    : null;
 
-  const picks =
-    selection.contentTypes.length +
-    selection.genres.length +
-    selection.musicTastes.length +
-    selection.goals.length +
-    selection.favoriteTitles.length +
-    selection.moods.length +
-    selection.artists.length;
-
-  const content = rank(contentPool, (i) => scoreContent(i, selection), 8);
-  const goalLinks = selection.goals
-    .map((goal) => goalLinksCatalog[goal])
-    .filter(Boolean);
+  const tasteBreakdown: TasteBreakdownItem[] = [
+    { label: "Watch Match", value: average(content.slice(0, 8).map((item) => item.matchScore)) },
+    { label: "Music Match", value: average(tracks.slice(0, 8).map((track) => track.matchScore)) },
+    { label: "Artist Match", value: average(artists.slice(0, 5).map((artist) => artist.matchScore)) },
+    { label: "Profile Depth", value: profileDepth(selection) },
+  ];
 
   return {
-    tasteScore: Math.min(78 + picks * 1.5, 97),
-    tasteBreakdown: buildTasteBreakdown(selection),
+    tasteScore: average(content.slice(0, 10).map((item) => item.matchScore)),
+    tasteBreakdown,
     summaryChips: buildSummaryChips(selection),
     content,
-    tracks: rank(trackPool, (t) => scoreTrack(t, selection), 8),
-    communities: rank(communityPool, (c) => scoreCommunity(c, selection), 4),
-    collections: rank(collectionPool, (c) => scoreCollection(c, selection), 4),
-    artists: rank(artistPool, (a) => scoreArtist(a, selection), 6),
-    starterWatchlist: content.slice(0, 3),
-    goalLinks,
+    tracks,
+    artists,
+    communities: rankCommunities(communities, selection, 4),
+    collections: rankBy(collections, (c) => scoreCollection(c, selection), 4),
+    starterWatchlist: content.slice(0, 4),
+    goalLinks: selection.goals.map((goal) => GOAL_LINKS[goal]).filter(Boolean),
+    becauseYouLoved: becauseYouLoved?.items.length ? becauseYouLoved : null,
   };
+}
+
+/**
+ * Turn taste-test picks into real profile data: favorite titles become
+ * ContentFavorites and picked artists are followed. Additive only — a retake
+ * never removes favorites or follows the user made elsewhere.
+ */
+export async function applyOnboardingPicks(userId: string, selection: OnboardingSelection) {
+  const [contents, artists] = await Promise.all([
+    selection.favoriteTitles.length
+      ? prisma.content.findMany({
+          where: { slug: { in: selection.favoriteTitles } },
+          select: { id: true },
+        })
+      : [],
+    selection.artists.length
+      ? prisma.artist.findMany({
+          where: { slug: { in: selection.artists } },
+          select: { id: true },
+        })
+      : [],
+  ]);
+
+  await prisma.$transaction([
+    prisma.contentFavorite.createMany({
+      data: contents.map((row) => ({ userId, contentId: row.id })),
+      skipDuplicates: true,
+    }),
+    prisma.artistFollow.createMany({
+      data: artists.map((row) => ({ userId, artistId: row.id })),
+      skipDuplicates: true,
+    }),
+  ]);
 }

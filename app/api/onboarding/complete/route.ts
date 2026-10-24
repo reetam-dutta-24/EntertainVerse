@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
-import type {
-  OnboardingGoalLink,
-  OnboardingSelection,
-  TasteBreakdownItem,
+import {
+  normalizeOnboardingSelection,
+  type OnboardingGoalLink,
+  type TasteBreakdownItem,
 } from "@/lib/data/onboarding-config";
 import { completeOnboarding } from "@/lib/services/onboarding.service";
+import { applyOnboardingPicks } from "@/lib/services/onboarding-recommendations.service";
 
 /**
  * POST /api/onboarding/complete
  * Called when the user finishes or skips onboarding.
- * Sets onboardingCompletedAt so future logins go straight to dashboard.
+ * Sets onboardingCompletedAt so future logins go straight to dashboard,
+ * and turns favorite titles / artist picks into favorites and follows.
  */
 export async function POST(request: Request) {
   const session = await auth();
@@ -21,7 +23,7 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json().catch(() => ({}))) as {
       tasteScore?: number;
-      selection?: OnboardingSelection;
+      selection?: unknown;
       summaryChips?: string[];
       tasteBreakdown?: TasteBreakdownItem[];
       goalLinks?: OnboardingGoalLink[];
@@ -31,7 +33,7 @@ export async function POST(request: Request) {
       body.selection && body.tasteScore != null
         ? {
             tasteScore: body.tasteScore,
-            selection: body.selection,
+            selection: normalizeOnboardingSelection(body.selection),
             summaryChips: body.summaryChips ?? [],
             tasteBreakdown: body.tasteBreakdown ?? [],
             goalLinks: body.goalLinks ?? [],
@@ -39,6 +41,9 @@ export async function POST(request: Request) {
         : undefined;
 
     await completeOnboarding(session.user.id, body.tasteScore, tasteProfile);
+    if (tasteProfile) {
+      await applyOnboardingPicks(session.user.id, tasteProfile.selection);
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
