@@ -5,6 +5,7 @@ import {
   MusicCarouselSection,
   WelcomeBanner,
 } from "@/components/dashboard";
+import { AiModeLauncher } from "@/components/ai-mode/ai-mode-launcher";
 import { getAiTasteProfileScore, getForYouFeed } from "@/lib/data/for-you";
 import { getCurrentUser } from "@/lib/data/user";
 
@@ -24,6 +25,7 @@ export default async function ForYouPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="foryou" />
+      <AiModeLauncher defaultMode="watch" />
 
       <AiTasteProfileBar score={tasteScore} />
 

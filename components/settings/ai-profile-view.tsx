@@ -354,8 +354,8 @@ export function AiProfileView({ initialProfile, insights }: AiProfileViewProps) 
           <EmptyState
             icon={<Sparkles className="size-6" aria-hidden />}
             title="No answers yet"
-            description="Take the AI taste quiz or chat with AI mode in For You or Discover — what you say shows up here."
-            action={{ label: "Open For You", href: "/dashboard/for-you" }}
+            description="Take the AI taste quiz or chat with AI mode — what you say shows up here."
+            action={{ label: "Open AI mode", href: "/dashboard/ai-mode" }}
             compact
           />
         )}

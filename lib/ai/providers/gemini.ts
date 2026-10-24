@@ -6,11 +6,19 @@ import { CatalogAiError } from "@/lib/ai/errors";
 import type { StructuredRequest, WebResearch } from "@/lib/ai/provider";
 
 /**
- * Google Gemini via the official @google/genai SDK. `gemini-flash-latest`
- * always tracks the current Flash model, which the free tier covers.
- * Override with GEMINI_MODEL if you want a specific model.
+ * Google Gemini via the official @google/genai SDK, on two tiers:
+ *  - smart (`gemini-flash-latest`): admin import/review and roadmaps. The free tier
+ *    allows only ~20 requests a day on it.
+ *  - fast (`gemini-flash-lite-latest`): high-volume user features (AI-mode chat), with a
+ *    much larger free quota. Smart calls fall back to it when their daily quota runs out.
+ * Override with GEMINI_MODEL / GEMINI_FAST_MODEL.
  */
-const model = () => process.env.GEMINI_MODEL || "gemini-flash-latest";
+export type GeminiTier = "smart" | "fast";
+
+const model = (tier: GeminiTier = "smart") =>
+  tier === "fast"
+    ? process.env.GEMINI_FAST_MODEL || "gemini-flash-lite-latest"
+    : process.env.GEMINI_MODEL || "gemini-flash-latest";
 
 let client: GoogleGenAI | null = null;
 function gemini() {
@@ -26,7 +34,7 @@ function toError(error: unknown): CatalogAiError {
   if (error instanceof CatalogAiError) return error;
   if (error instanceof ApiError) {
     if (error.status === 429) {
-      return new CatalogAiError("Gemini's free-tier limit was reached — wait a minute and try again.", 429);
+      return new CatalogAiError("Gemini's free-tier limit was reached — try again in a minute (or tomorrow if the daily quota is used up).", 429);
     }
     if (error.status === 400 || error.status === 401 || error.status === 403) {
       return new CatalogAiError("Gemini rejected the request — check GEMINI_API_KEY (and GEMINI_MODEL if set).", 503);
@@ -63,18 +71,31 @@ async function withRetry<T>(call: () => Promise<T>): Promise<T> {
  * Drafting doesn't need deep reasoning — low thinking keeps imports fast.
  * Older models that don't accept `thinkingLevel` get one retry without it.
  */
-async function generateWithThinking(prompt: string, config: GenerateContentConfig, level: ThinkingLevel) {
+async function generateOn(name: string, prompt: string, config: GenerateContentConfig, level: ThinkingLevel) {
   try {
     return await withRetry(() =>
       gemini().models.generateContent({
-        model: model(),
+        model: name,
         contents: prompt,
         config: { ...config, thinkingConfig: { thinkingLevel: level } },
       }),
     );
   } catch (error) {
     if (error instanceof ApiError && error.status === 400) {
-      return withRetry(() => gemini().models.generateContent({ model: model(), contents: prompt, config }));
+      return withRetry(() => gemini().models.generateContent({ model: name, contents: prompt, config }));
+    }
+    throw error;
+  }
+}
+
+/** Run on the requested tier; a smart call that hits its quota is retried on the fast tier. */
+async function generateWithThinking(prompt: string, config: GenerateContentConfig, level: ThinkingLevel, tier: GeminiTier = "smart") {
+  try {
+    return await generateOn(model(tier), prompt, config, level);
+  } catch (error) {
+    if (tier === "smart" && error instanceof ApiError && error.status === 429 && model("fast") !== model("smart")) {
+      console.warn(`[gemini] ${model("smart")} quota reached — falling back to ${model("fast")}`);
+      return generateOn(model("fast"), prompt, config, level);
     }
     throw error;
   }
@@ -90,6 +111,7 @@ export async function geminiStructured<S extends z.ZodType>(request: StructuredR
         responseJsonSchema: jsonSchemaFor(request.schema),
       },
       request.depth === "deep" ? ThinkingLevel.HIGH : ThinkingLevel.LOW,
+      request.tier,
     );
     const text = response.text;
     if (!text) {
@@ -133,13 +155,18 @@ export async function geminiEmbed(
 
 export async function geminiResearch(system: string, instructions: string): Promise<WebResearch> {
   try {
-    const response = await withRetry(() =>
-      gemini().models.generateContent({
-        model: model(),
-        contents: instructions,
-        config: { systemInstruction: system, tools: [{ googleSearch: {} }] },
-      }),
-    );
+    const research = (name: string) =>
+      withRetry(() =>
+        gemini().models.generateContent({
+          model: name,
+          contents: instructions,
+          config: { systemInstruction: system, tools: [{ googleSearch: {} }] },
+        }),
+      );
+    const response = await research(model("smart")).catch((error: unknown) => {
+      if (error instanceof ApiError && error.status === 429) return research(model("fast"));
+      throw error;
+    });
     const factSheet = response.text?.trim();
     if (!factSheet) throw new CatalogAiError("Web research came back empty — try a more specific title.");
 

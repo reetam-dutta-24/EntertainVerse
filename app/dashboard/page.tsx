@@ -8,7 +8,9 @@ import {
   MusicCarouselSection,
   WelcomeBanner,
 } from "@/components/dashboard";
+import { AiModeSpotlight } from "@/components/ai-mode/ai-mode-spotlight";
 import { getCurrentUser } from "@/lib/data/user";
+import { getTonightsPicks } from "@/lib/services/ai-mode.service";
 import {
   getHomeCollections,
   getHomeCommunities,
@@ -51,6 +53,7 @@ export default async function DashboardHomePage() {
     continueListening,
     communities,
     collections,
+    tonight,
   ] = await Promise.all([
     getHomeStats(user.id),
     getHomeContinueWatching(user.id),
@@ -59,11 +62,14 @@ export default async function DashboardHomePage() {
     getHomeContinueListening(user.id),
     getHomeCommunities(user.id),
     getHomeCollections(user.id),
+    getTonightsPicks(user.id),
   ]);
 
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="home" />
+
+      <AiModeSpotlight watch={tonight.watch} listen={tonight.listen} />
 
       <AiTasteProfileBar score={stats.aiTasteScore} />
 

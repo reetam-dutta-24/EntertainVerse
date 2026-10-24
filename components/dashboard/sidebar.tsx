@@ -14,6 +14,7 @@ import {
   Search,
   Settings,
   Users,
+  WandSparkles,
 } from "lucide-react";
 import {
   UserProfileMenu,
@@ -24,6 +25,7 @@ import { MessagesNavBadge } from "@/components/messages/messages-nav-badge";
 
 const navItems = [
   { label: "Home", href: "/dashboard", icon: Home },
+  { label: "AI Mode", href: "/dashboard/ai-mode", icon: WandSparkles },
   { label: "Discover", href: "/dashboard/discover", icon: Search },
   { label: "Collections", href: "/dashboard/collections", icon: BookOpen },
   { label: "Favourites", href: "/dashboard/favorites", icon: Heart },

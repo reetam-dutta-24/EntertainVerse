@@ -1,3 +1,4 @@
+import { AiModeLauncher } from "@/components/ai-mode/ai-mode-launcher";
 import type { Metadata } from "next";
 import {
   ActiveFiltersBar,
@@ -48,6 +49,7 @@ export default async function DiscoverPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="discover" />
+      <AiModeLauncher defaultMode="listen" />
 
       <ActiveFiltersBar filters={filters} />
 

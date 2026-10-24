@@ -647,12 +647,15 @@ export async function rankContent(
 
 export async function rankTracks(
   signals: TasteSignals,
-  options: { limit?: number; kinds?: string[] } = {},
+  options: { limit?: number; kinds?: string[]; /** Skip favorites and heavily played tracks. */ excludeKnown?: boolean } = {},
 ): Promise<MusicTrack[]> {
   const catalog = await loadTasteCatalog();
   const v = buildVector(signals, catalog.content);
   const ctx = await musicContext(signals, catalog);
-  const pool = catalog.tracks.filter((row) => !options.kinds || options.kinds.includes(row.kind));
+  const known = (slug: string) => signals.favoriteTracks.has(slug) || (signals.listened.get(slug) ?? 0) > 0.6;
+  const pool = catalog.tracks.filter(
+    (row) => (!options.kinds || options.kinds.includes(row.kind)) && !(options.excludeKnown && known(row.slug)),
+  );
   const semantic = semanticScores(pool, ctx.trackVector, ctx.profile);
   const collab = collabScores(ctx.collab);
   return pool
@@ -668,13 +671,14 @@ export async function rankTracks(
 
 export async function rankArtists(
   signals: TasteSignals,
-  options: { limit?: number } = {},
+  options: { limit?: number; /** Skip artists the user follows or picked. */ excludeKnown?: boolean } = {},
 ): Promise<ContentItem[]> {
   const catalog = await loadTasteCatalog();
   const v = buildVector(signals, catalog.content);
   const ctx = await musicContext(signals, catalog);
-  const semantic = semanticScores(catalog.artists, ctx.artistVector, ctx.profile);
-  return catalog.artists
+  const pool = catalog.artists.filter((row) => !(options.excludeKnown && v.artists.has(row.slug)));
+  const semantic = semanticScores(pool, ctx.artistVector, ctx.profile);
+  return pool
     .map((row) => ({ row, score: blendScore(scoreArtistRow(row, v), semantic.get(row.slug), undefined) }))
     .sort((a, b) => b.score - a.score)
     .slice(0, options.limit ?? 12)

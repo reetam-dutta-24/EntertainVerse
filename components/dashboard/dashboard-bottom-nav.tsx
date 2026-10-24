@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BarChart3,
   BookOpen,
   Clapperboard,
   Home,
   PlayCircle,
   Search,
+  WandSparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +18,7 @@ const items = [
   { label: "For You", href: "/dashboard/for-you", icon: PlayCircle },
   { label: "Watchlist", href: "/dashboard/watchlist", icon: Clapperboard },
   { label: "Collections", href: "/dashboard/collections", icon: BookOpen },
-  { label: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  { label: "AI Mode", href: "/dashboard/ai-mode", icon: WandSparkles },
 ] as const;
 
 /** Mobile bottom tab bar — primary dashboard routes. */

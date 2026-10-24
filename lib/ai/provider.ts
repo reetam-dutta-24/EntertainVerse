@@ -22,6 +22,8 @@ export interface StructuredRequest<S extends z.ZodType> {
   schema: S;
   /** "deep" for careful review work; "standard" for drafting. */
   depth?: "standard" | "deep";
+  /** Gemini only: "fast" for high-volume user features (bigger free quota). Default "smart". */
+  tier?: "smart" | "fast";
 }
 
 export interface WebResearch {
