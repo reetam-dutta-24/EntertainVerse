@@ -27,6 +27,7 @@ import {
 } from "@/lib/data/content-detail";
 import { isContentFavorited } from "@/lib/services/favorite.service";
 import { isContentOnWatchlist } from "@/lib/services/watchlist.service";
+import { ContentWatchOptions } from "@/components/content/content-watch-options";
 
 interface ContentPageProps {
   params: Promise<{ contentid: string }>;
@@ -83,6 +84,13 @@ export default async function ContentDetailPage({ params }: ContentPageProps) {
         content={content}
         initialFavorited={initialFavorited}
         initialOnWatchlist={initialOnWatchlist}
+      />
+
+      <ContentWatchOptions
+        title={content.title}
+        trailerUrl={content.trailerUrl}
+        tmdbId={content.tmdbId}
+        tmdbKind={content.tmdbKind}
       />
 
       {isMovie ? (

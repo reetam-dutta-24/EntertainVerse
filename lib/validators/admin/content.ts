@@ -69,6 +69,11 @@ export const contentFormSchema = z.object({
   seasonCount: z.coerce.number().int().min(0).max(500).optional(),
   episodeCount: z.coerce.number().int().min(0).max(10000).optional(),
   videoUrl: optionalString,
+  /** Official trailer page (YouTube). */
+  trailerUrl: optionalString,
+  /** TMDB link used for live "where to watch" data. */
+  tmdbId: z.coerce.number().int().positive().optional(),
+  tmdbKind: z.union([z.enum(["movie", "tv"]), z.literal("")]).optional(),
   genreLabels: z.array(contentGenreEnum).default([]),
   seasons: z.array(contentSeasonInputSchema).default([]),
   episodes: z.array(contentEpisodeInputSchema).default([]),

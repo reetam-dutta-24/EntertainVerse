@@ -100,6 +100,7 @@ interface AnilistMedia {
   bannerImage?: string | null;
   nextAiringEpisode?: { airingAt: number; episode: number } | null;
   streamingEpisodes: { title: string; thumbnail?: string }[];
+  trailer?: { id: string; site: string } | null;
   characters: {
     edges: {
       role: string;
@@ -121,6 +122,7 @@ export async function fetchAnilistFacts(id: string): Promise<SourceFacts> {
         countryOfOrigin source coverImage { extraLarge } bannerImage
         nextAiringEpisode { airingAt episode }
         streamingEpisodes { title thumbnail }
+        trailer { id site }
         characters(perPage: 8, sort: [ROLE, RELEVANCE]) {
           edges { role node { name { full } image { large } } voiceActors(language: JAPANESE, sort: [RELEVANCE]) { name { full } } }
         }
@@ -169,6 +171,7 @@ export async function fetchAnilistFacts(id: string): Promise<SourceFacts> {
     }));
 
   const draft: Partial<ContentFormInput> = {
+    trailerUrl: m.trailer?.site === "youtube" ? `https://www.youtube.com/watch?v=${m.trailer.id}` : "",
     title,
     nativeTitle: m.title.native ?? "",
     type: isMovie ? "movie" : "anime",

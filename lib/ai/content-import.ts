@@ -107,7 +107,7 @@ function emptyForm(): ContentFormInput {
     composer: "", status: "", ageRating: "", airedFrom: "", airedTo: "", broadcast: "",
     episodeDuration: "", airingDay: "", seasonLabel: "", lastUpdate: "", languages: [], genreLabels: [],
     seasons: [], episodes: [], characters: [], featuredTrackSlugs: [], relatedContentSlugs: [],
-    catalogReviews: [], videoUrl: "",
+    catalogReviews: [], videoUrl: "", trailerUrl: "",
   } as ContentFormInput;
 }
 

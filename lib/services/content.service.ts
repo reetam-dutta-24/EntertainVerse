@@ -89,6 +89,9 @@ function toContentData(input: ContentFormInput): Prisma.ContentCreateInput {
     seasonCount: input.seasonCount ?? null,
     episodeCount: input.episodeCount ?? null,
     videoUrl: emptyToNull(input.videoUrl),
+    trailerUrl: emptyToNull(input.trailerUrl),
+    tmdbId: input.tmdbId ?? null,
+    tmdbKind: input.tmdbKind || null,
   };
 }
 
@@ -468,6 +471,9 @@ export function contentRecordToFormInput(row: ContentRecordFull): ContentFormInp
     seasonCount: row.seasonCount ?? undefined,
     episodeCount: row.episodeCount ?? undefined,
     videoUrl: row.videoUrl ?? "",
+    trailerUrl: row.trailerUrl ?? "",
+    tmdbId: row.tmdbId ?? undefined,
+    tmdbKind: (row.tmdbKind as "movie" | "tv" | null) ?? "",
     genreLabels: row.genres.map(
       (g) => g.genre.label as ContentFormInput["genreLabels"][number],
     ),

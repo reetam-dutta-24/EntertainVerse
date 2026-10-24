@@ -743,6 +743,22 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
             </>
           )}
 
+          <Field label="Trailer URL" hint="Official YouTube trailer — shown on the detail page">
+            <input
+              className={inputClass}
+              value={form.trailerUrl ?? ""}
+              onChange={(e) => update("trailerUrl", e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=…"
+            />
+          </Field>
+
+          <Field
+            label="Where to watch"
+            hint={form.tmdbId ? `Linked to TMDB ${form.tmdbKind || "title"} #${form.tmdbId} — providers load live` : "Import from TMDB to show streaming providers"}
+          >
+            <input className={`${inputClass} opacity-60`} value={form.tmdbId ? `TMDB ${form.tmdbKind} #${form.tmdbId}` : "Not linked"} readOnly />
+          </Field>
+
           <Field label="Last update">
             <input
               className={inputClass}

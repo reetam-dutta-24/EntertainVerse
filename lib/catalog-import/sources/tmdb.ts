@@ -19,7 +19,7 @@ export function isTmdbConfigured() {
   return Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_ACCESS_TOKEN);
 }
 
-async function tmdb<T>(path: string, params: Record<string, string> = {}): Promise<T> {
+async function tmdb<T>(path: string, params: Record<string, string> = {}, revalidateSeconds?: number): Promise<T> {
   const url = new URL(`${API}${path}`);
   for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
   const headers: Record<string, string> = { accept: "application/json" };
@@ -28,7 +28,11 @@ async function tmdb<T>(path: string, params: Record<string, string> = {}): Promi
   } else if (process.env.TMDB_API_KEY) {
     url.searchParams.set("api_key", process.env.TMDB_API_KEY);
   }
-  const response = await fetch(url, { headers, cache: "no-store", signal: AbortSignal.timeout(10_000) });
+  const response = await fetch(url, {
+    headers,
+    signal: AbortSignal.timeout(10_000),
+    ...(revalidateSeconds ? { next: { revalidate: revalidateSeconds } } : { cache: "no-store" as const }),
+  });
   if (!response.ok) throw new Error(`TMDB ${response.status} on ${path}`);
   return response.json() as Promise<T>;
 }
@@ -50,6 +54,63 @@ function minutesLabel(minutes?: number | null, movie = false) {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return h ? `${h}h ${m}m` : `${m}m`;
+}
+
+interface TmdbVideo {
+  key: string;
+  site: string;
+  type: string;
+  official: boolean;
+}
+
+/** Prefer an official YouTube trailer, then any trailer, then a teaser. */
+function pickTrailer(videos: TmdbVideo[]): string {
+  const youtube = videos.filter((v) => v.site === "YouTube");
+  const best =
+    youtube.find((v) => v.type === "Trailer" && v.official) ??
+    youtube.find((v) => v.type === "Trailer") ??
+    youtube.find((v) => v.type === "Teaser");
+  return best ? `https://www.youtube.com/watch?v=${best.key}` : "";
+}
+
+export interface WatchProvider {
+  id: number;
+  name: string;
+  logoUrl?: string;
+}
+
+export interface WatchProviders {
+  /** TMDB's watch page for this title/region (links out to the services). */
+  link: string;
+  stream: WatchProvider[];
+  free: WatchProvider[];
+  rent: WatchProvider[];
+  buy: WatchProvider[];
+}
+
+/** Live "where to watch" for one region (default India). Cached for a day. */
+export async function fetchWatchProviders(id: number, kind: "movie" | "tv", region = process.env.WATCH_REGION || "IN"): Promise<WatchProviders | null> {
+  if (!isTmdbConfigured()) return null;
+  const data = await tmdb<{ results: Record<string, { link: string; flatrate?: RawProvider[]; free?: RawProvider[]; ads?: RawProvider[]; rent?: RawProvider[]; buy?: RawProvider[] }> }>(
+    `/${kind}/${id}/watch/providers`,
+    {},
+    86_400,
+  );
+  const entry = data.results[region];
+  if (!entry) return null;
+  const map = (list?: RawProvider[]) =>
+    (list ?? [])
+      .sort((a, b) => a.display_priority - b.display_priority)
+      .slice(0, 6)
+      .map((p) => ({ id: p.provider_id, name: p.provider_name, logoUrl: p.logo_path ? `https://image.tmdb.org/t/p/w92${p.logo_path}` : undefined }));
+  return { link: entry.link, stream: map(entry.flatrate), free: map([...(entry.free ?? []), ...(entry.ads ?? [])]), rent: map(entry.rent), buy: map(entry.buy) };
+}
+
+interface RawProvider {
+  provider_id: number;
+  provider_name: string;
+  logo_path?: string;
+  display_priority: number;
 }
 
 interface TmdbSearchResult {
@@ -112,7 +173,8 @@ export async function fetchTmdbFacts(id: string, kind: "movie" | "tv"): Promise<
       spoken_languages: { english_name: string }[]; original_language: string;
       credits: { cast: Person[]; crew: Person[] };
       release_dates: { results: { iso_3166_1: string; release_dates: { certification: string }[] }[] };
-    }>(`/movie/${id}`, { append_to_response: "credits,release_dates" });
+      videos: { results: TmdbVideo[] };
+    }>(`/movie/${id}`, { append_to_response: "credits,release_dates,videos" });
 
     const crew = (job: string) => m.credits.crew.filter((p) => p.job === job).map((p) => p.name);
     const certification = m.release_dates.results
@@ -120,6 +182,9 @@ export async function fetchTmdbFacts(id: string, kind: "movie" | "tv"): Promise<
       ?.release_dates.find((d) => d.certification)?.certification;
 
     const draft: Partial<ContentFormInput> = {
+      trailerUrl: pickTrailer(m.videos.results),
+      tmdbId: Number(id),
+      tmdbKind: "movie",
       title: m.title,
       nativeTitle: m.original_title !== m.title ? m.original_title : "",
       type: "movie",
@@ -174,7 +239,8 @@ export async function fetchTmdbFacts(id: string, kind: "movie" | "tv"): Promise<
     next_episode_to_air?: { air_date?: string } | null;
     aggregate_credits: { cast: Person[]; crew: (Person & { jobs?: { job: string }[] })[] };
     content_ratings: { results: { iso_3166_1: string; rating: string }[] };
-  }>(`/tv/${id}`, { append_to_response: "aggregate_credits,content_ratings" });
+    videos: { results: TmdbVideo[] };
+  }>(`/tv/${id}`, { append_to_response: "aggregate_credits,content_ratings,videos" });
 
   const seasons = t.seasons.filter((s) => s.season_number > 0);
   const episodeLists = await Promise.all(
@@ -194,6 +260,9 @@ export async function fetchTmdbFacts(id: string, kind: "movie" | "tv"): Promise<
   const ended = t.status === "Ended" || t.status === "Canceled";
 
   const draft: Partial<ContentFormInput> = {
+    trailerUrl: pickTrailer(t.videos.results),
+    tmdbId: Number(id),
+    tmdbKind: "tv",
     title: t.name,
     nativeTitle: t.original_name !== t.name ? t.original_name : "",
     type: t.origin_country.includes("KR") ? "kdrama" : "show",

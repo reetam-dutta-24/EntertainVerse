@@ -198,6 +198,11 @@ model Content {
   seasonCount     Int?
   episodeCount    Int?
   videoUrl        String?
+  /// Official trailer (YouTube) — filled by AI import from TMDB.
+  trailerUrl      String?
+  /// TMDB id + kind, used to look up live "where to watch" providers.
+  tmdbId          Int?
+  tmdbKind        String?
   /// Total detail-page views — incremented for every visitor.
   viewCount       Int       @default(0)
   createdAt   DateTime  @default(now())
@@ -359,6 +364,10 @@ model MusicTrack {
   imageUrl        String?
   backdropUrl     String?
   audioUrl        String?
+  /// Official 30-second preview clip (iTunes / Deezer) — played when no full audioUrl exists.
+  previewUrl      String?
+  /// [{ provider, url }] — legal "listen on" links (Apple Music, Deezer…).
+  listenLinks     Json     @default("[]")
   accent          String?
   trendingLabel   String?
   creditLabel     String?
@@ -400,6 +409,8 @@ model Artist {
   label       String?
   debutYear   Int?
   isGroup     Boolean  @default(false)
+  /// [{ provider, url }] — legal "listen on" links (Apple Music, Deezer…).
+  listenLinks Json     @default("[]")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

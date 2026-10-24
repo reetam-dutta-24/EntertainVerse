@@ -375,6 +375,10 @@ export interface ContentDetail {
   backdropUrl?: string;
   /** Full-length video URL for movies/documentaries. */
   videoUrl?: string;
+  /** Official trailer (YouTube) and TMDB link for "where to watch". */
+  trailerUrl?: string;
+  tmdbId?: number;
+  tmdbKind?: "movie" | "tv";
   /** Full-length audio URL for songs/OSTs. */
   audioUrl?: string;
   matchScore?: number;
