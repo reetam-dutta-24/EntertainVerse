@@ -7,7 +7,7 @@ import {
 } from "@/components/landing/scroll-fade-in";
 import { LANDING_TASTE_STATS } from "@/lib/data/landing";
 
-/** "Understand your entertainment taste" — static demo stat cards. */
+/** "Understand your entertainment taste" — sample stat cards, labelled as a sample. */
 export function StatsSection() {
   const stats = LANDING_TASTE_STATS;
 
@@ -19,7 +19,7 @@ export function StatsSection() {
       <ScrollFadeIn>
         <SectionHeader
           title="Understand your entertainment taste"
-          subtitle="Track what you watch, hear, save, and love"
+          subtitle="A sample taste profile — yours fills in as you watch, listen and save"
         />
       </ScrollFadeIn>
       <ScrollFadeStagger className="grid w-full max-w-[1200px] grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">

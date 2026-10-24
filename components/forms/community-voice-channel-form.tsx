@@ -205,25 +205,24 @@ export function VoiceChannelActions({
     router.refresh();
   }
 
-  const isFull =
-    !channel.viewerJoined &&
-    (channel.memberCount ?? 0) >= (channel.memberLimit ?? 0);
-
   return (
     <div className="flex shrink-0 flex-wrap items-center gap-2">
+      {/* Audio rooms aren't built yet: joining is disabled, leaving still works. */}
       <GradientButton
         size="sm"
         className="rounded-full px-5"
-        disabled={loading || isFull}
+        disabled={loading || !channel.viewerJoined}
         onClick={() => void handleJoinToggle()}
+        title={channel.viewerJoined ? undefined : "Voice chat is coming soon"}
       >
-        {channel.viewerJoined ? "Leave VC" : isFull ? "Full" : "Join VC"}
+        {channel.viewerJoined ? "Leave VC" : "Voice soon"}
       </GradientButton>
       {channel.canEdit ? (
         <button
           type="button"
           onClick={() => setEditOpen(true)}
-          className="rounded-full border border-white/20 p-2 text-white/70 hover:text-white"
+          aria-label={`Edit ${channel.title}`}
+          className="rounded-full border border-white/20 p-2.5 text-white/70 hover:text-white"
         >
           <Pencil className="size-3.5" />
         </button>
@@ -232,7 +231,8 @@ export function VoiceChannelActions({
         <button
           type="button"
           onClick={() => setDeleteOpen(true)}
-          className="rounded-full border border-white/20 p-2 text-white/70 hover:text-red-300"
+          aria-label={`Delete ${channel.title}`}
+          className="rounded-full border border-white/20 p-2.5 text-white/70 hover:text-red-300"
         >
           <Trash2 className="size-3.5" />
         </button>

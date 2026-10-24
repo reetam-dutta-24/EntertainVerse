@@ -63,8 +63,8 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
     >
       <ScrollFadeIn>
         <SectionHeader
-          title="Loved by fans worldwide"
-          subtitle="Real reviews from the AniVerse community"
+          title="What fans can share on AniVerse"
+          subtitle="Example reviews — real member reviews live on every title, song and collection page"
         />
       </ScrollFadeIn>
 

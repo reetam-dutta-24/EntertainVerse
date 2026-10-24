@@ -188,6 +188,8 @@ export interface CollectionPlayTrack {
   imageUrl?: string;
   backdropUrl?: string;
   previewUrl: string;
+  /** True when no real audio is linked and previewUrl is a demo stream. */
+  isDemoPreview?: boolean;
   lyrics?: string;
   language?: string;
   rating?: number;

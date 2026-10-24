@@ -70,6 +70,7 @@ function mapDbTrack(
     imageUrl: getTrackCoverUrl(track.slug, track.imageUrl, track.backdropUrl),
     backdropUrl: getTrackCoverUrl(track.slug, track.backdropUrl, track.imageUrl),
     previewUrl: getTrackPreviewUrl(track.slug, track.audioUrl),
+    isDemoPreview: !track.audioUrl?.trim(),
     lyrics: track.lyrics ?? undefined,
     language: track.language ?? undefined,
     rating: track.rating ?? undefined,
@@ -123,6 +124,7 @@ export async function getArtistPlayQueue(
     imageUrl: getTrackCoverUrl(track.id, track.imageUrl),
     backdropUrl: getTrackCoverUrl(track.id, track.imageUrl),
     previewUrl: getTrackPreviewUrl(track.id),
+    isDemoPreview: true,
     language: track.language,
     rating: track.rating,
     genreLabels: track.language

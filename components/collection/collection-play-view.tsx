@@ -41,6 +41,7 @@ import type {
   CollectionPlayTrack,
 } from "@/types";
 import { usePlayerShortcuts } from "@/hooks/use-player-shortcuts";
+import { PreviewBadge } from "@/components/ui/coming-soon-notice";
 
 interface CollectionPlayViewProps {
   collectionSlug?: string;
@@ -623,6 +624,7 @@ function MusicPlayQueue({
               fallbackChar={currentTrack.title.charAt(0)}
               theme={theme}
             />
+            {currentTrack.isDemoPreview ? <PreviewBadge className="mt-2 self-start" /> : null}
 
             <div className="mt-4 flex flex-wrap gap-1.5">
               <Chip musicKind={currentTrack.kind}>

@@ -13,6 +13,7 @@ import { AddToCollectionDialog } from "@/components/forms/add-to-collection-dial
 import { ToggleSongFavoriteButton } from "@/components/forms/toggle-song-favorite-button";
 import { SongLyricsPanel } from "@/components/song/song-lyrics-panel";
 import type { AccentColor } from "@/types";
+import { PreviewBadge } from "@/components/ui/coming-soon-notice";
 
 function formatTime(seconds: number) {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
@@ -280,6 +281,7 @@ export function SongHeroPosterPanel({
             )}
             <span className="truncate">{isPlaying ? "Pause" : playLabel}</span>
           </button>
+          {!audioUrl?.trim() ? <PreviewBadge /> : null}
         </div>
       </div>
 

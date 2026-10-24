@@ -24,6 +24,7 @@ import type { CommunityDashboardSection } from "@/lib/community-routes";
 import type { CommunityDetail } from "@/types";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Megaphone, Radio, Sparkles, Tv } from "lucide-react";
+import { ComingSoonNotice } from "@/components/ui/coming-soon-notice";
 
 export interface CommunityDashboardSectionContentProps {
   section: CommunityDashboardSection;
@@ -268,6 +269,10 @@ export function CommunityDashboardSectionContent({
             <CreateWatchChannelButton communitySlug={communitySlug} />
           </SectionHeader>
           <ScrollBody className="flex flex-col gap-4">
+            <ComingSoonNotice>
+              Synced watch parties aren&rsquo;t live yet. Joining a channel lists you as a member,
+              and you watch the title on your own for now.
+            </ComingSoonNotice>
             {community.dashboardWatchParties.length === 0 ? (
               <EmptyState compact icon={<Tv />} description="No watch channels yet." />
             ) : (
@@ -302,6 +307,10 @@ export function CommunityDashboardSectionContent({
             <CreateVoiceChannelButton communitySlug={communitySlug} />
           </SectionHeader>
           <ScrollBody className="flex flex-col gap-4">
+            <ComingSoonNotice>
+              Live voice chat isn&rsquo;t available yet. You can set up channels now; joining
+              opens once audio rooms launch.
+            </ComingSoonNotice>
             {community.dashboardVoiceChannels.length === 0 ? (
               <EmptyState compact icon={<Radio />} description="No voice channels yet." />
             ) : (

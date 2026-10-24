@@ -19,7 +19,7 @@ export function CommunitiesSection() {
       <ScrollFadeIn>
         <SectionHeader
           title="Find fandoms that feel like home"
-          subtitle="Join communities, post reviews, chat live, and watch together"
+          subtitle="Example fan spaces — join communities, post reviews and chat live. Watch parties are coming soon."
         />
       </ScrollFadeIn>
       <div className="w-full overflow-x-auto pb-8 pt-2">
