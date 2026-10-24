@@ -34,8 +34,7 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
   const [importingKey, setImportingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function search(event?: React.FormEvent) {
-    event?.preventDefault();
+  async function search() {
     if (query.trim().length < 2) return;
     setSearching(true);
     setError(null);
@@ -100,26 +99,35 @@ export function ContentImportPanel({ aiEnabled, tmdbEnabled, providerLabel, onIm
         </p>
       ) : (
         <>
-          <form onSubmit={search} className="flex flex-col gap-2 sm:flex-row">
+          {/* Not a <form>: this panel lives inside the content form, and nested forms are invalid HTML. */}
+          <div role="search" className="flex flex-col gap-2 sm:flex-row">
             <label className="relative flex flex-1 items-center">
               <Search className="pointer-events-none absolute left-3 size-4 text-white/40" aria-hidden />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  // Enter searches instead of submitting the surrounding content form.
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void search();
+                  }
+                }}
                 placeholder="e.g. Frieren, Breaking Bad, Parasite"
                 aria-label="Title to import"
                 className="h-11 w-full rounded-xl border border-white/15 bg-white/5 pl-9 pr-3 text-sm text-white placeholder:text-white/35 focus:border-brand-magenta focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"
               />
             </label>
             <button
-              type="submit"
+              type="button"
+              onClick={() => void search()}
               disabled={busy || query.trim().length < 2}
               className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl bg-white/10 px-5 text-sm font-semibold text-white transition-colors hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {searching ? <LoaderCircle className="size-4 animate-spin" aria-hidden /> : null}
               Search
             </button>
-          </form>
+          </div>
           {!tmdbEnabled ? (
             <p className="text-xs text-white/45">
               Only anime sources are on. Add <code className="font-mono">TMDB_API_KEY</code> for movies, shows and K-dramas.
