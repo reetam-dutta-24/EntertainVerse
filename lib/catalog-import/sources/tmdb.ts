@@ -9,7 +9,9 @@ import type { CatalogCandidate, SourceFacts } from "@/lib/catalog-import/types";
  * Attribution: "This product uses the TMDB API but is not endorsed or certified by TMDB."
  */
 
-const API = "https://api.themoviedb.org/3";
+// api.tmdb.org is TMDB's official alternate API host; api.themoviedb.org is DNS-blocked
+// by several Indian ISPs (Jio, Airtel, ACT), while this one stays reachable.
+const API = "https://api.tmdb.org/3";
 const IMAGE = "https://image.tmdb.org/t/p/original";
 const MAX_SEASONS_WITH_EPISODES = 4;
 

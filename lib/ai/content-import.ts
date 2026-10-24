@@ -27,9 +27,10 @@ const enrichmentSchema = z.object({
   highlightTags: z.array(z.string()),
   creditLabel: z.string(),
   accent: z.enum(accentValues),
-  status: z.string(),
-  ageRating: z.string(),
-  sourceMaterial: z.string(),
+  // Fixed vocabularies keep every provider on the house format.
+  status: z.enum(["Airing", "Completed", "Released", "Upcoming", ""]),
+  ageRating: z.enum(["7+", "13+", "16+", "17+", "18+", ""]),
+  sourceMaterial: z.enum(["Manga", "Light Novel", "Novel", "Webtoon", "Comic", "Video Game", "Original", ""]),
   originalAuthor: z.string(),
   country: z.string(),
   broadcast: z.string(),

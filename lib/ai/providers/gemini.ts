@@ -1,6 +1,6 @@
 import "server-only";
 
-import { ApiError, GoogleGenAI } from "@google/genai";
+import { ApiError, GoogleGenAI, ThinkingLevel, type GenerateContentConfig } from "@google/genai";
 import { z } from "zod";
 import { CatalogAiError } from "@/lib/ai/errors";
 import type { StructuredRequest, WebResearch } from "@/lib/ai/provider";
@@ -43,17 +43,36 @@ function jsonSchemaFor(schema: z.ZodType) {
   return rest;
 }
 
+/**
+ * Drafting doesn't need deep reasoning — low thinking keeps imports fast.
+ * Older models that don't accept `thinkingLevel` get one retry without it.
+ */
+async function generateWithThinking(prompt: string, config: GenerateContentConfig, level: ThinkingLevel) {
+  try {
+    return await gemini().models.generateContent({
+      model: model(),
+      contents: prompt,
+      config: { ...config, thinkingConfig: { thinkingLevel: level } },
+    });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 400) {
+      return gemini().models.generateContent({ model: model(), contents: prompt, config });
+    }
+    throw error;
+  }
+}
+
 export async function geminiStructured<S extends z.ZodType>(request: StructuredRequest<S>): Promise<z.infer<S>> {
   try {
-    const response = await gemini().models.generateContent({
-      model: model(),
-      contents: request.prompt,
-      config: {
+    const response = await generateWithThinking(
+      request.prompt,
+      {
         systemInstruction: request.system,
         responseMimeType: "application/json",
         responseJsonSchema: jsonSchemaFor(request.schema),
       },
-    });
+      request.depth === "deep" ? ThinkingLevel.HIGH : ThinkingLevel.LOW,
+    );
     const text = response.text;
     if (!text) {
       throw new CatalogAiError("Gemini returned no answer (it may have been blocked by a safety filter).", 422);
