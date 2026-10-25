@@ -13,7 +13,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: CI,
   retries: CI ? 2 : 0,
-  workers: CI ? 2 : undefined,
+  // The app server runs on the same machine; more workers just starve it of CPU.
+  workers: CI ? 2 : 4,
   timeout: 30_000,
   expect: { timeout: 10_000 },
   reporter: CI ? [["github"], ["html", { open: "never" }]] : [["list"], ["html", { open: "never" }]],
