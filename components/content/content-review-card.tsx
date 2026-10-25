@@ -16,7 +16,7 @@ export function ContentReviewCard({ review }: ContentReviewCardProps) {
 
   return (
     <article
-      className="flex min-h-[300px] w-[min(280px,85vw)] shrink-0 flex-col gap-2.5 overflow-hidden rounded-2xl bg-glass-purple p-4 sm:min-h-[320px] sm:w-[292px] sm:gap-3 sm:p-5"
+      className="flex min-h-[240px] w-[min(280px,85vw)] shrink-0 flex-col gap-2.5 overflow-hidden rounded-2xl bg-glass-purple p-4 sm:min-h-[240px] sm:w-[292px] sm:gap-3 sm:p-5"
       style={{
         boxShadow: `${getHexOuterGlow(avatarColor, 8)}, inset 0 0 24px rgba(0,0,0,0.4)`,
       }}

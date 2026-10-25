@@ -197,7 +197,6 @@ function PaginatedCarouselInner({
 
             const viewportClass = cn(
               compact ? "py-1" : variant === "review" ? "py-3 sm:py-4" : "py-4",
-              variant === "review" && !rowHover && "min-h-[420px] sm:min-h-[450px]",
             );
 
             if (rowHover) {

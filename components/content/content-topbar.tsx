@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import Link from "next/link";
+import { Search } from "lucide-react";
 import {
   UserProfileMenu,
   type DashboardUser,
@@ -23,23 +24,30 @@ export function ContentTopbar({
     <header className="sticky top-0 z-50 w-full bg-background/90 shadow-[0_10px_40px_rgba(0,0,0,0.8)] backdrop-blur-md">
       <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center gap-4 px-4 sm:h-[72px] sm:gap-6 sm:px-8 lg:px-12">
         <Link href="/dashboard" className="shrink-0 p-1 sm:p-2">
-          <span className="text-gradient-brand text-xl font-semibold leading-none sm:text-heading">
+          <span className="text-gradient-brand text-lg font-semibold leading-none sm:text-heading">
             EntertainVerse
           </span>
         </Link>
 
-        <Suspense
-          fallback={
-            <div className="mx-auto h-10 w-full max-w-[340px] rounded-full border border-white/25 bg-surface/60 sm:max-w-[400px]" />
-          }
-        >
-          <GlobalSearch
-            className="mx-auto max-w-[340px] sm:max-w-[400px]"
-            initialQuery={initialSearchQuery}
-          />
-        </Suspense>
+        {/* Full search from sm up; phones get an icon to the search page so the bar never overflows. */}
+        <div className="hidden min-w-0 flex-1 sm:block">
+          <Suspense
+            fallback={
+              <div className="mx-auto h-10 w-full max-w-[400px] rounded-full border border-white/25 bg-surface/60" />
+            }
+          >
+            <GlobalSearch className="mx-auto max-w-[400px]" initialQuery={initialSearchQuery} />
+          </Suspense>
+        </div>
 
-        <div className="flex shrink-0 items-center gap-3 sm:gap-4">
+        <div className="ms-auto flex shrink-0 items-center gap-3 sm:ms-0 sm:gap-4">
+          <Link
+            href="/search"
+            aria-label="Search"
+            className="rounded-full p-2 text-white transition-colors hover:bg-white/10 sm:hidden"
+          >
+            <Search className="size-5" aria-hidden />
+          </Link>
           <NotificationBell />
           {user ? (
             <UserProfileMenu user={user} placement="topbar" />

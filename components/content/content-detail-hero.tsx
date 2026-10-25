@@ -37,7 +37,9 @@ const DETAIL_CHIP =
 const CHIP_ROW = "flex flex-wrap items-center gap-2";
 
 const TITLE_CLASS =
-  "text-2xl font-bold leading-tight text-white sm:text-title lg:text-title";
+  "text-3xl font-extrabold leading-[1.05] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.6)] sm:text-4xl lg:text-5xl";
+
+const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
 
 function totalEpisodes(content: ContentDetail) {
   return content.seasons
@@ -141,9 +143,6 @@ export function ContentDetailHero({
 }: ContentDetailHeroProps) {
   const tint = getAccentTint(content.accent);
   const heroGlow = getDetailHeroBoundaryGlow(tint.glass);
-  const titleLine = content.nativeTitle
-    ? `${content.title} | ${content.nativeTitle}`
-    : content.title;
   const languages = content.metadata.languages ?? [];
   const songMedia = isSongMedia(content.type);
   const isMovie = isMovieContentType(content.type);
@@ -163,15 +162,12 @@ export function ContentDetailHero({
       />
 
       <div className="relative grid w-full grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(300px,36vw)] lg:min-h-[calc(100dvh-4.5rem)]">
-        <div className="flex flex-col gap-3 px-5 py-5 sm:px-8 sm:py-6 lg:gap-3.5 lg:px-10 lg:py-7 xl:px-14">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span
-              className={cn("inline-flex items-center gap-2", TITLE_CLASS)}
-            >
-              <Star className="size-6 shrink-0 fill-yellow-400 text-yellow-400 sm:size-7" />
-              {formatRating(content.rating)}
-            </span>
-            <h1 className={TITLE_CLASS}>{titleLine}</h1>
+        <div className="flex flex-col gap-3 px-5 py-6 sm:px-8 sm:py-8 lg:justify-center lg:gap-4 lg:px-10 lg:py-10 xl:px-14">
+          <div className="flex flex-col gap-1">
+            <h1 className={TITLE_CLASS}>{content.title}</h1>
+            {content.nativeTitle ? (
+              <p className="text-base font-medium text-white/55 sm:text-lg">{content.nativeTitle}</p>
+            ) : null}
           </div>
 
           {content.creditLabel ? (
@@ -187,6 +183,18 @@ export function ContentDetailHero({
           ) : null}
 
           <div className={CHIP_ROW}>
+            {content.rating != null ? (
+              <span
+                className={cn(
+                  DETAIL_CHIP,
+                  "inline-flex items-center gap-1.5 rounded-full border border-yellow-300/40 bg-yellow-400/15 font-bold text-yellow-200 backdrop-blur-md",
+                )}
+                aria-label={`Rated ${formatRating(content.rating)} out of 10`}
+              >
+                <Star className="size-3.5 fill-yellow-300 text-yellow-300" aria-hidden />
+                {formatRating(content.rating)}
+              </span>
+            ) : null}
             <Chip mediaType={content.type} className={DETAIL_CHIP}>
               {songMedia && content.metadata.sourceMaterial
                 ? content.metadata.sourceMaterial
@@ -239,10 +247,10 @@ export function ContentDetailHero({
             ) : (
               <>
                 <Chip chipKey={resolveMetadataChip("season-count")} className={DETAIL_CHIP}>
-                  {seasonCount(content)} Seasons
+                  {plural(seasonCount(content), "Season")}
                 </Chip>
                 <Chip chipKey={resolveMetadataChip("episode-count")} className={DETAIL_CHIP}>
-                  {totalEpisodes(content)} Episodes
+                  {plural(totalEpisodes(content), "Episode")}
                 </Chip>
                 {metadataChips}
               </>
@@ -254,40 +262,41 @@ export function ContentDetailHero({
             ))}
           </div>
 
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            {metadataRows.length > 0 ? (
-              <ul className="grid min-w-0 flex-1 grid-cols-1 gap-x-6 gap-y-0.5 text-xs text-white/85 sm:grid-cols-2 sm:text-sm">
-                {metadataRows.map((row) => (
-                  <li key={row.label}>
-                    <span className="font-semibold text-white">
-                      {row.label}
-                    </span>
-                    <span className="text-white/60"> : </span>
-                    {row.value}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <span />
-            )}
-
-            <div className={cn(DETAIL_HERO_BTN_PAIR, "shrink-0 sm:justify-end")}>
-              {songMedia ? (
+          {/* Primary actions — one row, Watch first */}
+          <div className="mt-2 flex flex-wrap items-center gap-2.5">
+            {songMedia ? (
+              <div className={DETAIL_HERO_BTN_PAIR}>
                 <SongHeroWatchlistButton
                   sourceContentSlug={content.sourceContentSlug}
                   sourceTitle={content.metadata.originalAuthor}
                   initialOnWatchlist={initialOnWatchlist}
                 />
-              ) : (
-                <ContentHeroCollectionButton
-                  contentSlug={content.id}
-                  contentTitle={content.title}
+              </div>
+            ) : (
+              <>
+                <ContentHeroPosterActions
+                  content={content}
+                  continueEpisode={continueEpisode}
+                  initialFavorited={initialFavorited}
+                  initialOnWatchlist={initialOnWatchlist}
                 />
-              )}
-            </div>
+                <ContentHeroCollectionButton contentSlug={content.id} contentTitle={content.title} />
+              </>
+            )}
           </div>
 
-          <div className="mt-4">
+          {metadataRows.length > 0 ? (
+            <dl className="mt-1 flex flex-wrap gap-x-6 gap-y-1 text-xs text-white/70 sm:text-sm">
+              {metadataRows.map((row) => (
+                <div key={row.label} className="flex gap-1.5">
+                  <dt className="font-semibold uppercase tracking-wider text-white/45 text-[11px] leading-5 sm:text-xs">{row.label}</dt>
+                  <dd className="text-white/90">{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
+          <div className="mt-1">
             <ContentEngagementPanel accent={content.accent} />
           </div>
 
@@ -344,14 +353,7 @@ export function ContentDetailHero({
                 accent={content.accent}
                 initialFavorited={initialFavorited}
               />
-            ) : (
-              <ContentHeroPosterActions
-                content={content}
-                continueEpisode={continueEpisode}
-                initialFavorited={initialFavorited}
-                initialOnWatchlist={initialOnWatchlist}
-              />
-            )}
+            ) : null}
           </div>
         </div>
       </div>

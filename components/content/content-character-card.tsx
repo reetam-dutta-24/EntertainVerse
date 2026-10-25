@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { getAccentStyle } from "@/lib/accents";
-import { getAccentTint, getTintOuterGlow } from "@/lib/card-theme";
+import { getAccentTint, getTintOuterGlow, getTintRgb } from "@/lib/card-theme";
+import { glassSurface } from "@/components/cards/glass-card-frame";
 import type { AccentColor, Character } from "@/types";
 
 export interface ContentCharacterCardProps {
@@ -26,7 +27,12 @@ export function ContentCharacterCard({
   const [hovered, setHovered] = useState(false);
   const accent = getAccentStyle(character.accent ?? "purple");
   const tint = getAccentTint(contentAccent);
-  const shortName = character.name.split(" ")[0];
+  const initials = character.name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
   const castPrefix = castLabel === "voice" ? "Voice Actor" : "Actor";
   const subtitle = character.voiceActor
     ? `${castPrefix}: ${character.voiceActor}`
@@ -76,7 +82,16 @@ export function ContentCharacterCard({
               )}
             />
           ) : (
-            <div className={cn("size-full", accent.header)} />
+            // No portrait: tinted glass with the character's initials.
+            <div
+              className="relative flex size-full items-start justify-center pt-16"
+              style={{ background: glassSurface(getTintRgb(getAccentTint(character.accent ?? contentAccent).glass).join(",")) }}
+            >
+              <div className={cn("absolute inset-x-0 top-0 h-1/2 opacity-40", accent.header)} aria-hidden />
+              <span className="relative flex size-20 items-center justify-center rounded-full bg-white/10 text-2xl font-extrabold tracking-wide text-white/90 ring-1 ring-white/20 backdrop-blur-md">
+                {initials}
+              </span>
+            </div>
           )}
           <div
             className={cn(
@@ -94,12 +109,12 @@ export function ContentCharacterCard({
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent px-3 pb-3 pt-12">
           <p
             className={cn(
-              "font-bold text-white",
+              "line-clamp-2 font-bold leading-tight text-white",
               interactive && "transition-all duration-300",
               isHovered ? "text-lg" : "text-base",
             )}
           >
-            {shortName}
+            {character.name}
           </p>
           {interactive ? (
             <p

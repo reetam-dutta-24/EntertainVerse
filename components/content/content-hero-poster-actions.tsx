@@ -4,21 +4,10 @@ import { PlayCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isMovieContentType } from "@/lib/content-media";
 import { getContentWatchPath } from "@/lib/content-routes";
-import {
-  detailHeroBtnBase,
-  DETAIL_HERO_BTN_ACCENT_SOLID,
-  DETAIL_HERO_BTN_GROUP,
-  DETAIL_HERO_BTN_WATCH,
-  HERO_BTN_INTERACTIVE,
-} from "@/lib/detail-route-ui";
 import { ToggleContentFavoriteButton } from "@/components/forms/toggle-content-favorite-button";
 import { ContentHeroWatchlistButton } from "@/components/content/content-hero-watchlist-button";
 import { ContentWatchNowLink } from "@/components/content/content-watch-now-link";
-import type { ContentDetail, Episode, MediaType } from "@/types";
-
-function isSongMedia(type: MediaType) {
-  return type === "song" || type === "album" || type === "playlist";
-}
+import type { ContentDetail, Episode } from "@/types";
 
 export interface ContentHeroPosterActionsProps {
   content: ContentDetail;
@@ -27,65 +16,45 @@ export interface ContentHeroPosterActionsProps {
   initialOnWatchlist?: boolean;
 }
 
+/** Large primary Watch CTA. */
+const WATCH_PRIMARY = cn(
+  "inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full bg-gradient-brand px-6 text-sm font-bold text-white",
+  "shadow-[0_10px_30px_-8px_rgba(216,2,220,0.75)] transition-all duration-300 ease-out",
+  "hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-8px_rgba(216,2,220,0.9)] hover:brightness-110",
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink",
+);
+
+/** Hero action row for titles: Watch / Continue first, then favourite and watchlist. */
 export function ContentHeroPosterActions({
   content,
   continueEpisode,
   initialFavorited,
   initialOnWatchlist,
 }: ContentHeroPosterActionsProps) {
-  const songMedia = isSongMedia(content.type);
   const isMovie = isMovieContentType(content.type);
-  const isWatching = continueEpisode != null;
   const season = continueEpisode?.seasonNumber ?? 1;
   const episodeNum = continueEpisode?.number ?? 1;
 
-  const watchLabel = songMedia
-    ? content.resumeLabel
-      ? `Continue from ${content.resumeLabel}`
-      : "Play now"
-    : isMovie
-      ? "Watch movie"
-      : isWatching
-        ? `Continue S${season} E${episodeNum}`
-        : "Watch now";
+  const watchLabel = isMovie
+    ? "Watch movie"
+    : continueEpisode
+      ? `Continue S${season} E${episodeNum}`
+      : "Watch now";
 
-  const watchHref = songMedia
-    ? `#player`
-    : getContentWatchPath(
-        content.id,
-        continueEpisode?.id ?? content.episodes[0]?.id,
-      );
+  const watchHref = getContentWatchPath(content.id, continueEpisode?.id ?? content.episodes[0]?.id);
 
   return (
-    <div
-      className={cn(
-        "absolute inset-x-0 bottom-0 flex flex-col gap-2.5 bg-gradient-to-t from-black/95 via-black/80 to-transparent px-4 pb-4 pt-10 sm:gap-3 sm:px-5 sm:pb-5",
-      )}
-    >
-      <div className={DETAIL_HERO_BTN_GROUP}>
-        <ToggleContentFavoriteButton
-          contentSlug={content.id}
-          initialFavorited={initialFavorited}
-        />
-        <ContentHeroWatchlistButton
-          contentSlug={content.id}
-          contentTitle={content.title}
-          initialOnWatchlist={initialOnWatchlist}
-        />
+    <>
+      <ContentWatchNowLink href={watchHref} contentSlug={content.id} className={WATCH_PRIMARY}>
+        <PlayCircle className="size-5 shrink-0" />
+        <span className="truncate">{watchLabel}</span>
+      </ContentWatchNowLink>
+      <div className="flex-none">
+        <ToggleContentFavoriteButton contentSlug={content.id} initialFavorited={initialFavorited} />
       </div>
-
-      <div className={DETAIL_HERO_BTN_GROUP}>
-        <ContentWatchNowLink
-          href={watchHref}
-          contentSlug={content.id}
-          className={detailHeroBtnBase(
-            cn(DETAIL_HERO_BTN_ACCENT_SOLID, DETAIL_HERO_BTN_WATCH, HERO_BTN_INTERACTIVE),
-          )}
-        >
-          <PlayCircle className="size-4 shrink-0" />
-          <span className="truncate">{watchLabel}</span>
-        </ContentWatchNowLink>
+      <div className="flex-none">
+        <ContentHeroWatchlistButton contentSlug={content.id} contentTitle={content.title} initialOnWatchlist={initialOnWatchlist} />
       </div>
-    </div>
+    </>
   );
 }
