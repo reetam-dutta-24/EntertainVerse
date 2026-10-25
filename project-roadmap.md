@@ -3,7 +3,7 @@
 The full journey of AniVerse: what was built, in what order, where each area stands today, and
 what is still left. For setup and architecture, see [README.md](README.md).
 
-**Last updated:** October 2026 · **Status:** feature-complete MVP plus an AI layer; not yet deployed.
+**Last updated:** 25 October 2026 · **Status:** feature scope locked and complete — MVP, AI layer, social AI and live parties; not yet deployed.
 
 ---
 
@@ -13,8 +13,8 @@ what is still left. For setup and architecture, see [README.md](README.md).
 |---|---|
 | **What it is** | An AI-powered entertainment hub for anime, shows, K-dramas, films and music: discover, plan, collect, discuss. |
 | **The problem** | People pay for several streaming services and still lose 20 minutes scrolling. They don't know what to watch next, or in what order. |
-| **The answer** | A hybrid recommender that explains every pick, plus *AI mode*: a quiz or chat that turns your mood into a time-budgeted roadmap that tracks itself. |
-| **Scale today** | 49 pages · 99 API routes · 51 Prisma models · 28 migrations · 65+ commits |
+| **The answer** | A hybrid recommender that explains every pick, plus *AI mode*: a quiz or chat that turns your mood into a time-budgeted roadmap that tracks itself. Then the social layer: AI Match rooms, synced watch and listen parties, voice talk rooms, and group picks that suit everyone. |
+| **Scale today** | 51 pages · 108 API routes · 57 Prisma models · 32 migrations · 80 commits |
 | **Stack** | Next.js 16 · React 19 · TypeScript · Tailwind v4 · PostgreSQL + Prisma 6 · NextAuth v5 · Socket.IO · Gemini |
 
 ---
@@ -93,6 +93,23 @@ what is still left. For setup and architecture, see [README.md](README.md).
 | 6 | **Smart collections:** weekly collection ideas learned from behaviour (save or dismiss) | `97bc3bf` |
 | 7 | **Offline evaluation** (leave-one-out), README AI section, polish | `3f4c3a1` |
 
+### Phase 7 — Social AI, live parties & the final feature set (25 Oct 2026)
+
+| Step | What | Commit |
+|---|---|---|
+| 1 | Docs rewrite (README + this roadmap); fixed the `npm run dev` crash caused by a `server-only` import in the socket chain | `ab7ea59` `51759c1` |
+| 2 | Removed the old "AI Taste Profile" score bar and the sidebar Notifications link | `0ad5f76` `b435ba4` |
+| 3 | **Deeper taste quiz**: worlds, protagonists, endings, intensity, occasions, company, subs/dubs, loved titles, vocals, eras, loved artists | `91914c6` |
+| 4 | **Strict daily limit**: a 5-minute warning, then the app locks until midnight; the timezone can't be changed while a limit is active | `65c5232` |
+| 5 | **Analytics wired to real-time activity**: session-based watch/listen minutes, taste fit, a live traits radar, a timezone-aware 12-week rhythm | `4379d64` |
+| 6 | **AI Match**: taste circles, nearby / country / worldwide, then broadcast rooms. The creator opens a room and matching users get a popup + notification and join in one tap | `5dad7f3` `0830afb` |
+| 7 | **Live parties**: synced watch parties and listen parties over Socket.IO (host control, skew correction, chat, reactions, queue) | `b37c345` |
+| 8 | **Talk rooms**: WebRTC voice with Socket.IO signalling | `56f50b1` |
+| 9 | **Watch trailer in the hero panel**: plays in place; the poster stays the default. 98 trailers backfilled | `bfa57d8` |
+| 10 | **Group AI mode**: "What should we watch / listen to?" for everyone in a party, with a fit for each person | `45e7ded` |
+| 11 | **Catch me up**: spoiler-safe recaps up to your stopping point, using RAG over episode guides or the web; cached and shared | `a7c4b54` |
+| 12 | **Taste DNA history + AniVerse Wrapped**: monthly taste strands and eras; a story of your year with an AI-named persona and a share card | `1fbea9f` |
+
 ---
 
 ## Where every area stands
@@ -110,11 +127,15 @@ what is still left. For setup and architecture, see [README.md](README.md).
 | Profiles & friends | ✅ Mostly | Two profile KPI tiles are still placeholders |
 | Communities (posts, chat, join codes) | ✅ Done | Realtime chat over Socket.IO |
 | Direct messages | ✅ Done | Socket.IO + REST, read state |
-| Notifications | 🟡 Works | DB-backed, polled over HTTP; not pushed over sockets |
-| Analytics | ✅ Done | Real watch/listen events → Recharts |
+| Notifications | 🟡 Works | DB-backed, polled over HTTP; not pushed over sockets; reachable from the bell (no longer in the sidebar) |
+| Analytics | ✅ Done | Real-time watch/listen sessions → Recharts; taste fit, live traits, Taste DNA history |
 | Media playback | 🟡 Legal-first | Official trailers, 30s previews and listen/watch links; full video/audio only where an admin adds a licensed URL; otherwise demo audio |
-| Voice channels / watch parties | 🔴 Shell only | Channel CRUD and membership; no WebRTC audio, no synced playback (labelled "Coming soon") |
-| AI recommender, AI mode, roadmaps, smart collections | ✅ Done | Tested with live scripts; manual browser pass in progress |
+| Watch / listen parties | ✅ Done | Socket.IO sync with host control, chat, reactions and a shared queue; state is in memory |
+| Talk rooms (voice) | ✅ Done | WebRTC mesh over public STUN; good for small rooms (TURN/SFU needed at scale) |
+| AI Match rooms | ✅ Done | Popup + notification invites; tested with seeded demo accounts |
+| Catch me up, Taste DNA, Wrapped | ✅ Done | Recaps tested against episode-guide and synopsis grounding; Wrapped tested on a seeded active profile |
+| Daily limit | ✅ Done | Heartbeat-based; locks until local midnight |
+| AI recommender, AI mode, roadmaps, smart collections, group picks | ✅ Done | Tested with live scripts; manual browser pass in progress |
 | Automated tests | 🔴 None | No unit/e2e suite yet; the recommender has an offline evaluation script |
 | Deployment | 🔴 Not yet | Runs locally (`npm run dev`); no hosting / CI config in the repo |
 
@@ -124,7 +145,11 @@ what is still left. For setup and architecture, see [README.md](README.md).
 
 ### Must do before calling it shipped
 
-1. **Manual test pass of the new AI screens** in the browser: AI mode quiz and chat, roadmap actions, smart collections, the AI profile page, at phone and desktop widths.
+1. **Manual test pass in the browser**, at phone and desktop widths:
+   - AI mode quiz and chat, roadmap actions, smart collections, the AI profile page
+   - AI Match rooms with several accounts
+   - watch/listen parties and talk rooms across two browsers
+   - Catch me up, Wrapped (including the share card) and the daily-limit lock
 2. **Deploy:** pick a host that supports the custom `server.ts` (Socket.IO needs a long-running Node server, so serverless-only hosting won't carry realtime). Set production env vars, then run `prisma migrate deploy`, `npm run db:seed` (if needed) and `npm run embed:catalog`.
 3. **Production secrets:** a fresh `AUTH_SECRET`, Google OAuth redirect URI for the production domain, and a Gemini key (or a paid tier; see the quota note below).
 4. **Grow the catalog** through the AI import (e.g. cozy and slice-of-life anime are thin today), then re-run `npm run embed:catalog` and `npm run eval:recommender`.
@@ -136,12 +161,15 @@ what is still left. For setup and architecture, see [README.md](README.md).
 7. **Socket-pushed notifications** instead of HTTP polling.
 8. **Replace the two placeholder profile KPI tiles** with real metrics.
 9. **Untested admin paths:** the "Research on the web instead" fallback for music and artists has never been run end to end.
-10. **Rate limiting** on the AI routes (chat, roadmap) per user, to protect the shared Gemini quota.
+10. **Rate limiting** on the AI routes (chat, roadmap, recap) per user, to protect the shared Gemini quota.
 11. **Discord sign-in:** add credentials or remove the button.
 
 ### Stretch
 
-12. **Live voice channels** (WebRTC, e.g. LiveKit) and **synced watch parties** (shared playback state over Socket.IO).
+12. **Voice and parties at scale:**
+    - a TURN server for strict NATs
+    - an SFU (e.g. LiveKit) for big rooms
+    - Redis-backed party state, so parties survive restarts and work across several server instances
 13. **Roadmap reminders:** a weekly nudge ("2 h left in this week's plan") via notifications.
 14. **Learned ranking weights:** once there's enough real interaction data, tune the 50/35/15 blend from the evaluation instead of fixed weights.
 15. **Multilingual UI** (the settings already store a language preference).
@@ -160,6 +188,11 @@ what is still left. For setup and architecture, see [README.md](README.md).
 | `prisma generate` hits `EPERM` on Windows while the dev server runs | Engine DLL can't be replaced | Stop `npm run dev`, regenerate, restart |
 | The dev server can leave a half-written `.next/dev/types/routes.d.ts` | `next build` fails on that file | Restart `npm run dev` (it regenerates the file) |
 | Small seeded dataset | Evaluation numbers are indicative only | Re-run `npm run eval:recommender` as real usage grows |
+| `gemini-flash-latest` can take minutes to answer at busy times | Slow admin imports and roadmap builds | User-facing calls (chat, recaps, group picks, Wrapped) run on Flash-Lite |
+| Google Search grounding has its own free daily quota | Web-grounded recaps and web research fail for the rest of the day | Recaps fall back to the synopsis, say so, and aren't cached, so a grounded recap is written once quota returns |
+| Party state lives in server memory | A restart ends live parties; a single server instance only | Fine for one Node server; Redis for scale |
+| WebRTC mesh over public STUN | Some strict networks can't connect; CPU grows with room size | Add TURN; SFU for big rooms |
+| Some admin-entered episode descriptions are placeholders | Recaps for those titles fall back to web/synopsis | Re-import the title with AI import |
 
 ---
 
