@@ -5,7 +5,6 @@ import { ContentCarouselSection } from "@/components/content/content-carousel-se
 import { ContentReviewCard } from "@/components/content/content-review-card";
 import type { Review } from "@/types";
 
-const REVIEW_AUTO_ADVANCE_MS = 3000;
 
 export interface ContentReviewSectionProps {
   title: string;
@@ -51,7 +50,6 @@ export function ContentReviewSection({
         sectionTitle={title}
         variant="review"
         rowHover={false}
-        autoAdvanceMs={REVIEW_AUTO_ADVANCE_MS}
       />
     </section>
   );

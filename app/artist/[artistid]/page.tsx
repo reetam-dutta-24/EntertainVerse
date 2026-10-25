@@ -45,7 +45,6 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
   if (!artist) notFound();
 
   const showBandMembers = artist.members.length > 0;
-  const relatedAutoMs = 4000;
 
   return (
     <div className="flex w-full flex-col">
@@ -92,7 +91,6 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
             itemsPerPage={5}
             overflowVisible
             itemsCenter
-            autoAdvanceMs={relatedAutoMs}
             emptyMessage="No band members listed for this artist."
             slides={artist.members.map((member) => ({
               id: member.id,
@@ -111,7 +109,6 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
         <ContentPageSection
           title={`🎤 Artists Similar To ${artist.title}`}
           variant="content"
-          autoAdvanceMs={relatedAutoMs}
           emptyMessage={`No similar artists to ${artist.title} yet.`}
           slides={artist.similarArtists.map((entry) => ({
             id: entry.id,

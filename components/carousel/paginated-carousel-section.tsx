@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   CarouselCardSlot,
@@ -10,7 +10,7 @@ import {
   useCarouselTintSeed,
 } from "@/components/carousel/carousel-section-context";
 import { PaginationDots } from "@/components/dashboard/pagination-dots";
-import { useAutoAdvanceInterval } from "@/hooks/use-auto-advance-interval";
+import { CAROUSEL_AUTOPLAY_MS, useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
 import {
   CAROUSEL_ITEMS_COMMUNITY,
   CAROUSEL_ITEMS_CONTENT,
@@ -52,6 +52,7 @@ export interface PaginatedCarouselSectionProps {
   overflowVisible?: boolean;
   itemsCenter?: boolean;
   compact?: boolean;
+  /** Auto-slide interval; defaults to the shared 5s beat, 0 turns it off. */
   autoAdvanceMs?: number;
   /** Spotify-style row wash + sibling fade on card hover. Off for static portrait rows. */
   rowHover?: boolean;
@@ -73,12 +74,12 @@ function PaginatedCarouselInner({
   overflowVisible = false,
   itemsCenter = false,
   compact = false,
-  autoAdvanceMs,
+  autoAdvanceMs = CAROUSEL_AUTOPLAY_MS,
   rowHover = true,
 }: Omit<PaginatedCarouselSectionProps, "sectionTitle">) {
   const [page, setPage] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [autoPaused, setAutoPaused] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const tintSeed = useCarouselTintSeed();
   const perPage = itemsPerPage ?? VARIANT_ITEMS[variant];
 
@@ -99,19 +100,20 @@ function PaginatedCarouselInner({
     setHoveredId(null);
   }
 
-  const advancePage = useCallback(() => {
+  const stepPage = useCallback((direction: 1 | -1) => {
     setPage((current) => {
       const safe = Math.min(current, totalPages - 1);
-      return (safe + 1) % totalPages;
+      return (safe + direction + totalPages) % totalPages;
     });
     setHoveredId(null);
   }, [totalPages]);
 
-  useAutoAdvanceInterval({
+  useCarouselAutoplay({
+    rootRef,
     intervalMs: autoAdvanceMs,
     enabled: Boolean(autoAdvanceMs && totalPages > 1),
-    paused: autoPaused,
-    onAdvance: advancePage,
+    onStep: stepPage,
+    resetKey: safePage,
   });
 
   const viewportPadding = compact
@@ -122,11 +124,7 @@ function PaginatedCarouselInner({
 
   return (
     <div className={cn("flex flex-col", compact ? "gap-1" : "gap-4", className)}>
-      <div
-        className={cn("relative", overflowVisible && "overflow-visible")}
-        onMouseEnter={() => setAutoPaused(true)}
-        onMouseLeave={() => setAutoPaused(false)}
-      >
+      <div ref={rootRef} className={cn("relative", overflowVisible && "overflow-visible")}>
         {totalPages > 1 ? (
           <button
             type="button"

@@ -16,7 +16,6 @@ import type { Review } from "@/types";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Star } from "lucide-react";
 
-const REVIEW_AUTO_ADVANCE_MS = 3000;
 
 export interface InteractiveReviewSectionProps {
   title: string;
@@ -146,7 +145,6 @@ export function InteractiveReviewSection({
             variant="review"
             rowHover={false}
             overflowVisible
-            autoAdvanceMs={REVIEW_AUTO_ADVANCE_MS}
             className="overflow-visible"
           />
         </div>

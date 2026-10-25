@@ -85,7 +85,6 @@ export default async function SongDetailPage({ params }: SongPageProps) {
       <ContentPageSection
         title={`🎵 Songs/OSTs Similar To ${song.title}`}
         variant="content"
-        autoAdvanceMs={4000}
         emptyMessage={`No similar songs or OSTs for ${song.title} yet.`}
         slides={song.featuredOsts.map((track) => ({
           id: track.id,

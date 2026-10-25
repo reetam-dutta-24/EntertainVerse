@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { MusicCard } from "@/components/cards/music-card";
 import { PosterCard } from "@/components/cards/poster-card";
@@ -10,12 +10,11 @@ import {
 } from "@/components/carousel/carousel-row-viewport";
 import { PaginationDots } from "@/components/dashboard/pagination-dots";
 import { SearchPill } from "@/components/dashboard/search-pill";
+import { useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
 import { useColumnCount } from "@/hooks/use-column-count";
 import { resolveCardTint, sectionTintSeed } from "@/lib/card-theme";
 import { CAROUSEL_COLS_BREAKPOINTS } from "@/lib/grid-section-config";
 import type { ProfileRecentActivityItem } from "@/types";
-
-const AUTO_ADVANCE_MS = 4000;
 
 export interface ProfileActivityCarouselSectionProps {
   userName: string;
@@ -60,7 +59,7 @@ export function ProfileActivityCarouselSection({
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [autoPaused, setAutoPaused] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const { cols, itemsPerPage } = useColumnCount(CAROUSEL_COLS_BREAKPOINTS, 1);
 
   const filtered = useMemo(() => {
@@ -101,19 +100,15 @@ export function ProfileActivityCarouselSection({
     setHoveredId(null);
   }
 
-  const advancePage = useCallback(() => {
+  const stepPage = useCallback((direction: 1 | -1) => {
     setPage((current) => {
       const safe = Math.min(current, Math.max(0, totalPages - 1));
-      return totalPages > 0 ? (safe + 1) % totalPages : 0;
+      return totalPages > 0 ? (safe + direction + totalPages) % totalPages : 0;
     });
     setHoveredId(null);
   }, [totalPages]);
 
-  useEffect(() => {
-    if (autoPaused || totalPages <= 1) return;
-    const timer = window.setTimeout(advancePage, AUTO_ADVANCE_MS);
-    return () => window.clearTimeout(timer);
-  }, [autoPaused, totalPages, safePage, advancePage]);
+  useCarouselAutoplay({ rootRef, enabled: totalPages > 1, onStep: stepPage, resetKey: safePage });
 
   if (items.length === 0) {
     return (
@@ -153,11 +148,7 @@ export function ProfileActivityCarouselSection({
         />
       </div>
 
-      <div
-        className="relative px-2"
-        onMouseEnter={() => setAutoPaused(true)}
-        onMouseLeave={() => setAutoPaused(false)}
-      >
+      <div ref={rootRef} className="relative px-2">
         {totalPages > 1 ? (
           <button
             type="button"

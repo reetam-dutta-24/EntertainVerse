@@ -70,7 +70,6 @@ export default async function ContentDetailPage({ params }: ContentPageProps) {
   const isMovie = isMovieContentType(content.type);
   const movieEpisode = content.episodes[0];
   const castLabel = isVoiceCastContentType(content.type) ? "voice" : "actor";
-  const relatedAutoMs = 4000;
 
   return (
     <ContentDetailEngagementShell
@@ -111,7 +110,6 @@ export default async function ContentDetailPage({ params }: ContentPageProps) {
         title="🎭 Characters"
         variant="content"
         rowHover={false}
-        autoAdvanceMs={4000}
         slides={content.characters.map((character) => ({
           id: character.id,
           node: (
@@ -129,7 +127,6 @@ export default async function ContentDetailPage({ params }: ContentPageProps) {
       <ContentPageSection
         title={`🎼 Featured OSTs of ${content.title}`}
         variant="content"
-        autoAdvanceMs={relatedAutoMs}
         emptyMessage={`No featured OSTs linked to ${content.title} yet.`}
         slides={content.featuredOsts.map((track) => ({
           id: track.id,
@@ -141,7 +138,6 @@ export default async function ContentDetailPage({ params }: ContentPageProps) {
       <ContentPageSection
         title="💡 You may also like"
         variant="content"
-        autoAdvanceMs={relatedAutoMs}
         emptyMessage="No related titles to suggest yet."
         slides={content.relatedContent.map((item) => ({
           id: item.id,

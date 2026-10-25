@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Music, SearchX } from "lucide-react";
 import { MusicCard } from "@/components/cards/music-card";
 import {
@@ -9,7 +9,7 @@ import {
 } from "@/components/carousel/carousel-row-viewport";
 import { PaginationDots } from "@/components/dashboard/pagination-dots";
 import { SearchPill } from "@/components/dashboard/search-pill";
-import { useAutoAdvanceInterval } from "@/hooks/use-auto-advance-interval";
+import { CAROUSEL_AUTOPLAY_MS, useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
 import { useColumnCount } from "@/hooks/use-column-count";
 import { resolveCardTint, sectionTintSeed } from "@/lib/card-theme";
 import { CAROUSEL_COLS_BREAKPOINTS } from "@/lib/grid-section-config";
@@ -22,6 +22,7 @@ export interface MusicCarouselSectionProps {
   searchPlaceholder: string;
   tracks: MusicTrack[];
   /** Auto-advance pages (ms) — for related-content rows only. */
+  /** Auto-slide interval; defaults to the shared 5s beat, 0 turns it off. */
   autoAdvanceMs?: number;
   emptyMessage?: string;
   /** Next useful action shown with the empty state. */
@@ -54,14 +55,14 @@ export function MusicCarouselSection({
   subtitle,
   searchPlaceholder,
   tracks,
-  autoAdvanceMs,
+  autoAdvanceMs = CAROUSEL_AUTOPLAY_MS,
   emptyAction = { href: "/dashboard/discover", label: "Discover music" },
   emptyMessage = "No related music available yet.",
 }: MusicCarouselSectionProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [autoPaused, setAutoPaused] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const { cols, itemsPerPage } = useColumnCount(CAROUSEL_COLS_BREAKPOINTS, 1);
 
   const filtered = useMemo(() => filterTracks(tracks, query), [tracks, query]);
@@ -93,19 +94,20 @@ export function MusicCarouselSection({
     setHoveredId(null);
   }
 
-  const advancePage = useCallback(() => {
+  const stepPage = useCallback((direction: 1 | -1) => {
     setPage((current) => {
       const safe = Math.min(current, totalPages - 1);
-      return (safe + 1) % totalPages;
+      return (safe + direction + totalPages) % totalPages;
     });
     setHoveredId(null);
   }, [totalPages]);
 
-  useAutoAdvanceInterval({
+  useCarouselAutoplay({
+    rootRef,
     intervalMs: autoAdvanceMs,
     enabled: Boolean(autoAdvanceMs && totalPages > 1),
-    paused: autoPaused,
-    onAdvance: advancePage,
+    onStep: stepPage,
+    resetKey: safePage,
   });
 
   if (tracks.length === 0) {
@@ -135,11 +137,7 @@ export function MusicCarouselSection({
         />
       </div>
 
-      <div
-        className="relative px-2"
-        onMouseEnter={() => setAutoPaused(true)}
-        onMouseLeave={() => setAutoPaused(false)}
-      >
+      <div ref={rootRef} className="relative px-2">
         {totalPages > 1 ? (
           <button
             type="button"

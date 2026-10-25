@@ -177,7 +177,6 @@ export default async function CollectionDetailPage({
             title={`🎵 Related Songs To ${collection.name}`}
             searchPlaceholder="Search tracks…"
             tracks={collection.similarTracks}
-            autoAdvanceMs={4000}
             emptyMessage={`No related songs for ${collection.name} yet.`}
           />
         ) : (
@@ -185,7 +184,6 @@ export default async function CollectionDetailPage({
             title={`💡 Similar Content To ${collection.name}`}
             searchPlaceholder="Search titles…"
             items={collection.similarContent}
-            autoAdvanceMs={4000}
             emptyMessage={`No similar content for ${collection.name} yet.`}
           />
         )}
