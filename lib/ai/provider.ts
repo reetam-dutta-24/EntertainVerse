@@ -69,8 +69,8 @@ const RESEARCH_SYSTEM =
   "you found in sources; write 'unknown' for anything you could not confirm. Never guess numbers or dates.";
 
 /** Web research into a plain fact sheet plus the pages it came from. */
-export function researchWithWeb(instructions: string): Promise<WebResearch> {
+export function researchWithWeb(instructions: string, options: { tier?: "smart" | "fast" } = {}): Promise<WebResearch> {
   return requireProvider() === "claude"
     ? claudeResearch(RESEARCH_SYSTEM, instructions)
-    : geminiResearch(RESEARCH_SYSTEM, instructions);
+    : geminiResearch(RESEARCH_SYSTEM, instructions, options.tier);
 }

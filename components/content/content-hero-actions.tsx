@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Share2 } from "lucide-react";
+import { BookOpen, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { shareCurrentUrl } from "@/lib/share-url";
 import { Button } from "@/components/ui/button";
+import { RecapDialog } from "@/components/content/recap-dialog";
 import {
   DETAIL_HERO_BTN_PAIR_ROW,
   detailHeroBtnBase,
@@ -83,6 +84,9 @@ const SHARE_STYLES: Record<AccentColor, { share: string; shareIcon: string }> = 
   },
 };
 
+/** Music has no story to recap. */
+const NO_RECAP = new Set(["song", "album", "artist", "playlist"]);
+
 export interface ContentHeroActionsProps {
   content: ContentDetail;
   continueEpisode: Episode | null;
@@ -92,6 +96,8 @@ export function ContentHeroActions({ content }: ContentHeroActionsProps) {
   const accent = content.accent ?? "blue";
   const cta = SHARE_STYLES[accent] ?? SHARE_STYLES.blue;
   const [copied, setCopied] = useState(false);
+  const [recapOpen, setRecapOpen] = useState(false);
+  const canRecap = !NO_RECAP.has(content.type);
 
   async function handleShare() {
     const ok = await shareCurrentUrl({
@@ -117,6 +123,21 @@ export function ContentHeroActions({ content }: ContentHeroActionsProps) {
         <Share2 className={cn("size-4 shrink-0", cta.shareIcon)} />
         {copied ? "Link Copied!" : "Share"}
       </Button>
+      {canRecap ? (
+        <>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setRecapOpen(true)}
+            className={cn(detailHeroBtnBase(), "w-full border-brand-magenta/50 bg-brand-magenta/10 text-white hover:bg-brand-magenta/20 sm:w-auto")}
+          >
+            <BookOpen className="size-4 shrink-0 text-brand-pink" />
+            Catch me up
+          </Button>
+          <RecapDialog slug={content.id} open={recapOpen} onClose={() => setRecapOpen(false)} />
+        </>
+      ) : null}
     </div>
   );
 }

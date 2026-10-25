@@ -254,6 +254,7 @@ model Content {
 
   @@index([type])
   @@index([slug])
+  recaps          AiRecap[]
 }
 
 model ContentSeason {
@@ -1214,4 +1215,25 @@ model MatchCircleMember {
 
   @@unique([circleId, userId])
   @@index([userId, status])
+}
+
+/// AI "Catch me up" recaps, cached and shared by everyone: one recap per title,
+/// stopping point and depth (so the free AI quota isn't spent twice).
+model AiRecap {
+  id        String   @id @default(cuid())
+  contentId String
+  /// Stopping point, e.g. "s2e8" or "film-50".
+  upTo      String
+  /// quick | standard | detailed
+  depth     String
+  /// { headline, beats[], characters[], leftOff, watchFor, upToLabel }
+  payload   Json
+  sources   Json     @default("[]")
+  /// episodes (catalog) | web | synopsis
+  grounding String
+  createdAt DateTime @default(now())
+
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@unique([contentId, upTo, depth])
 }

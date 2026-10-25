@@ -153,7 +153,7 @@ export async function geminiEmbed(
   }
 }
 
-export async function geminiResearch(system: string, instructions: string): Promise<WebResearch> {
+export async function geminiResearch(system: string, instructions: string, tier: GeminiTier = "smart"): Promise<WebResearch> {
   try {
     const research = (name: string) =>
       withRetry(() =>
@@ -163,8 +163,8 @@ export async function geminiResearch(system: string, instructions: string): Prom
           config: { systemInstruction: system, tools: [{ googleSearch: {} }] },
         }),
       );
-    const response = await research(model("smart")).catch((error: unknown) => {
-      if (error instanceof ApiError && error.status === 429) return research(model("fast"));
+    const response = await research(model(tier)).catch((error: unknown) => {
+      if (tier === "smart" && error instanceof ApiError && error.status === 429) return research(model("fast"));
       throw error;
     });
     const factSheet = response.text?.trim();
