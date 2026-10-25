@@ -1,4 +1,5 @@
 import type { ContentItem, MusicTrack } from "@/types";
+import { CacheTags, cached } from "@/lib/cache/server-cache";
 import { getArtistDetail } from "@/lib/data/artist-detail";
 import { getGlobalCommunities } from "@/lib/data/community";
 import { getGlobalPublicCollections } from "@/lib/data/collections";
@@ -103,12 +104,19 @@ function detectPrimaryType(
   return "content";
 }
 
+/** Search hits every keystroke; results are shared by everyone typing the same thing. */
+const SEARCH_CACHE = { ttl: 120, swr: 600, tags: [CacheTags.catalog, CacheTags.communities, CacheTags.collections, CacheTags.allUsers] };
+
 export async function searchAutocomplete(
   query: string,
   limit = 8,
 ): Promise<SearchResult[]> {
   const q = normalizeSearchQuery(query);
   if (q.length < 2) return [];
+  return cached(`search:autocomplete:${limit}:${q}`, SEARCH_CACHE, () => runAutocomplete(q, limit));
+}
+
+async function runAutocomplete(q: string, limit: number): Promise<SearchResult[]> {
 
   const [content, songs, artists, profiles, collections, communities] = await Promise.all([
     searchCatalogContent(q, 16),
@@ -229,6 +237,10 @@ export async function searchAutocomplete(
 export async function getSearchPageData(query: string): Promise<SearchPageData | null> {
   const q = normalizeSearchQuery(query);
   if (!q) return null;
+  return cached(`search:page:${query.trim()}`, SEARCH_CACHE, () => runSearchPage(query, q));
+}
+
+async function runSearchPage(query: string, q: string): Promise<SearchPageData | null> {
 
   const suggestions = await searchAutocomplete(q, 24);
   const primaryType = detectPrimaryType(q, suggestions);

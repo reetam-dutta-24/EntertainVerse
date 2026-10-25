@@ -3,6 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import { after } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { CacheTags, cached, invalidateTags } from "@/lib/cache/server-cache";
 import { CatalogAiError } from "@/lib/ai/errors";
 import { GEMINI_EMBEDDING_MODEL, geminiEmbed, isGeminiConfigured } from "@/lib/ai/providers/gemini";
 import { LISTEN_MOODS, WATCH_THEMES, WATCH_VIBES } from "@/lib/ai-profile/vocabulary";
@@ -207,7 +208,8 @@ async function runSync({ force, onProgress }: { force?: boolean; onProgress?: (d
   const orphans = existing.filter((row) => !live.has(`${row.kind}:${row.itemId}`)).map((row) => row.id);
   if (orphans.length) await prisma.catalogEmbedding.deleteMany({ where: { id: { in: orphans } } });
 
-  if (stale.length || orphans.length) cached = null;
+  // Writes already invalidated the index; once more now that every batch has committed.
+  if (stale.length || orphans.length) invalidateTags(CacheTags.embeddings);
   return { embedded: stale.length, unchanged: items.length - stale.length, removed: orphans.length };
 }
 
@@ -234,8 +236,6 @@ export interface EmbeddingIndex {
   size: number;
 }
 
-let cached: { at: number; index: EmbeddingIndex } | null = null;
-const TTL_MS = 5 * 60_000;
 let lastHeal = 0;
 
 function normalize(values: number[]): Vector {
@@ -247,17 +247,20 @@ function normalize(values: number[]): Vector {
   return vector;
 }
 
-/** All catalog vectors (cached for a few minutes). Empty when embeddings aren't set up. */
+/**
+ * All catalog vectors. Empty when embeddings aren't set up. Cached for every request
+ * and dropped whenever a vector is written (the `embeddings` tag).
+ */
 export async function loadEmbeddingIndex(): Promise<EmbeddingIndex> {
-  if (cached && Date.now() - cached.at < TTL_MS) return cached.index;
-  const rows = await prisma.catalogEmbedding.findMany({
-    where: { model: GEMINI_EMBEDDING_MODEL },
-    select: { kind: true, itemId: true, vector: true },
+  const index = await cached("embedding-index", { ttl: 600, swr: 3600, tags: [CacheTags.embeddings] }, async () => {
+    const rows = await prisma.catalogEmbedding.findMany({
+      where: { model: GEMINI_EMBEDDING_MODEL },
+      select: { kind: true, itemId: true, vector: true },
+    });
+    const vectors = new Map<string, Vector>();
+    for (const row of rows) if (row.vector.length) vectors.set(`${row.kind}:${row.itemId}`, normalize(row.vector));
+    return { vectors, size: vectors.size };
   });
-  const vectors = new Map<string, Vector>();
-  for (const row of rows) if (row.vector.length) vectors.set(`${row.kind}:${row.itemId}`, normalize(row.vector));
-  const index = { vectors, size: vectors.size };
-  cached = { at: Date.now(), index };
 
   // Self-heal: new items (e.g. user collections) get embedded in the background, at most every 10 min.
   const building = process.env.NEXT_PHASE === "phase-production-build";

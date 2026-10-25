@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { CacheTags, cached } from "@/lib/cache/server-cache";
 import { mapContentToItem, prismaMediaTypeToApp } from "@/lib/mappers/content.mapper";
 import { mapTrackToMusicTrack } from "@/lib/mappers/music.mapper";
 import { mapArtistToContentItem } from "@/lib/mappers/artist.mapper";
@@ -103,7 +104,13 @@ function asStrings(value: unknown): string[] {
     .map((item) => item.toLowerCase());
 }
 
-export const loadTasteCatalog = cache(async () => {
+/**
+ * The whole catalog as the recommender sees it. Shared by every user and request
+ * (read-only!) and dropped when any catalog row is written.
+ */
+export const loadTasteCatalog = cache(() => cached("taste-catalog", { ttl: 600, swr: 3600, tags: [CacheTags.catalog] }, loadCatalogRows));
+
+async function loadCatalogRows() {
   const [content, tracks, artists] = await Promise.all([
     prisma.content.findMany({
       include: contentInclude,
@@ -121,7 +128,7 @@ export const loadTasteCatalog = cache(async () => {
     }),
   ]);
   return { content, tracks, artists };
-});
+}
 
 function contentGenres(row: ContentRow): string[] {
   return row.genres.map((g) => g.genre.label.toLowerCase());
@@ -149,7 +156,12 @@ function historyWeights(rows: { slug: string; minutes: number; at: Date }[]): Ma
   return max ? new Map([...totals].map(([slug, total]) => [slug, total / max])) : totals;
 }
 
-export const loadTasteSignals = cache(async (userId: string): Promise<TasteSignals> => {
+/** One user's taste signals — cached per user (read-only!) and dropped on any write of theirs. */
+export const loadTasteSignals = cache((userId: string): Promise<TasteSignals> =>
+  cached(`taste-signals:${userId}`, { ttl: 300, swr: 900, tags: [CacheTags.user(userId), CacheTags.allUsers] }, () => loadSignalRows(userId)),
+);
+
+async function loadSignalRows(userId: string): Promise<TasteSignals> {
   const since = new Date(Date.now() - 180 * 86_400_000);
   const [profile, favorites, watchlist, follows, trackFavorites, watches, listens, aiProfile] = await Promise.all([
     prisma.tasteProfile.findUnique({ where: { userId }, select: { selections: true } }),
@@ -203,7 +215,7 @@ export const loadTasteSignals = cache(async (userId: string): Promise<TasteSigna
         }
       : undefined,
   };
-});
+}
 
 function buildVector(signals: TasteSignals, catalog: ContentRow[]): TasteVector {
   const { selection } = signals;

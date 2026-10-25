@@ -2,6 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { CacheTags, cached } from "@/lib/cache/server-cache";
 import { centroid, dot, embeddingKey, type EmbeddingIndex, type EmbeddingKind, type Vector } from "@/lib/recommender/embeddings";
 
 /**
@@ -104,8 +105,16 @@ export function answersAnchor(kind: EmbeddingKind, vector: number[], reason: str
   return { kind, slug: "__answers", title: "your AI-mode answers", verb: "", weight, vector: Float32Array.from(vector, (value) => value / norm), reason };
 }
 
-/** Who interacted with what, across every user (favorites, ≥20 min watched, ratings ≥7, listens). */
-export const loadInteractionGraph = cache(async () => {
+/**
+ * Who interacted with what, across every user (favorites, ≥20 min watched, ratings ≥7, listens).
+ * It scans everyone's activity, so it's rebuilt on a timer rather than on each write:
+ * "fans of X also liked Y" can lag a few minutes; only catalog changes (slugs) drop it.
+ */
+export const loadInteractionGraph = cache(() =>
+  cached("interaction-graph", { ttl: 600, swr: 3600, tags: [CacheTags.catalog] }, buildInteractionGraph),
+);
+
+async function buildInteractionGraph() {
   const since = new Date(Date.now() - 365 * 86_400_000);
   const [favorites, watches, ratings, trackFavorites, listens] = await Promise.all([
     prisma.contentFavorite.findMany({ select: { userId: true, content: { select: { slug: true } } } }),
@@ -135,7 +144,7 @@ export const loadInteractionGraph = cache(async () => {
   for (const row of trackFavorites) add(tracks, row.track.slug, row.userId);
   for (const row of listens) if ((row._sum.minutes ?? 0) >= 3) add(tracks, trackSlug.get(row.trackId), row.userId);
   return { content, tracks };
-});
+}
 
 /**
  * Item-item collaborative score: for each candidate, how strongly other users

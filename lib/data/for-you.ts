@@ -1,4 +1,5 @@
 import type { ContentItem, MusicTrack } from "@/types";
+import { CacheTags, cached } from "@/lib/cache/server-cache";
 import { MOOD_GENRES } from "@/lib/data/onboarding-config";
 import { getRelaxingMusic as getRelaxingMusicFromDb } from "@/lib/services/feed.service";
 import { getUserById } from "@/lib/services/user.service";
@@ -41,7 +42,14 @@ export interface ForYouFeed {
   shelves: ForYouShelf[];
 }
 
+/** The whole feed is ~8 rankings; cached per user and dropped on their writes or catalog changes. */
 export async function getForYouFeed(userId: string): Promise<ForYouFeed> {
+  return cached(`for-you:${userId}`, { ttl: 120, swr: 600, tags: [CacheTags.user(userId), CacheTags.allUsers, CacheTags.catalog, CacheTags.embeddings] }, () =>
+    buildForYouFeed(userId),
+  );
+}
+
+async function buildForYouFeed(userId: string): Promise<ForYouFeed> {
   const signals = await loadTasteSignals(userId);
   const [recommended, music, artists, anchor, genres, relaxing] = await Promise.all([
     rankContent(signals, { limit: 18, excludeKnown: true }),

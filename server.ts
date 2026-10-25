@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
 import { parse } from "node:url";
 import next from "next";
@@ -26,5 +27,20 @@ app.prepare().then(() => {
 
   httpServer.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port} (Next.js + Socket.IO)`);
+    void warmCache();
   });
 });
+
+/** Fill the shared server cache (catalog, embeddings, collaborative graph) before the first visitor. */
+async function warmCache() {
+  // Same process as Next, so the route sees this per-boot token; nobody else can trigger it.
+  const token = randomUUID();
+  process.env.CACHE_WARMUP_TOKEN = token;
+  try {
+    const response = await fetch(`http://localhost:${port}/api/internal/warm`, { headers: { "x-warmup-token": token } });
+    const body = (await response.json()) as { ms?: number; entries?: number };
+    if (response.ok) console.log(`> Cache warmed in ${body.ms}ms (${body.entries} entries)`);
+  } catch (error) {
+    console.warn("> Cache warm-up skipped:", error instanceof Error ? error.message : error);
+  }
+}

@@ -2,6 +2,7 @@ import type { ContentItem, MusicTrack } from "@/types";
 import { tasteProfileToActiveFilters } from "@/lib/mappers/active-taste.mapper";
 import { getTasteProfileForUser } from "@/lib/services/onboarding.service";
 import { prisma } from "@/lib/prisma";
+import { CacheTags, cached } from "@/lib/cache/server-cache";
 import {
   getContinueListening as getContinueListeningFromDb,
   getContinueWatchingContent,
@@ -39,8 +40,11 @@ export async function getActiveFilters(userId: string) {
   return tasteProfileToActiveFilters(tasteProfile.selections, tasteScore);
 }
 
+/** Shared lists below are the same for every user — cached and dropped on catalog writes. */
+const SHARED_LIST = { ttl: 300, swr: 1800, tags: [CacheTags.catalog] };
+
 export async function getTrendingThisWeek(): Promise<ContentItem[]> {
-  return getTrendingContent(18);
+  return cached("discover:trending", SHARED_LIST, () => getTrendingContent(18));
 }
 
 /** Taste-ranked picks for a signed-in user; global top-rated otherwise. */
@@ -51,7 +55,7 @@ export async function getRecommendedForYou(userId?: string): Promise<ContentItem
 }
 
 export async function getNewReleases(): Promise<ContentItem[]> {
-  return getNewReleasesContent(18);
+  return cached("discover:new-releases", SHARED_LIST, () => getNewReleasesContent(18));
 }
 
 export async function getContinueWatching(userId?: string): Promise<ContentItem[]> {
@@ -65,7 +69,7 @@ export async function getMusicForYourTaste(userId?: string): Promise<MusicTrack[
 }
 
 export async function getTrendingMusic(): Promise<MusicTrack[]> {
-  return getTrendingMusicFromDb(18);
+  return cached("discover:trending-music", SHARED_LIST, () => getTrendingMusicFromDb(18));
 }
 
 export async function getContinueListening(userId?: string): Promise<MusicTrack[]> {

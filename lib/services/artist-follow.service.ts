@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { invalidateUser } from "@/lib/cache/server-cache";
 
 export class ArtistFollowNotFoundError extends Error {
   constructor(message = "Artist not found.") {
@@ -48,6 +49,7 @@ export async function toggleArtistFollow(userId: string, artistSlug: string) {
       DELETE FROM "ArtistFollow" WHERE id = ${existing[0].id}
     `;
     const followerCount = await countArtistFollowers(artist.id);
+    invalidateUser(userId);
     return { following: false, followerCount };
   }
 
@@ -57,6 +59,7 @@ export async function toggleArtistFollow(userId: string, artistSlug: string) {
     VALUES (${followId}, ${userId}, ${artist.id}, NOW())
   `;
   const followerCount = await countArtistFollowers(artist.id);
+  invalidateUser(userId);
   return { following: true, followerCount };
 }
 

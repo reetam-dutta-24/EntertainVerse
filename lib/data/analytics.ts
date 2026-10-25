@@ -1,3 +1,4 @@
+import { CacheTags, cached } from "@/lib/cache/server-cache";
 import { getAnalyticsForUser } from "@/lib/services/analytics.service";
 
 export interface AnalyticsKpi {
@@ -56,6 +57,9 @@ export interface AnalyticsData {
   };
 }
 
+/** Cached per user; any write of theirs (a watched minute, a post, a rating) drops it, so it stays live. */
 export async function getAnalyticsData(userId: string): Promise<AnalyticsData> {
-  return getAnalyticsForUser(userId);
+  return cached(`analytics:${userId}`, { ttl: 60, swr: 300, tags: [CacheTags.user(userId), CacheTags.allUsers, CacheTags.catalog, CacheTags.embeddings] }, () =>
+    getAnalyticsForUser(userId),
+  );
 }

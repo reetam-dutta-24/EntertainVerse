@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { invalidateUser } from "@/lib/cache/server-cache";
 
 export class FavoriteNotFoundError extends Error {
   constructor(message = "Item not found.") {
@@ -59,6 +60,7 @@ export async function toggleCollectionFavorite(userId: string, collectionSlug: s
         select: { favoriteCount: true },
       });
     });
+    invalidateUser(userId);
     return {
       favorited: false,
       favoriteCount: Math.max(0, updated.favoriteCount),
@@ -77,6 +79,8 @@ export async function toggleCollectionFavorite(userId: string, collectionSlug: s
       select: { favoriteCount: true },
     });
   });
+
+  invalidateUser(userId);
 
   return { favorited: true, favoriteCount: updated.favoriteCount };
 }
@@ -149,6 +153,7 @@ export async function toggleContentFavorite(userId: string, contentSlug: string)
       DELETE FROM "ContentFavorite" WHERE id = ${existing[0].id}
     `;
     const favoriteCount = await getContentFavoriteCount(content.id);
+    invalidateUser(userId);
     return { favorited: false, favoriteCount };
   }
 
@@ -158,6 +163,7 @@ export async function toggleContentFavorite(userId: string, contentSlug: string)
     VALUES (${favoriteId}, ${userId}, ${content.id}, NOW())
   `;
   const favoriteCount = await getContentFavoriteCount(content.id);
+  invalidateUser(userId);
   return { favorited: true, favoriteCount };
 }
 
@@ -192,6 +198,7 @@ export async function toggleTrackFavorite(userId: string, trackSlug: string) {
     await prisma.$executeRaw`
       DELETE FROM "TrackFavorite" WHERE id = ${existing[0].id}
     `;
+    invalidateUser(userId);
     return { favorited: false };
   }
 
@@ -200,6 +207,7 @@ export async function toggleTrackFavorite(userId: string, trackSlug: string) {
     INSERT INTO "TrackFavorite" (id, "userId", "trackId", "createdAt")
     VALUES (${favoriteId}, ${userId}, ${track.id}, NOW())
   `;
+  invalidateUser(userId);
   return { favorited: true };
 }
 
@@ -234,6 +242,7 @@ export async function toggleArtistFavorite(userId: string, artistSlug: string) {
     await prisma.$executeRaw`
       DELETE FROM "ArtistFavorite" WHERE id = ${existing[0].id}
     `;
+    invalidateUser(userId);
     return { favorited: false };
   }
 
@@ -242,5 +251,6 @@ export async function toggleArtistFavorite(userId: string, artistSlug: string) {
     INSERT INTO "ArtistFavorite" (id, "userId", "artistId", "createdAt")
     VALUES (${favoriteId}, ${userId}, ${artist.id}, NOW())
   `;
+  invalidateUser(userId);
   return { favorited: true };
 }

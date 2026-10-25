@@ -7,6 +7,7 @@ import {
   listPublicCommunities,
   listRecommendedCommunities,
 } from "@/lib/services/community.service";
+import { CacheTags, cached } from "@/lib/cache/server-cache";
 
 /**
  * Community page — backed by PostgreSQL per user.
@@ -64,11 +65,13 @@ export async function getMostActiveCommunities(
 export async function getRecommendedCommunities(
   userId: string,
 ): Promise<Community[]> {
-  return listRecommendedCommunities(userId, 12);
+  return cached(`communities:recommended:${userId}`, { ttl: 120, swr: 600, tags: [CacheTags.communities, CacheTags.embeddings, CacheTags.user(userId), CacheTags.allUsers] }, () =>
+    listRecommendedCommunities(userId, 12),
+  );
 }
 
 export async function getGlobalCommunities(): Promise<Community[]> {
-  return listPublicCommunities(15);
+  return cached("communities:public", { ttl: 120, swr: 600, tags: [CacheTags.communities] }, () => listPublicCommunities(15));
 }
 
 export async function getCommunityMemberPreviewForSlug(

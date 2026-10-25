@@ -15,6 +15,21 @@ const nextConfig: NextConfig = {
     // dev cache writes them, which corrupted the cache (routes deeper than two segments 404'd)
     // and grew it to 28 GB. Dev compiles from scratch instead.
     turbopackFileSystemCacheForDev: false,
+    // Client router cache: a dashboard page you just left is reused for 30s, so back/forward
+    // and tab switches are instant. Mutations call router.refresh(), which bypasses it.
+    staleTimes: {
+      dynamic: 30,
+    },
+  },
+  // Posters, artwork and uploads are served from /public with `max-age=0` by default.
+  // File names don't change in place often, so let browsers keep them for a day.
+  async headers() {
+    return [
+      {
+        source: "/:folder(images|uploads)/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      },
+    ];
   },
 };
 

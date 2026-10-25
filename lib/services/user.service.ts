@@ -1,3 +1,4 @@
+import { cache } from "react";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import type { RegisterInput } from "@/lib/validators/auth";
@@ -251,8 +252,11 @@ export async function findOrCreateOAuthUser(input: {
   });
 }
 
-/** Load the logged-in user for dashboard layouts and pages. */
-export async function getUserById(id: string) {
+/**
+ * Load the logged-in user for dashboard layouts and pages. Wrapped in React `cache`
+ * so the layout and the page share one query per request.
+ */
+export const getUserById = cache(async (id: string) => {
   return prisma.user.findUnique({
     where: { id },
     select: {
@@ -268,4 +272,4 @@ export async function getUserById(id: string) {
       createdAt: true,
     },
   });
-}
+});
