@@ -7,14 +7,23 @@ import { listenPrefsSchema, watchPrefsSchema, type AiMode, type ListenPrefs, typ
 import {
   ARCHETYPES,
   COMMITMENT_OPTIONS,
+  COMPANY_OPTIONS,
   DISCOVERY_OPTIONS,
+  ENDING_OPTIONS,
   ENERGY_OPTIONS,
+  ERA_OPTIONS,
+  INTENSITY_OPTIONS,
   LISTEN_MOODS,
   PACE_OPTIONS,
+  PROTAGONISTS,
+  SUBS_DUBS_OPTIONS,
+  VOCALS_OPTIONS,
   WATCH_AVOID,
   WATCH_FORMATS,
+  WATCH_OCCASIONS,
   WATCH_THEMES,
   WATCH_VIBES,
+  WATCH_WORLDS,
   type VocabOption,
 } from "@/lib/ai-profile/vocabulary";
 
@@ -38,16 +47,23 @@ const VOCAB_GUIDE: Record<AiMode, string> = {
   watch:
     `formats: ${list(WATCH_FORMATS)}\nvibes: ${list(WATCH_VIBES)}\nthemes: ${list(WATCH_THEMES)}\n` +
     `avoid: ${list(WATCH_AVOID)}\npace: ${list(PACE_OPTIONS)}\ncommitment: ${list(COMMITMENT_OPTIONS)}\n` +
-    `archetype: ${list(ARCHETYPES)}\nlanguages: ${LANGUAGE_OPTIONS.map((o) => o.value).join(", ")}\n` +
-    "weeklyHours: whole hours per week they can watch, or null",
+    `archetype: ${list(ARCHETYPES)}\nworlds: ${list(WATCH_WORLDS)}\nprotagonists: ${list(PROTAGONISTS)}\n` +
+    `ending: ${list(ENDING_OPTIONS)}\nintensity: ${list(INTENSITY_OPTIONS)}\noccasions: ${list(WATCH_OCCASIONS)}\n` +
+    `company: ${list(COMPANY_OPTIONS)}\nsubsDubs: ${list(SUBS_DUBS_OPTIONS)}\n` +
+    `languages: ${LANGUAGE_OPTIONS.map((o) => o.value).join(", ")}\n` +
+    "weeklyHours: whole hours per week they can watch, or null\nlovedTitles: always [] (set by the quiz, not the chat)",
   listen:
     `moods: ${list(LISTEN_MOODS)}\ngenres: ${SONG_GENRE_OPTIONS.map((o) => o.value).join(", ")}\n` +
-    `energy: ${list(ENERGY_OPTIONS)}\ndiscovery: ${list(DISCOVERY_OPTIONS)}\nlanguages: ${LANGUAGE_OPTIONS.map((o) => o.value).join(", ")}`,
+    `energy: ${list(ENERGY_OPTIONS)}\ndiscovery: ${list(DISCOVERY_OPTIONS)}\nvocals: ${list(VOCALS_OPTIONS)}\n` +
+    `eras: ${list(ERA_OPTIONS)}\nlanguages: ${LANGUAGE_OPTIONS.map((o) => o.value).join(", ")}\n` +
+    "lovedArtists: always [] (set by the quiz, not the chat)",
 };
 
 const FOLLOW_UPS: Record<AiMode, string> = {
-  watch: "the vibe, the kind of stories, pacing, how long a commitment, hours per week, or anything to avoid",
-  listen: "the mood or moment, the sounds they love, energy level, or how adventurous to be",
+  watch:
+    "the vibe, the kind of stories or worlds, the kind of main character, how dark it can get, how it should end, " +
+    "pacing, how long a commitment, hours per week, who they watch with, or anything to avoid",
+  listen: "the mood or moment, the sounds they love, vocals or instrumental, the era, energy level, or how adventurous to be",
 };
 
 function systemPrompt(mode: AiMode) {
@@ -79,6 +95,8 @@ export async function chatTurn<M extends AiMode>(
     prefs: mode === "watch" ? watchPrefsSchema : listenPrefsSchema,
   });
   const transcript = messages.map((m) => `${m.role === "user" ? "User" : "AI mode"}: ${m.text}`).join("\n");
+  // Quiz-only picks are kept as they are — the chat can't see posters.
+  const keep = mode === "watch" ? { lovedTitles: (prefs as WatchPrefs).lovedTitles } : { lovedArtists: (prefs as ListenPrefs).lovedArtists };
   const out = await generateStructured({
     // Chat is high-volume: the fast tier has a far bigger free quota.
     tier: "fast",
@@ -88,7 +106,7 @@ export async function chatTurn<M extends AiMode>(
   });
   return {
     reply: out.reply.trim(),
-    prefs: out.prefs as M extends "watch" ? WatchPrefs : ListenPrefs,
+    prefs: { ...out.prefs, ...keep } as M extends "watch" ? WatchPrefs : ListenPrefs,
     suggestions: out.suggestions.map((s) => s.trim()).filter((s) => s && s.length <= 60).slice(0, 3),
     ready: out.ready,
   };

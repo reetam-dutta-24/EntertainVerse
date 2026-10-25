@@ -11,6 +11,8 @@ export interface VocabOption {
   emoji: string;
   phrase: string;
   genres?: string[];
+  /** Poster / photo for "pick what you love" cards (catalog-backed options). */
+  imageUrl?: string;
 }
 
 const byId = (options: readonly VocabOption[]) => new Map(options.map((option) => [option.id, option]));
@@ -86,6 +88,60 @@ export const ARCHETYPES: readonly VocabOption[] = [
   { id: "completionist", label: "The Completionist", emoji: "🏁", phrase: "finishes every season and loves long sagas" },
 ];
 
+export const WATCH_WORLDS: readonly VocabOption[] = [
+  { id: "fantasy-realm", label: "A fantasy realm", emoji: "🐉", phrase: "set in fantasy realms with magic and legends", genres: ["fantasy"] },
+  { id: "near-future", label: "A tech-noir future", emoji: "🌆", phrase: "set in sci-fi futures and dystopias", genres: ["sci-fi"] },
+  { id: "space", label: "Deep space", emoji: "🚀", phrase: "set in space, among stars and starships", genres: ["sci-fi"] },
+  { id: "big-city", label: "A big modern city", emoji: "🏙️", phrase: "set in big modern cities" },
+  { id: "small-town", label: "A quiet small town", emoji: "🏘️", phrase: "set in quiet small towns and countryside" },
+  { id: "school", label: "A school or campus", emoji: "🎒", phrase: "set in schools, campuses and clubs" },
+  { id: "historical", label: "The past", emoji: "🏯", phrase: "set in history — samurai, vikings, empires" },
+  { id: "underworld", label: "The criminal underworld", emoji: "🕶️", phrase: "set in crime syndicates and the underworld", genres: ["crime"] },
+];
+
+export const PROTAGONISTS: readonly VocabOption[] = [
+  { id: "underdog", label: "The underdog", emoji: "🌱", phrase: "an underdog lead who grows stronger" },
+  { id: "anti-hero", label: "The anti-hero", emoji: "🦹", phrase: "a morally grey anti-hero lead" },
+  { id: "genius", label: "The genius", emoji: "🧠", phrase: "a brilliant, strategic genius lead" },
+  { id: "ensemble", label: "A tight-knit crew", emoji: "👥", phrase: "an ensemble cast with team chemistry" },
+  { id: "overpowered", label: "The overpowered one", emoji: "💥", phrase: "an overpowered lead with epic power fantasies" },
+  { id: "everyday", label: "A relatable everyday person", emoji: "🙂", phrase: "an ordinary, relatable lead" },
+];
+
+export const ENDING_OPTIONS: readonly VocabOption[] = [
+  { id: "happy", label: "Happy & satisfying", emoji: "🌈", phrase: "satisfying, happy endings" },
+  { id: "bittersweet", label: "Bittersweet", emoji: "🥀", phrase: "bittersweet endings that linger" },
+  { id: "mind-blown", label: "Twist that breaks my brain", emoji: "🤯", phrase: "shocking twist endings" },
+  { id: "any", label: "Don't care — the ride matters", emoji: "🎢", phrase: "any ending if the journey is great" },
+];
+
+export const INTENSITY_OPTIONS: readonly VocabOption[] = [
+  { id: "light", label: "Keep it light", emoji: "☀️", phrase: "light-hearted with low intensity" },
+  { id: "medium", label: "Some tension is fine", emoji: "🌤️", phrase: "moderate tension and stakes" },
+  { id: "heavy", label: "Go as dark as you want", emoji: "🌑", phrase: "intense, heavy and mature themes" },
+];
+
+export const WATCH_OCCASIONS: readonly VocabOption[] = [
+  { id: "late-night", label: "Late at night", emoji: "🌙", phrase: "late-night watching" },
+  { id: "with-food", label: "With dinner", emoji: "🍜", phrase: "easy watching over a meal" },
+  { id: "commute", label: "On the go", emoji: "🚇", phrase: "short episodes for commutes and breaks" },
+  { id: "weekend-binge", label: "Weekend binge", emoji: "🛋️", phrase: "weekend binge sessions" },
+  { id: "background", label: "In the background", emoji: "🎧", phrase: "something easy to follow in the background" },
+];
+
+export const COMPANY_OPTIONS: readonly VocabOption[] = [
+  { id: "solo", label: "Just me", emoji: "🙋", phrase: "watching solo" },
+  { id: "partner", label: "With my partner", emoji: "💑", phrase: "date-night watching with a partner" },
+  { id: "friends", label: "With friends", emoji: "🍕", phrase: "group watching with friends" },
+  { id: "family", label: "With family", emoji: "👨‍👩‍👧", phrase: "family-friendly watching" },
+];
+
+export const SUBS_DUBS_OPTIONS: readonly VocabOption[] = [
+  { id: "subs", label: "Subtitles, always", emoji: "💬", phrase: "original audio with subtitles" },
+  { id: "dubs", label: "Dubbed, please", emoji: "🎙️", phrase: "dubbed audio" },
+  { id: "either", label: "Either is fine", emoji: "🤷", phrase: "subtitles or dubs" },
+];
+
 // ---- Listen mode -----------------------------------------------------------------------------
 
 export const LISTEN_MOODS: readonly VocabOption[] = [
@@ -113,7 +169,29 @@ export const DISCOVERY_OPTIONS: readonly VocabOption[] = [
   { id: "new", label: "Surprise me", emoji: "🛸", phrase: "new, unexpected discoveries" },
 ];
 
+export const VOCALS_OPTIONS: readonly VocabOption[] = [
+  { id: "sing-along", label: "Lyrics I can sing", emoji: "🎤", phrase: "catchy vocals you can sing along to" },
+  { id: "instrumental", label: "Mostly instrumental", emoji: "🎹", phrase: "instrumental, wordless music" },
+  { id: "either", label: "Either", emoji: "🎶", phrase: "vocals or instrumental" },
+];
+
+export const ERA_OPTIONS: readonly VocabOption[] = [
+  { id: "latest", label: "Brand-new releases", emoji: "🆕", phrase: "the latest releases" },
+  { id: "2010s", label: "2010s favourites", emoji: "📱", phrase: "2010s hits" },
+  { id: "2000s", label: "2000s throwbacks", emoji: "💿", phrase: "2000s throwbacks" },
+  { id: "classics", label: "Timeless classics", emoji: "📻", phrase: "timeless classics" },
+];
+
 export const VOCAB = {
+  worlds: byId(WATCH_WORLDS),
+  protagonists: byId(PROTAGONISTS),
+  ending: byId(ENDING_OPTIONS),
+  intensity: byId(INTENSITY_OPTIONS),
+  occasions: byId(WATCH_OCCASIONS),
+  company: byId(COMPANY_OPTIONS),
+  subsDubs: byId(SUBS_DUBS_OPTIONS),
+  vocals: byId(VOCALS_OPTIONS),
+  era: byId(ERA_OPTIONS),
   vibes: byId(WATCH_VIBES),
   themes: byId(WATCH_THEMES),
   avoid: byId(WATCH_AVOID),

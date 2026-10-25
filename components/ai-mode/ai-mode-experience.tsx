@@ -8,6 +8,7 @@ import { TasteChat } from "@/components/ai-mode/taste-chat";
 import { TasteQuiz } from "@/components/ai-mode/taste-quiz";
 import { ContentCarouselSection, MusicCarouselSection } from "@/components/dashboard";
 import { hasListenPrefs, hasWatchPrefs, type AiMode, type ListenPrefs, type WatchPrefs } from "@/lib/ai-profile/schema";
+import type { QuizCatalog } from "@/lib/ai-profile/quiz";
 import { summarizePrefs } from "@/lib/ai-profile/summary";
 import { VOCAB } from "@/lib/ai-profile/vocabulary";
 import type { AiModePicks } from "@/lib/services/ai-mode.service";
@@ -22,6 +23,8 @@ export interface AiModeExperienceProps {
   initialListen: ListenPrefs;
   /** Chat needs an AI provider; the quiz works without one. */
   chatEnabled: boolean;
+  /** Posters / artist photos for the quiz's "which did you love?" cards. */
+  quizCatalog?: QuizCatalog;
 }
 
 const MODE_COPY: Record<AiMode, { label: string; icon: typeof Tv; what: string }> = {
@@ -55,7 +58,7 @@ function ModeToggle({ mode, onChange }: { mode: AiMode; onChange: (mode: AiMode)
 }
 
 /** AI mode: pick Watch or Listen, answer by quiz cards or chat, get explained picks. */
-export function AiModeExperience({ initialMode, initialStart, initialWatch, initialListen, chatEnabled }: AiModeExperienceProps) {
+export function AiModeExperience({ initialMode, initialStart, initialWatch, initialListen, chatEnabled, quizCatalog }: AiModeExperienceProps) {
   const [mode, setMode] = useState<AiMode>(initialMode);
   const [phase, setPhase] = useState<Phase>(initialStart === "chat" && !chatEnabled ? "quiz" : (initialStart ?? "start"));
   const [watch, setWatch] = useState(initialWatch);
@@ -132,7 +135,9 @@ export function AiModeExperience({ initialMode, initialStart, initialWatch, init
                   <span className="text-3xl" aria-hidden>🃏</span>
                   <span>
                     <span className="block text-base font-bold text-white">Take the taste quiz</span>
-                    <span className="mt-1 block text-sm text-white/60">About a minute. Tap through cards about {MODE_COPY[mode].what}.</span>
+                    <span className="mt-1 block text-sm text-white/60">
+                      Two minutes, tap-only. Niche questions about {MODE_COPY[mode].what} — skip any you don&apos;t care about.
+                    </span>
                   </span>
                   <span className="mt-auto text-sm font-semibold text-brand-pink">Start quiz →</span>
                 </button>
@@ -174,7 +179,7 @@ export function AiModeExperience({ initialMode, initialStart, initialWatch, init
           ) : null}
 
           {phase === "quiz" ? (
-            <TasteQuiz key={mode} mode={mode} initial={prefs} onDone={(next) => void finish(next)} onCancel={() => setPhase("start")} />
+            <TasteQuiz key={mode} mode={mode} initial={prefs} catalog={quizCatalog} onDone={(next) => void finish(next)} onCancel={() => setPhase("start")} />
           ) : null}
 
           {phase === "chat" ? (

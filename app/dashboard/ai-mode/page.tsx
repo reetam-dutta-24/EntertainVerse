@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AiModeExperience } from "@/components/ai-mode/ai-mode-experience";
 import { isAiConfigured } from "@/lib/ai/provider";
 import { getCurrentUser } from "@/lib/data/user";
+import { getQuizCatalog } from "@/lib/services/ai-mode.service";
 import { getAiProfile } from "@/lib/services/ai-profile.service";
 
 export const metadata: Metadata = {
@@ -15,7 +16,7 @@ interface AiModePageProps {
 
 export default async function AiModePage({ searchParams }: AiModePageProps) {
   const [user, params] = await Promise.all([getCurrentUser(), searchParams]);
-  const profile = await getAiProfile(user.id);
+  const [profile, quizCatalog] = await Promise.all([getAiProfile(user.id), getQuizCatalog()]);
 
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
@@ -25,6 +26,7 @@ export default async function AiModePage({ searchParams }: AiModePageProps) {
         initialWatch={profile.watch}
         initialListen={profile.listen}
         chatEnabled={isAiConfigured()}
+        quizCatalog={quizCatalog}
       />
     </div>
   );

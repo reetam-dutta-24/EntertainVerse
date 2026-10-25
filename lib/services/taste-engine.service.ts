@@ -84,6 +84,8 @@ interface TasteVector {
   avoidGenres: Set<string>;
   avoidLongSeries: boolean;
   commitment: string;
+  /** Family viewing or "keep it light": push 18+ titles down. */
+  softenMature: boolean;
   types: Set<string>;
   genreWeights: Map<string, number>;
   languages: Set<string>;
@@ -219,9 +221,14 @@ function buildVector(signals: TasteSignals, catalog: ContentRow[]): TasteVector 
     for (const genre of VOCAB.vibes.get(vibe)?.genres ?? []) bump(genre, 0.65);
   }
   const avoidGenres = new Set((watchAnswers?.avoid ?? []).flatMap((id) => VOCAB.avoid.get(id)?.genres ?? []));
+  // "Keep it light" behaves like avoiding horror; chosen worlds nudge their genres.
+  if (watchAnswers?.intensity === "light") avoidGenres.add("horror");
+  for (const world of watchAnswers?.worlds ?? []) {
+    for (const genre of VOCAB.worlds.get(world)?.genres ?? []) bump(genre, 0.55);
+  }
   for (const genre of avoidGenres) genreWeights.delete(genre);
 
-  const anchors = new Set([...selection.favoriteTitles, ...signals.favoriteContent]);
+  const anchors = new Set([...selection.favoriteTitles, ...signals.favoriteContent, ...(signals.ai?.watch.lovedTitles ?? [])]);
   const anchorGenres = new Map<string, number>();
   for (const row of catalog) {
     if (!anchors.has(row.slug)) continue;
@@ -237,6 +244,7 @@ function buildVector(signals: TasteSignals, catalog: ContentRow[]): TasteVector 
     avoidGenres,
     avoidLongSeries: watchAnswers?.avoid.includes("long-series") ?? false,
     commitment: watchAnswers?.commitment ?? "",
+    softenMature: watchAnswers?.company === "family" || watchAnswers?.intensity === "light",
     types: new Set([...selection.contentTypes, ...(watchAnswers?.formats ?? [])]),
     genreWeights,
     languages: new Set([...selection.languages, ...(watchAnswers?.languages ?? []), ...(listenAnswers?.languages ?? [])]),
@@ -344,6 +352,7 @@ async function contentContext(signals: TasteSignals, content: ContentRow[]): Pro
   for (const slug of signals.selection.favoriteTitles) push(slug, "picked", 0.9);
   for (const [slug, weight] of signals.watched) push(slug, "watched", 0.3 + 0.55 * weight);
   for (const slug of signals.watchlist) push(slug, "saved", 0.35);
+  for (const slug of signals.ai?.watch.lovedTitles ?? []) push(slug, "picked", 0.9);
   const anchors = buildAnchors(index, inputs);
   const answers = signals.ai ? answersAnchor("content", signals.ai.watchVector, vibeReason(signals.ai.watch)) : null;
   if (answers) anchors.push(answers);
@@ -417,6 +426,7 @@ async function musicContext(
   for (const [slug, weight] of signals.listened) track(slug, "played", 0.3 + 0.55 * weight);
   for (const slug of signals.followedArtists) artist(slug, "follow", 0.8);
   for (const slug of signals.selection.artists) artist(slug, "picked", 0.7);
+  for (const slug of signals.ai?.listen.lovedArtists ?? []) artist(slug, "picked", 0.85);
   for (const slug of signals.favoriteContent) {
     const row = contentBySlug.get(slug);
     if (row) inputs.push({ kind: "content", itemId: row.id, slug, title: row.title, verb: "loved", weight: 0.3 });
@@ -527,6 +537,7 @@ function scoreContentRow(row: ContentRow, v: TasteVector): number {
   const isFilm = type === "movie" || type === "documentary";
   if (v.commitment === "bite-size" && !isFilm && (row.seasonCount ?? 1) > 2) fit *= 0.85;
   if (v.commitment === "epic" && isFilm) fit *= 0.9;
+  if (v.softenMature && row.ageRating === "18+") fit *= 0.6;
   return score * fit;
 }
 

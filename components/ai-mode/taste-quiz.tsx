@@ -3,13 +3,16 @@
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
-import { answerFor, quizFor, withAnswer, type QuizQuestion } from "@/lib/ai-profile/quiz";
+import { answerFor, quizFor, withAnswer, type QuizCatalog, type QuizQuestion } from "@/lib/ai-profile/quiz";
 import type { AiMode, ListenPrefs, WatchPrefs } from "@/lib/ai-profile/schema";
+import { HdImage } from "@/components/ui/hd-image";
 import { cn } from "@/lib/utils";
 
 export interface TasteQuizProps<P extends WatchPrefs | ListenPrefs> {
   mode: AiMode;
   initial: P;
+  /** Posters / artist photos for the "which did you love?" cards. */
+  catalog?: QuizCatalog;
   onDone: (prefs: P) => void;
   onCancel: () => void;
 }
@@ -25,6 +28,32 @@ function OptionTile({
   selected: boolean;
   onToggle: () => void;
 }) {
+  if (question.kind === "picks") {
+    return (
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-pressed={selected}
+        className={cn(
+          "group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border text-left transition-all duration-200",
+          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink",
+          selected ? "border-brand-magenta shadow-[0_0_24px_rgba(255,0,204,0.3)]" : "border-white/10 hover:border-white/30",
+        )}
+      >
+        <span className={cn("relative block w-full bg-white/10", question.source === "artists" ? "aspect-square" : "aspect-[2/3]")}>
+          {option.imageUrl ? (
+            <HdImage src={option.imageUrl} alt="" className={cn("size-full object-cover transition-opacity", selected ? "opacity-100" : "opacity-80 group-hover:opacity-100")} />
+          ) : null}
+          {selected ? (
+            <span className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-gradient-brand">
+              <Check className="size-3.5 text-white" aria-hidden />
+            </span>
+          ) : null}
+        </span>
+        <span className="line-clamp-2 px-2 py-1.5 text-caption font-semibold leading-4 text-white">{option.label}</span>
+      </button>
+    );
+  }
   return (
     <button
       type="button"
@@ -56,8 +85,8 @@ function OptionTile({
  * Animated taste quiz: one card per question, tap to answer. Single-choice
  * cards advance on their own; multi-choice cards respect a max.
  */
-export function TasteQuiz<P extends WatchPrefs | ListenPrefs>({ mode, initial, onDone, onCancel }: TasteQuizProps<P>) {
-  const questions = quizFor(mode);
+export function TasteQuiz<P extends WatchPrefs | ListenPrefs>({ mode, initial, catalog, onDone, onCancel }: TasteQuizProps<P>) {
+  const questions = quizFor(mode, catalog);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [prefs, setPrefs] = useState<P>(initial);
@@ -80,7 +109,7 @@ export function TasteQuiz<P extends WatchPrefs | ListenPrefs>({ mode, initial, o
   function toggle(id: string) {
     if (advancing.current) return;
     let values: string[];
-    if (question.kind === "multi") {
+    if (question.kind === "multi" || question.kind === "picks") {
       values = selected.includes(id) ? selected.filter((value) => value !== id) : [...selected, id];
       if (question.max && values.length > question.max) values = values.slice(values.length - question.max);
     } else {
@@ -89,7 +118,7 @@ export function TasteQuiz<P extends WatchPrefs | ListenPrefs>({ mode, initial, o
     const nextPrefs = withAnswer(prefs, question, values);
     setPrefs(nextPrefs);
     // Single picks move on by themselves — feels like flipping cards.
-    if (question.kind !== "multi" && values.length) {
+    if ((question.kind === "single" || question.kind === "hours") && values.length) {
       advancing.current = true;
       window.setTimeout(() => (isLast ? onDone(nextPrefs) : go(1)), 260);
     }
@@ -122,13 +151,17 @@ export function TasteQuiz<P extends WatchPrefs | ListenPrefs>({ mode, initial, o
               <h2 className="text-lg font-bold text-white sm:text-xl">{question.title}</h2>
               <p className="mt-1 text-sm text-white/60">
                 {question.subtitle}
-                {question.kind === "multi" && question.max ? ` · ${selected.length}/${question.max}` : ""}
+                {(question.kind === "multi" || question.kind === "picks") && question.max ? ` · ${selected.length}/${question.max}` : ""}
               </p>
             </div>
             <div
               className={cn(
                 "grid gap-2.5",
-                question.showPhrase ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
+                question.kind === "picks"
+                  ? "grid-cols-3 sm:grid-cols-4 lg:grid-cols-6"
+                  : question.showPhrase
+                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                    : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
               )}
             >
               {question.options.map((option) => (

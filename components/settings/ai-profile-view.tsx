@@ -158,6 +158,9 @@ export function AiProfileView({ initialProfile, insights }: AiProfileViewProps) 
   const watchChips: { title: string; chips: Chip[] }[] = [
     { title: "Vibes", chips: listChips("vibes", VOCAB.vibes) },
     { title: "Themes", chips: listChips("themes", VOCAB.themes) },
+    { title: "Worlds", chips: listChips("worlds", VOCAB.worlds) },
+    { title: "Main characters", chips: listChips("protagonists", VOCAB.protagonists) },
+    { title: "When you watch", chips: listChips("occasions", VOCAB.occasions) },
     { title: "Avoid", chips: listChips("avoid", VOCAB.avoid) },
     { title: "Formats", chips: listChips("formats", VOCAB.formats) },
     {
@@ -187,7 +190,27 @@ export function AiProfileView({ initialProfile, insights }: AiProfileViewProps) 
           label: vocabLabel(VOCAB.archetypes, watch.archetype),
           remove: () => saveWatch({ ...watch, archetype: "" }),
         },
+        watch.ending && { key: "ending", label: vocabLabel(VOCAB.ending, watch.ending), remove: () => saveWatch({ ...watch, ending: "" }) },
+        watch.intensity && {
+          key: "intensity",
+          label: vocabLabel(VOCAB.intensity, watch.intensity),
+          remove: () => saveWatch({ ...watch, intensity: "" }),
+        },
+        watch.company && { key: "company", label: vocabLabel(VOCAB.company, watch.company), remove: () => saveWatch({ ...watch, company: "" }) },
+        watch.subsDubs && {
+          key: "subsDubs",
+          label: vocabLabel(VOCAB.subsDubs, watch.subsDubs),
+          remove: () => saveWatch({ ...watch, subsDubs: "" }),
+        },
         ]),
+    },
+    {
+      title: "Titles you loved",
+      chips: watch.lovedTitles.map((slug) => ({
+        key: `loved-${slug}`,
+        label: `❤️ ${slug.replace(/-/g, " ")}`,
+        remove: () => saveWatch({ ...watch, lovedTitles: without(watch.lovedTitles, slug) }),
+      })),
     },
     {
       title: "Things you mentioned",
@@ -233,7 +256,24 @@ export function AiProfileView({ initialProfile, insights }: AiProfileViewProps) 
           label: vocabLabel(VOCAB.discovery, listen.discovery),
           remove: () => saveListen({ ...listen, discovery: "" }),
         },
+        listen.vocals && { key: "vocals", label: vocabLabel(VOCAB.vocals, listen.vocals), remove: () => saveListen({ ...listen, vocals: "" }) },
         ]),
+    },
+    {
+      title: "Eras",
+      chips: listen.eras.map((id) => ({
+        key: `era-${id}`,
+        label: vocabLabel(VOCAB.era, id),
+        remove: () => saveListen({ ...listen, eras: without(listen.eras, id) }),
+      })),
+    },
+    {
+      title: "Artists you love",
+      chips: listen.lovedArtists.map((slug) => ({
+        key: `artist-${slug}`,
+        label: `❤️ ${slug.replace(/-/g, " ")}`,
+        remove: () => saveListen({ ...listen, lovedArtists: without(listen.lovedArtists, slug) }),
+      })),
     },
     {
       title: "Things you mentioned",
