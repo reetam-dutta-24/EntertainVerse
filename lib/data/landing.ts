@@ -18,36 +18,52 @@ export interface LandingFeature {
 
 const features: LandingFeature[] = [
   {
-    title: "✨ AI Match",
-    body: "Get content, songs, artists, and communities matched to your taste.",
+    title: "🎯 Picks with reasons",
+    body: "Recommendations that blend your taste, what titles are about, and fans like you — each one says why.",
   },
   {
-    title: "🎧 Music Hub",
-    body: "Find OSTs, K-pop, J-pop, artists, albums, and playlists.",
+    title: "✨ AI Mode",
+    body: "Take a quick taste quiz or just chat about your mood, and get explained picks instantly.",
   },
   {
-    title: "🎬 Discover",
-    body: "Explore anime, movies, shows, K-dramas, and trending titles.",
+    title: "🗺️ AI Roadmaps",
+    body: "An ordered watch or listen plan that fits your weekly hours and ticks itself off as you go.",
   },
   {
-    title: "📁 Collections",
-    body: "Organize your favorites into smart personal collections.",
+    title: "🤝 AI Match",
+    body: "Open a room and people whose taste matches yours get an invite — nearby or worldwide.",
+  },
+  {
+    title: "🍿 Watch Together",
+    body: "Synced watch and listen parties, voice talk rooms, and group picks that suit everyone.",
+  },
+  {
+    title: "🧠 Catch Me Up",
+    body: "Tell it where you stopped and get a spoiler-safe recap of only what you've seen.",
+  },
+  {
+    title: "🧬 Taste DNA & Wrapped",
+    body: "See how your taste shifts month by month, then share your Wrapped and AI persona.",
+  },
+  {
+    title: "📁 Smart Collections",
+    body: "Build public or private collections, and get weekly collection ideas from what you love.",
   },
   {
     title: "💬 Communities",
-    body: "Join fandoms, chats, watch rooms, and discussions.",
+    body: "Fandoms with posts, reviews, and live chat — plus DMs with friends and matches.",
   },
   {
-    title: "📊 Analytics",
-    body: "Track your watching, listening, genres, and taste patterns.",
+    title: "🎧 Music Hub",
+    body: "OSTs, K-pop, J-pop, and artists, with official previews, lyrics, and listen links.",
   },
   {
-    title: "🎯 Watchlist",
-    body: "Save anime, shows, movies, and songs you want to explore later.",
+    title: "🤖 Assistant",
+    body: "Ask anything about the app, your stats, or the catalog — answers cite their sources.",
   },
   {
-    title: "👤 Taste Profile",
-    body: "Build a personalized profile from your watching, listening, and community activity.",
+    title: "⏳ Your Time, Your Data",
+    body: "Set a daily limit that locks at midnight, and see, edit, or wipe what the AI knows.",
   },
 ];
 
@@ -98,11 +114,11 @@ const featuredCommunityMembers: UserSummary[] = [
 ];
 
 const featuredCollection: Collection = {
-  id: "music-playlist",
-  name: "Music Playlist",
+  id: "late-night-osts",
+  name: "Late-Night OSTs",
   itemCount: 42,
   favoriteCount: 16,
-  description: "The greatest anime I've ever watched.",
+  description: "Soundtracks for the 2 a.m. rewatch.",
   visibility: "public",
   createdAt: "10 Jan, 2026",
   updatedAt: "2 hrs ago",
@@ -166,7 +182,7 @@ const featuredReviews: Review[] = [
     author: { id: "u-aki", name: "Akira Tan", avatarColor: "#00e5ff" },
     rating: 10,
     content:
-      "EntertainVerse's AI match is scary good. It recommended Vinland Saga after my Berserk binge and now it's my favorite anime of all time.",
+      "\"Because you loved Berserk\" — that one line got me to start Vinland Saga. Now it's my favorite anime of all time. The reasons make the picks.",
     likeCount: 3120,
     createdAt: "4 Jul, 2026",
     accent: "cyan",
@@ -176,7 +192,7 @@ const featuredReviews: Review[] = [
     author: { id: "u-mina", name: "Mina Park", avatarColor: "#ff00cc" },
     rating: 9,
     content:
-      "Finally one app for my K-pop playlists AND my K-drama watchlist. The TWICE Fanverse community feels like home — chat is always alive.",
+      "Told AI mode I had six hours a week and wanted something cozy. It built me a roadmap, and the steps tick off by themselves as I watch.",
     likeCount: 2480,
     createdAt: "28 Jun, 2026",
     accent: "pink",
@@ -186,7 +202,7 @@ const featuredReviews: Review[] = [
     author: { id: "u-leo", name: "Leo Fernandez", avatarColor: "#ffd000" },
     rating: 9,
     content:
-      "The watch rooms are a game changer. Synced Money Heist rewatch with 40 strangers who are now friends. Collections keep everything organized.",
+      "Synced Money Heist watch party with my community, voice room on the side. Group picks settled the 'what next' fight in ten seconds.",
     likeCount: 1870,
     createdAt: "21 Jun, 2026",
     accent: "yellow",
@@ -196,7 +212,7 @@ const featuredReviews: Review[] = [
     author: { id: "u-yuki", name: "Yuki Sato", avatarColor: "#9d4bff" },
     rating: 10,
     content:
-      "My taste profile analytics blew my mind — 214 hours of OSTs tracked, genre patterns I never noticed. EntertainVerse knows me better than I do.",
+      "My Wrapped called me 'The Midnight Melancholic' and my Taste DNA showed a whole thriller era I'd forgotten. EntertainVerse knows me better than I do.",
     likeCount: 2940,
     createdAt: "15 Jun, 2026",
     accent: "purple",
@@ -206,7 +222,7 @@ const featuredReviews: Review[] = [
     author: { id: "u-sara", name: "Sara Ahmed", avatarColor: "#22e584" },
     rating: 9,
     content:
-      "Went from lurking to running a 5K-member fandom in two months. The community dashboard with posts, announcements, and stats is pure product depth.",
+      "Came back to Attack on Titan after a year. 'Catch me up' recapped exactly up to my episode — zero spoilers — and I was back in the same night.",
     likeCount: 1640,
     createdAt: "9 Jun, 2026",
     accent: "green",
@@ -216,7 +232,7 @@ const featuredReviews: Review[] = [
     author: { id: "u-dev", name: "Dev Malhotra", avatarColor: "#4b7bff" },
     rating: 10,
     content:
-      "Global search across anime, songs, artists, and communities in one bar — instant results. This is what every entertainment app should feel like.",
+      "Opened an AI Match room on a Friday night and three people with my exact taste joined in a minute. We've had a weekly listen party since.",
     likeCount: 2210,
     createdAt: "2 Jun, 2026",
     accent: "blue",
@@ -224,12 +240,12 @@ const featuredReviews: Review[] = [
 ];
 
 const tasteStats: StatMetric[] = [
-  { id: "watched", label: "🎬 Content Watched", value: "186" },
-  { id: "listened", label: "🎵 Music Listened", value: "214 h" },
-  { id: "communities", label: "👥 Communities Joined", value: "24" },
-  { id: "collections", label: "📒 Collections Created", value: "18" },
-  { id: "reviews", label: "✍️ Reviews Written", value: "57" },
-  { id: "artists", label: "🎤 Artists Followed", value: "36" },
+  { id: "watched", label: "🎬 Hours Watched", value: "186 h" },
+  { id: "listened", label: "🎵 Hours Listened", value: "214 h" },
+  { id: "fit", label: "🎯 Taste Fit", value: "92%" },
+  { id: "eras", label: "🧬 Taste Eras", value: "4" },
+  { id: "roadmap", label: "🗺️ Roadmap Steps Done", value: "23" },
+  { id: "communities", label: "👥 Communities Joined", value: "12" },
 ];
 
 /** Static landing-page exports — never fetch from DB or authenticated APIs. */

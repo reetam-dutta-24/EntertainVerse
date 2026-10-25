@@ -19,7 +19,7 @@ export function StatsSection() {
       <ScrollFadeIn>
         <SectionHeader
           title="Understand your entertainment taste"
-          subtitle="A sample taste profile — yours fills in as you watch, listen and save"
+          subtitle="A sample taste profile — yours fills in as you watch and listen, and becomes your Taste DNA and Wrapped"
         />
       </ScrollFadeIn>
       <ScrollFadeStagger className="grid w-full max-w-[1200px] grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">

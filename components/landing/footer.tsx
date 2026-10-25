@@ -10,19 +10,19 @@ const columns = [
     links: [
       { label: "Discover", href: "/dashboard/discover" },
       { label: "For You", href: "/dashboard/for-you" },
+      { label: "AI Mode", href: "/dashboard/ai-mode" },
       { label: "Collections", href: "/dashboard/collections" },
-      { label: "Watchlist", href: "/dashboard/watchlist" },
-      { label: "Analytics", href: "/dashboard/analytics" },
+      { label: "Wrapped", href: "/dashboard/wrapped" },
     ],
   },
   {
     heading: "Community",
     links: [
       { label: "Fan Communities", href: "/dashboard/community" },
-      { label: "Posts", href: "/dashboard/community" },
-      { label: "Watch rooms (soon)", href: "/dashboard/community" },
-      { label: "Voice rooms (soon)", href: "/dashboard/community" },
-      { label: "Reviews", href: "/#reviews" },
+      { label: "AI Match", href: "/dashboard/ai-mode/match" },
+      { label: "Watch parties", href: "/dashboard/community" },
+      { label: "Voice talk rooms", href: "/dashboard/community" },
+      { label: "Messages", href: "/dashboard/messages" },
     ],
   },
   {
@@ -58,8 +58,8 @@ export function Footer() {
             EntertainVerse
           </p>
           <p className="text-center text-sm text-muted">
-            AI-powered discovery for anime, shows, music, collections, and fan
-            communities.
+            Know what to watch and listen to next — and why. Anime, shows,
+            K-dramas, films, music, and the fans who love them.
           </p>
         </div>
         </ScrollFadeIn>

@@ -16,7 +16,7 @@ export function CtaSection() {
           Create your <span className="text-brand-pink">EntertainVerse</span>
         </h2>
         <p className="text-subtitle text-muted">
-          Your next favorite anime, song, artist, or community is waiting
+          Tell it your taste once — get picks, plans, and people who get it
         </p>
       </div>
       </ScrollFadeIn>

@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "EntertainVerse",
   description:
-    "AI-powered discovery for anime, shows, music, collections, and fan communities.",
+    "Know what to watch and listen to next — and why. AI picks with reasons, time-budgeted roadmaps, watch parties and fan communities for anime, shows, K-dramas, films and music.",
 };
 
 export default function RootLayout({

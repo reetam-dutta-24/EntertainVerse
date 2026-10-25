@@ -73,12 +73,12 @@ export function HighlightsSection() {
         </ScrollFadeIn>
         <ScrollFadeIn direction="right" delay={0.1}>
           <HighlightText
-            title="Discover content that fits your taste"
-            subtitle="Find anime, shows, songs, and artists matched to your preferences, moods, and genres."
+            title="Picks that explain themselves"
+            subtitle="Every recommendation blends what you've told us, what titles are actually about, and what fans like you love — and says why."
             bullets={[
-              "AI-powered recommendations",
-              "Personalized match scores",
-              "Content across anime, music, and shows",
+              "“Because you loved…” reasons on every card",
+              "Official trailers, previews, and where to watch",
+              "AI mode turns a mood into picks in seconds",
             ]}
             cta="Explore Discover"
             href="/login?callbackUrl=/dashboard/discover"
@@ -90,15 +90,15 @@ export function HighlightsSection() {
       <div className="flex w-full max-w-[1200px] flex-col-reverse items-center justify-center gap-8 lg:flex-row lg:gap-[120px]">
         <ScrollFadeIn direction="left" delay={0.1}>
           <HighlightText
-            title="Join communities built around what you love"
-            subtitle="Discover fan spaces where you can chat, post, review, and connect with people who share your taste."
+            title="Watch together, talk live"
+            subtitle="Fan communities with posts, reviews, and live chat — and rooms to watch, listen, and talk in real time."
             bullets={[
-              "Active fan communities",
-              "Watch rooms and discussions",
-              "Public and niche fandom spaces",
+              "Synced watch parties and listen parties",
+              "Voice talk rooms in every community",
+              "AI Match rooms bring in people who share your taste",
             ]}
             cta="View communities"
-            href="/login?callbackUrl=/community"
+            href="/login?callbackUrl=/dashboard/community"
           />
         </ScrollFadeIn>
         <ScrollFadeIn direction="right">
@@ -121,15 +121,15 @@ export function HighlightsSection() {
         </ScrollFadeIn>
         <ScrollFadeIn direction="right" delay={0.1}>
           <HighlightText
-            title="Save everything in smart collections"
-            subtitle="Organize your favorite anime, songs, playlists, and titles into collections that reflect your entertainment identity."
+            title="Collections that grow with you"
+            subtitle="Gather titles and songs into public or private collections, and get fresh collection ideas each week from what you love."
             bullets={[
-              "Build personal collections",
-              "Save favorites in one place",
-              "Revisit your best picks anytime",
+              "Weekly AI collection ideas — save or dismiss",
+              "Play mode with an ambient, themed player",
+              "Follow and favourite other fans' collections",
             ]}
             cta="See collections"
-            href="/login?callbackUrl=/collection"
+            href="/login?callbackUrl=/dashboard/collections"
           />
         </ScrollFadeIn>
       </div>

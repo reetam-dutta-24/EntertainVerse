@@ -8,23 +8,23 @@ import {
 const steps = [
   {
     number: "01",
-    title: "Pick your favorites",
-    body: "Choose genres, content types, artists, and communities",
+    title: "Share your taste",
+    body: "Pick favorites when you sign up, or take the AI quiz — you can always see and edit what it learned.",
   },
   {
     number: "02",
-    title: "Get matched",
-    body: "EntertainVerse creates your AI-powered taste profile.",
+    title: "Get picks with reasons",
+    body: "Recommendations across titles, songs, artists, and communities — each one says why.",
   },
   {
     number: "03",
-    title: "Build your universe",
-    body: "Save content, create collections, and organize your favorites.",
+    title: "Plan your week",
+    body: "Turn a mood into an AI roadmap that fits your hours and tracks itself as you watch.",
   },
   {
     number: "04",
-    title: "Join the experience",
-    body: "Enter communities, share reviews, join watch rooms, and connect with fans.",
+    title: "Enjoy it together",
+    body: "Join watch parties and fandoms, find taste matches, and share your Wrapped.",
   },
 ];
 

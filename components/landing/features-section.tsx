@@ -6,7 +6,7 @@ import {
   ScrollFadeStagger,
 } from "@/components/landing/scroll-fade-in";
 
-/** "Everything you love, connected." — 4×2 grid of gradient feature cards. */
+/** "Everything you love, connected." — 4×3 grid of gradient feature cards. */
 export function FeaturesSection() {
   const features = LANDING_FEATURES;
 
@@ -18,7 +18,7 @@ export function FeaturesSection() {
       <ScrollFadeIn>
         <SectionHeader
           title="Everything you love, connected."
-          subtitle="Discover, save, track, and share your entertainment universe."
+          subtitle="Discover with reasons, plan with AI, and enjoy it together."
         />
       </ScrollFadeIn>
       <ScrollFadeStagger className="grid max-w-[1200px] grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">

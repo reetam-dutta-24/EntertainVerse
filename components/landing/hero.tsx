@@ -73,12 +73,13 @@ export function Hero() {
       <div className="relative z-10 flex h-full min-h-[60dvh] items-center justify-center px-4 sm:min-h-[720px] sm:px-6 lg:min-h-[935px]">
         <EntranceFade className="flex w-full max-w-[800px] -translate-y-4 flex-col items-center gap-6 py-8 text-center sm:-translate-y-8 sm:gap-[30px] lg:-translate-y-14">
           <h1 className="text-3xl font-bold leading-tight text-white sm:text-5xl sm:leading-[0.93] lg:text-display">
-            Discover what matches{" "}
-            <span className="text-brand-fuchsia">your taste</span>
+            Know what to watch next{" "}
+            <span className="whitespace-nowrap text-brand-fuchsia">— and why</span>
           </h1>
           <p className="max-w-[600px] text-base font-semibold text-muted sm:text-lg">
-            Anime, shows, music, collections, and communities — all in one
-            place.
+            Anime, shows, K-dramas, films, and music matched to your taste,
+            with a reason for every pick, a plan that fits your week, and
+            people to enjoy it with.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-14">
             <Link
@@ -97,7 +98,7 @@ export function Hero() {
                 "w-[140px] border-brand-fuchsia",
               )}
             >
-              Explore Demo
+              See Features
             </Link>
           </div>
         </EntranceFade>
