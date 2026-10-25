@@ -1,5 +1,4 @@
 import type { Prisma } from "@prisma/client";
-import { rankCommunitiesForUser } from "@/lib/recommender/social";
 import { prisma } from "@/lib/prisma";
 import {
   mapCommunityPost,
@@ -37,6 +36,12 @@ import {
   normalizeJoinCode,
   verifyJoinCode,
 } from "@/lib/community-join-code";
+
+/**
+ * The recommender is server-only (it needs the Next server runtime). Load it lazily so
+ * this service can still be imported by the plain-Node Socket.IO server (server.ts).
+ */
+const loadSocialRecommender = () => import("@/lib/recommender/social");
 
 const communityInclude = {
   members: {
@@ -170,7 +175,9 @@ export async function listRecommendedCommunities(
     take: 60,
   });
   // Ranked by the recommender: taste fit + members who love what the viewer loves.
-  const picks = await rankCommunitiesForUser(userId, rows).catch((error) => {
+  const picks = await loadSocialRecommender()
+    .then(({ rankCommunitiesForUser }) => rankCommunitiesForUser(userId, rows))
+    .catch((error) => {
     // Ranking is a bonus — fall back to popularity order rather than failing the page.
     console.error("[recommender] communities", error);
     return new Map();

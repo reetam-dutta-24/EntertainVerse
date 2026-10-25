@@ -1,6 +1,5 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { rankCollectionsForUser } from "@/lib/recommender/social";
 import {
   mapCollectionItemToContent,
   mapCollectionToCard,
@@ -16,6 +15,12 @@ import type {
   CollectionItemFormInput,
   CollectionUpdateInput,
 } from "@/lib/validators/collection";
+
+/**
+ * The recommender is server-only (it needs the Next server runtime). Load it lazily so
+ * this service can still be imported by the plain-Node Socket.IO server (server.ts).
+ */
+const loadSocialRecommender = () => import("@/lib/recommender/social");
 
 const collectionInclude = {
   user: {
@@ -111,7 +116,9 @@ export async function listDiscoverablePublicCollections(
     take: 60,
     include: collectionCardInclude,
   });
-  const picks = await rankCollectionsForUser(userId, rows).catch((error) => {
+  const picks = await loadSocialRecommender()
+    .then(({ rankCollectionsForUser }) => rankCollectionsForUser(userId, rows))
+    .catch((error) => {
     // Ranking is a bonus — fall back to popularity order rather than failing the page.
     console.error("[recommender] collections", error);
     return new Map();
