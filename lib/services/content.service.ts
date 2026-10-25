@@ -386,11 +386,7 @@ export async function recordContentPageView(contentSlug: string) {
   return updated.viewCount;
 }
 
-export function formatEngagementCount(value: number): string {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
-  return String(value);
-}
+export { formatEngagementCount } from "@/lib/format-engagement";
 
 export class ContentConflictError extends Error {
   constructor() {

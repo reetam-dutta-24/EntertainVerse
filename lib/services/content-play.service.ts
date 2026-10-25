@@ -4,13 +4,6 @@ import { prismaMediaTypeToApp } from "@/lib/mappers/content.mapper";
 import { getContentRecordBySlug } from "@/lib/services/content.service";
 import type { ContentPlaySession, Episode } from "@/types";
 
-function resolveEpisodeVideoUrl(
-  episode: Episode,
-  fallbackVideoUrl?: string | null,
-): string | undefined {
-  return episode.videoUrl ?? fallbackVideoUrl ?? undefined;
-}
-
 function pickDefaultEpisode(
   episodes: Episode[],
   isMovie: boolean,
@@ -86,13 +79,3 @@ export async function getContentPlaySession(
   };
 }
 
-export function resolvePlayableVideoUrl(
-  session: ContentPlaySession,
-  episodeId: string,
-): string | undefined {
-  const episode =
-    session.episodes.find((entry) => entry.id === episodeId) ??
-    session.episodes[0];
-  if (!episode) return session.fallbackVideoUrl;
-  return resolveEpisodeVideoUrl(episode, session.fallbackVideoUrl);
-}

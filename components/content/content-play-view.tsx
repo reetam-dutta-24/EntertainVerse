@@ -23,7 +23,7 @@ import { formatEpisodeDisplayTitle } from "@/lib/format-episode-title";
 import { formatRating } from "@/lib/format-rating";
 import { Chip } from "@/components/ui/chip";
 import { getContentDetailPath, getContentWatchPath } from "@/lib/content-routes";
-import { resolvePlayableVideoUrl } from "@/lib/services/content-play.service";
+import { resolvePlayableVideoUrl } from "@/lib/content-play-utils";
 import { getPlayAccentTheme, getPlayFairyInnerGlow } from "@/lib/play-ambient";
 import { isMovieContentType } from "@/lib/content-media";
 import { HdImage } from "@/components/ui/hd-image";

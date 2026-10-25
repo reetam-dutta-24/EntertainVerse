@@ -9,7 +9,7 @@ import { mapContentToItem } from "@/lib/mappers/content.mapper";
 import { mapTrackToContentItem } from "@/lib/mappers/music.mapper";
 import { formatCardDate, formatRelativeTime } from "@/lib/format-dates";
 import { roundRating } from "@/lib/format-rating";
-import { formatEngagementCount } from "@/lib/services/content.service";
+import { formatEngagementCount } from "@/lib/format-engagement";
 import type {
   AccentColor,
   Collection as AppCollection,

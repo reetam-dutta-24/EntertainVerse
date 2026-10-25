@@ -24,7 +24,7 @@ import {
   type NotificationPreferences,
   type PrivacyPreferences,
   type SettingsData,
-} from "@/lib/data/settings";
+} from "@/lib/settings-options";
 import { ONBOARDING_RETAKE_PATH } from "@/lib/onboarding-routes";
 import { cn } from "@/lib/utils";
 import { useConfirm, useToast } from "@/components/feedback/feedback-provider";

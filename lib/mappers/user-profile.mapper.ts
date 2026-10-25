@@ -11,7 +11,7 @@ import { mapCommunityToCard } from "@/lib/mappers/community.mapper";
 import { mapContentToItem } from "@/lib/mappers/content.mapper";
 import { mapUserSummary } from "@/lib/mappers/community.mapper";
 import { mapTrackToMusicTrack } from "@/lib/mappers/music.mapper";
-import { formatEngagementCount } from "@/lib/services/content.service";
+import { formatEngagementCount } from "@/lib/format-engagement";
 import { PROFILE_SECTION_IDS } from "@/lib/profile-section-ids";
 import type { AnalyticsData } from "@/lib/data/analytics";
 import type {

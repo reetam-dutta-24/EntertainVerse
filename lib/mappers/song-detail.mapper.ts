@@ -11,7 +11,7 @@ import type {
 import { buildSongReferenceUrl } from "@/lib/content-reference-url";
 import { roundRating } from "@/lib/format-rating";
 import { parseListenLinks } from "@/lib/listen-links";
-import { formatEngagementCount } from "@/lib/services/content.service";
+import { formatEngagementCount } from "@/lib/format-engagement";
 import { mapArtistToContentItem } from "@/lib/mappers/artist.mapper";
 import { mapContentToItem } from "@/lib/mappers/content.mapper";
 import { mapTrackToMusicTrack } from "./music.mapper";

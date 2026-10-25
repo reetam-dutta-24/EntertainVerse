@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useOnValueChange } from "@/hooks/use-prop-sync";
-import { formatEngagementCount } from "@/lib/services/content.service";
+import { formatEngagementCount } from "@/lib/format-engagement";
 import type { ContentEngagementStat } from "@/types";
 import { useToast } from "@/components/feedback/feedback-provider";
 

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useOnValueChange } from "@/hooks/use-prop-sync";
 import { PlayCircle } from "lucide-react";
 import { getArtistPlayPath } from "@/lib/artist-routes";
-import { formatEngagementCount } from "@/lib/services/content.service";
+import { formatEngagementCount } from "@/lib/format-engagement";
 import { cn } from "@/lib/utils";
 import {
   detailHeroBtnBase,
