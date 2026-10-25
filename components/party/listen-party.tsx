@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Headphones, ListMusic, Pause, Play, SkipBack, SkipForward, X } from "lucide-react";
+import { GroupPicksPanel } from "@/components/party/group-picks";
 import { MediaPicker, MemberStrip, PartyChat, ReactionBar, ReactionLayer, formatClock } from "@/components/party/party-shared";
 import { usePlaybackMinutes } from "@/hooks/use-playback-minutes";
 import { useParty } from "@/hooks/use-party";
@@ -96,6 +97,17 @@ export function ListenParty({ communitySlug, viewerUserId }: { communitySlug: st
                 if (isHost) control({ action: "next" });
               }}
               className="hidden"
+            />
+          ) : null}
+          {state ? (
+            <GroupPicksPanel
+              communitySlug={communitySlug}
+              mode="listen"
+              memberIds={state.members.map((member) => member.userId)}
+              isHost={isHost}
+              onPlay={(slug) => control({ action: "load", item: { kind: "track", slug } })}
+              onQueue={(slug) => control({ action: "enqueue", item: { kind: "track", slug } })}
+              onSuggest={sendChat}
             />
           ) : null}
           <MediaPicker type="song" placeholder="Add a song to the queue…" onPick={(slug) => control({ action: "enqueue", item: { kind: "track", slug } })} />

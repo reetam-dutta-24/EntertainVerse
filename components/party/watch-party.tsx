@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Clapperboard, ExternalLink, Pause, Play, RotateCcw, RotateCw, Tv, X } from "lucide-react";
+import { GroupPicksPanel } from "@/components/party/group-picks";
 import { MediaPicker, MemberStrip, PartyChat, ReactionBar, ReactionLayer, formatClock } from "@/components/party/party-shared";
 import { usePlaybackMinutes } from "@/hooks/use-playback-minutes";
 import { useParty } from "@/hooks/use-party";
@@ -268,6 +269,16 @@ export function WatchParty({ channelId, channelTitle, viewerUserId, onClose }: W
             </div>
           ) : null}
 
+          {state ? (
+            <GroupPicksPanel
+              communitySlug={state.communitySlug}
+              mode="watch"
+              memberIds={state.members.map((member) => member.userId)}
+              isHost={isHost}
+              onPlay={(slug) => control({ action: "load", item: { kind: "content", slug } })}
+              onSuggest={sendChat}
+            />
+          ) : null}
           {isHost ? <MediaPicker type="content" placeholder={media ? "Switch to another title…" : "Search a title to watch together…"} onPick={(slug) => control({ action: "load", item: { kind: "content", slug } })} /> : null}
           {error ? <p className="text-sm text-amber-100">{error}</p> : null}
         </div>
