@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { useColumnCount } from "@/hooks/use-column-count";
+import { fitColumns, useColumnCount } from "@/hooks/use-column-count";
 import { CAROUSEL_COLS_BREAKPOINTS } from "@/lib/grid-section-config";
 
 function resizeTo(width: number) {
@@ -24,6 +24,14 @@ describe("useColumnCount", () => {
     window.innerWidth = width;
     const { result } = renderHook(() => useColumnCount(CAROUSEL_COLS_BREAKPOINTS));
     expect(result.current.cols).toBe(cols);
+  });
+
+  it("fits as many fixed-width cards as the container holds", () => {
+    const fit = { slotWidth: 148, gap: 12, min: 2, max: 10 };
+    expect(fitColumns(1204, fit)).toBe(7); // 1440px window, sidebar open
+    expect(fitColumns(804, fit)).toBe(5); // same window with the assistant docked
+    expect(fitColumns(272, fit)).toBe(2); // 320px phone keeps the 2-column minimum
+    expect(fitColumns(4000, fit)).toBe(10);
   });
 
   it("follows viewport resizes and multiplies by rows", () => {

@@ -13,7 +13,8 @@ import { SearchPill } from "@/components/dashboard/search-pill";
 import { useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
 import { useColumnCount } from "@/hooks/use-column-count";
 import { resolveCardTint, sectionTintSeed } from "@/lib/card-theme";
-import { CAROUSEL_COLS_BREAKPOINTS } from "@/lib/grid-section-config";
+import { pageItems } from "@/lib/carousel-pages";
+import { CAROUSEL_COLS_BREAKPOINTS, CAROUSEL_FIT } from "@/lib/grid-section-config";
 import type { ProfileRecentActivityItem } from "@/types";
 
 export interface ProfileActivityCarouselSectionProps {
@@ -41,14 +42,6 @@ function matchesQuery(entry: ProfileRecentActivityItem, q: string): boolean {
   );
 }
 
-function chunk<T>(arr: T[], size: number): T[][] {
-  const pages: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) {
-    pages.push(arr.slice(i, i + size));
-  }
-  return pages.length ? pages : [[]];
-}
-
 /** Recent watch/listen queue — standard app cards with auto-advancing pages. */
 export function ProfileActivityCarouselSection({
   userName,
@@ -60,7 +53,8 @@ export function ProfileActivityCarouselSection({
   const [page, setPage] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const { cols, itemsPerPage } = useColumnCount(CAROUSEL_COLS_BREAKPOINTS, 1);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const { cols, itemsPerPage } = useColumnCount(CAROUSEL_COLS_BREAKPOINTS, 1, { ref: rowRef, ...CAROUSEL_FIT });
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -69,7 +63,7 @@ export function ProfileActivityCarouselSection({
   }, [items, query]);
 
   const pages = useMemo(
-    () => chunk(filtered, itemsPerPage),
+    () => pageItems(filtered, itemsPerPage),
     [filtered, itemsPerPage],
   );
 
@@ -164,7 +158,8 @@ export function ProfileActivityCarouselSection({
           active={hoveredId != null}
           tintGlass={hoveredTintGlass}
         >
-          <div className="overflow-hidden">
+          {/* Clip the other pages sideways only — hovered cards grow taller than the row. */}
+          <div ref={rowRef} className="-my-7 overflow-hidden py-7">
             <div
               className="flex w-full transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${safePage * 100}%)` }}
@@ -172,8 +167,9 @@ export function ProfileActivityCarouselSection({
               {pages.map((pageItems, pageIndex) => (
                 <div
                   key={pageIndex}
-                  className="grid w-full min-w-full shrink-0 gap-3 overflow-hidden sm:gap-6"
+                  className="grid w-full min-w-full shrink-0 overflow-hidden"
                   style={{
+                    columnGap: CAROUSEL_FIT.gap,
                     gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
                   }}
                 >

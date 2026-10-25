@@ -12,7 +12,8 @@ import { SearchPill } from "@/components/dashboard/search-pill";
 import { CAROUSEL_AUTOPLAY_MS, useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
 import { useColumnCount } from "@/hooks/use-column-count";
 import { resolveCardTint, sectionTintSeed } from "@/lib/card-theme";
-import { CAROUSEL_COLS_BREAKPOINTS } from "@/lib/grid-section-config";
+import { pageItems } from "@/lib/carousel-pages";
+import { CAROUSEL_COLS_BREAKPOINTS, CAROUSEL_FIT } from "@/lib/grid-section-config";
 import type { MusicTrack } from "@/types";
 import { EmptyState, type EmptyStateLink } from "@/components/ui/empty-state";
 
@@ -41,14 +42,6 @@ function filterTracks(tracks: MusicTrack[], query: string) {
   );
 }
 
-function chunk<T>(arr: T[], size: number): T[][] {
-  const pages: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) {
-    pages.push(arr.slice(i, i + size));
-  }
-  return pages.length ? pages : [[]];
-}
-
 /** Paginated music row — responsive columns, strict clip, no bleed. */
 export function MusicCarouselSection({
   title,
@@ -63,11 +56,12 @@ export function MusicCarouselSection({
   const [page, setPage] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const { cols, itemsPerPage } = useColumnCount(CAROUSEL_COLS_BREAKPOINTS, 1);
+  const rowRef = useRef<HTMLDivElement>(null);
+  const { cols, itemsPerPage } = useColumnCount(CAROUSEL_COLS_BREAKPOINTS, 1, { ref: rowRef, ...CAROUSEL_FIT });
 
   const filtered = useMemo(() => filterTracks(tracks, query), [tracks, query]);
   const pages = useMemo(
-    () => chunk(filtered, itemsPerPage),
+    () => pageItems(filtered, itemsPerPage),
     [filtered, itemsPerPage],
   );
   const tintSeed = sectionTintSeed(title);
@@ -153,7 +147,8 @@ export function MusicCarouselSection({
           active={hoveredId != null}
           tintGlass={hoveredTintGlass}
         >
-          <div className="overflow-hidden">
+          {/* Clip the other pages sideways only — hovered cards grow taller than the row. */}
+          <div ref={rowRef} className="-my-7 overflow-hidden py-7">
             <div
               className="flex w-full transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${safePage * 100}%)` }}
@@ -161,8 +156,9 @@ export function MusicCarouselSection({
               {pages.map((pageTracks, pageIndex) => (
                 <div
                   key={pageIndex}
-                  className="grid w-full min-w-full shrink-0 gap-3 overflow-hidden sm:gap-4"
+                  className="grid w-full min-w-full shrink-0 overflow-hidden"
                   style={{
+                    columnGap: CAROUSEL_FIT.gap,
                     gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
                   }}
                 >

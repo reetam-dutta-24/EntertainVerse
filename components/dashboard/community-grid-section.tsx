@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { CommunityCard } from "@/components/cards/community-card";
 import { PaginationDots } from "@/components/dashboard/pagination-dots";
 import { SearchPill } from "@/components/dashboard/search-pill";
 import { useColumnCount } from "@/hooks/use-column-count";
 import {
   CARD_GRID_COLS_BREAKPOINTS,
+  CARD_GRID_FIT,
   COMMUNITY_GRID_ROWS,
 } from "@/lib/grid-section-config";
 import type { Community } from "@/types";
@@ -29,10 +30,8 @@ export function CommunityGridSection({
 }: CommunityGridSectionProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
-  const { cols, itemsPerPage } = useColumnCount(
-    CARD_GRID_COLS_BREAKPOINTS,
-    COMMUNITY_GRID_ROWS,
-  );
+  const gridRef = useRef<HTMLDivElement>(null);
+  const { cols, itemsPerPage } = useColumnCount(CARD_GRID_COLS_BREAKPOINTS, COMMUNITY_GRID_ROWS, { ref: gridRef, ...CARD_GRID_FIT });
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -68,8 +67,10 @@ export function CommunityGridSection({
 
       <div className="px-2 pt-1 pb-2 sm:pt-2">
         <div
-          className="grid justify-items-center gap-3 sm:gap-4"
+          ref={gridRef}
+          className="grid justify-items-center gap-y-4"
           style={{
+            columnGap: CARD_GRID_FIT.gap,
             gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
           }}
         >

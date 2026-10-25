@@ -17,6 +17,7 @@ import {
   CAROUSEL_ITEMS_EPISODE,
   CAROUSEL_ITEMS_REVIEW,
 } from "@/lib/grid-section-config";
+import { pageItems } from "@/lib/carousel-pages";
 import { resolveCardTint } from "@/lib/card-theme";
 import type { AccentColor } from "@/lib/catalog-enums";
 import { cn } from "@/lib/utils";
@@ -58,14 +59,6 @@ export interface PaginatedCarouselSectionProps {
   rowHover?: boolean;
 }
 
-function chunk<T>(arr: T[], size: number): T[][] {
-  const pages: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) {
-    pages.push(arr.slice(i, i + size));
-  }
-  return pages.length ? pages : [[]];
-}
-
 function PaginatedCarouselInner({
   slides,
   variant = "content",
@@ -83,7 +76,7 @@ function PaginatedCarouselInner({
   const tintSeed = useCarouselTintSeed();
   const perPage = itemsPerPage ?? VARIANT_ITEMS[variant];
 
-  const pages = useMemo(() => chunk(slides, perPage), [slides, perPage]);
+  const pages = useMemo(() => pageItems(slides, perPage), [slides, perPage]);
   const totalPages = pages.length;
   const safePage = Math.min(page, totalPages - 1);
 

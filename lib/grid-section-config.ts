@@ -23,6 +23,15 @@ export const CAROUSEL_COLS_BREAKPOINTS = [
   { minWidth: 0, cols: 2 },
 ] as const;
 
+/**
+ * Carousel rows fit as many 148px cards as their own width holds (12px apart), so a docked
+ * assistant or a wide screen changes the count; the breakpoints above cover the first render.
+ */
+export const CAROUSEL_FIT = { slotWidth: 148, gap: 12, min: 2, max: 10 } as const;
+
+/** Community / collection tile grids — fluid tiles up to 180px, fitted to the grid's width. */
+export const CARD_GRID_FIT = { slotWidth: 168, gap: 14, min: 2, max: 7 } as const;
+
 /** Watchlist / poster grid — same breakpoints as carousel. */
 export const POSTER_GRID_COLS_BREAKPOINTS = CAROUSEL_COLS_BREAKPOINTS;
 

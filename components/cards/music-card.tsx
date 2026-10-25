@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAppRouter } from "@/hooks/use-app-router";
-import { Headphones, PlayCircle } from "lucide-react";
+import { Headphones, Info } from "lucide-react";
 import { getSongDetailPath } from "@/lib/song-routes";
 import { useCarouselTintSeed } from "@/components/carousel/carousel-section-context";
 import { cn } from "@/lib/utils";
@@ -13,11 +13,10 @@ import type { MusicTrack } from "@/types";
 import { Chip, RatingChip } from "@/components/ui/chip";
 import { HdImage } from "@/components/ui/hd-image";
 import { CardBlurb } from "@/components/cards/card-blurb";
+import { CardArtwork, GlassCardFrame, cardActionClass } from "@/components/cards/glass-card-frame";
 
-const CARD_W = 148;
-const CARD_H = 224;
-const HOVER_W = 176;
-const HOVER_H = 258;
+const CARD_SIZE = { width: 148, height: 224 };
+const HOVER_SIZE = { width: 176, height: 262 };
 
 export interface MusicCardProps extends React.HTMLAttributes<HTMLDivElement> {
   track: MusicTrack;
@@ -73,10 +72,7 @@ function trackDescription(track: MusicTrack) {
   return `${track.artist} · ${kindLabel(track.kind)} on EntertainVerse.`;
 }
 
-const layerTransition =
-  "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]";
-
-/** Music card — compact default, fixed-size black expanded panel on hover. */
+/** Music card — artwork-led glass card that opens into a details panel on hover. */
 export function MusicCard({
   track,
   tintSeed: tintSeedProp,
@@ -91,6 +87,11 @@ export function MusicCard({
   const tintSeed = tintSeedProp ?? contextTintSeed;
   const [hovered, setHovered] = useState(false);
   const tint = resolveCardTint(track.id, track.accent, tintSeed);
+
+  function setHover(next: boolean) {
+    setHovered(next);
+    onHoverChange?.(next);
+  }
 
   function handleViewDetails() {
     if (onViewDetails) {
@@ -114,178 +115,100 @@ export function MusicCard({
         ? "English"
         : track.language ?? "Jpop";
 
+  const badge = trackTopLeftBadge(track);
+  const topLeft =
+    badge.kind === "rating" ? (
+      <RatingChip rating={badge.rating} />
+    ) : badge.kind === "source" ? (
+      <Chip chipKey="show" className="max-w-[90px] truncate">
+        {badge.label}
+      </Chip>
+    ) : badge.kind === "language" ? (
+      <Chip language={badge.label} className="max-w-[90px] truncate">
+        {badge.label}
+      </Chip>
+    ) : (
+      <Chip musicKind={track.kind} className="max-w-[90px] truncate">
+        {badge.label}
+      </Chip>
+    );
+
+  const artwork = track.imageUrl ? (
+    <HdImage src={track.imageUrl} alt={track.title} className="size-full object-cover" />
+  ) : (
+    <div className={cn("size-full", tint.header)} />
+  );
+
+  const front = (
+    <div className="flex h-full flex-col p-1.5">
+      <CardArtwork hovered={false} scrim="top" className="aspect-square w-full shrink-0 rounded-[14px]">
+        {artwork}
+      </CardArtwork>
+      <div className="absolute inset-x-3 top-3 flex items-center justify-between gap-1">
+        {topLeft}
+        <Chip musicKind={track.kind}>{kindLabel(track.kind)}</Chip>
+      </div>
+      <div className="flex flex-1 flex-col items-center justify-center gap-1 px-1 text-center">
+        <div className="w-full">
+          <p className="line-clamp-1 text-sm font-semibold leading-tight text-white drop-shadow">{track.title}</p>
+          <p className="line-clamp-1 text-caption font-normal text-white/60">{track.artist}</p>
+        </div>
+        <Chip language={langLabel}>{langLabel}</Chip>
+      </div>
+    </div>
+  );
+
+  const back = (
+    <>
+      <CardArtwork hovered={hovered} className="h-[92px] w-full shrink-0">
+        {artwork}
+      </CardArtwork>
+      <div className="relative -mt-7 flex flex-1 flex-col items-center gap-1.5 px-2.5 pb-2.5">
+        <div className="w-full text-center">
+          <p className="line-clamp-1 text-sm font-semibold leading-tight text-white drop-shadow">{track.title}</p>
+          <p className="line-clamp-1 text-caption font-normal text-white/65">{track.artist}</p>
+        </div>
+
+        <CardBlurb reason={track.reason} text={trackDescription(track)} className="text-center" />
+
+        <div className="mt-auto flex w-full flex-col items-center gap-1.5 pt-1">
+          <div className="flex w-full items-center justify-center gap-1.5">
+            <button type="button" onClick={handleListenNow} aria-label={`Listen to ${track.title} now`} className={cardActionClass}>
+              <Headphones className="size-3 shrink-0 text-brand-pink" />
+              Listen
+            </button>
+            <button type="button" onClick={handleViewDetails} aria-label={`View details for ${track.title}`} className={cardActionClass}>
+              <Info className="size-3 shrink-0 text-brand-pink" />
+              Details
+            </button>
+          </div>
+          <CardAddToCollectionButton itemKind="song" itemSlug={track.id} itemTitle={track.title} />
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div
       className={cn("relative isolate mx-auto w-full max-w-[148px] shrink-0 overflow-visible", className)}
       style={{ width: SLOT_W, height: SLOT_H }}
       {...props}
-      onMouseEnter={() => {
-        setHovered(true);
-        onHoverChange?.(true);
-      }}
-      onMouseLeave={() => {
-        setHovered(false);
-        onHoverChange?.(false);
-      }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       // Keyboard users get the same quick-actions panel as hover.
       tabIndex={0}
       role="group"
       aria-label={track.title}
-      onFocus={() => {
-        setHovered(true);
-        onHoverChange?.(true);
-      }}
+      onFocus={() => setHover(true)}
       onBlur={(event) => {
         if (event.currentTarget.contains(event.relatedTarget as Node)) return;
-        setHovered(false);
-        onHoverChange?.(false);
+        setHover(false);
       }}
       onKeyDown={(event) => {
         if (event.key === "Enter" && event.target === event.currentTarget) handleViewDetails();
       }}
     >
-      <div
-        className={cn(
-          "absolute left-1/2 top-1/2 z-10 flex flex-col overflow-hidden rounded-card shadow-card-inner transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]",
-          hovered && "z-30 rounded-card",
-        )}
-        style={{
-          width: hovered ? HOVER_W : CARD_W,
-          height: hovered ? HOVER_H : CARD_H,
-          transform: "translate(-50%, -50%)",
-          backgroundColor: hovered ? "var(--color-surface)" : tint.glass,
-        }}
-      >
-        <div className="relative h-full w-full">
-          <div
-            className={cn(
-              "absolute inset-0 flex flex-col",
-              layerTransition,
-              hovered
-                ? "pointer-events-none scale-[0.98] opacity-0"
-                : "scale-100 opacity-100",
-            )}
-          >
-            <div className="flex shrink-0 items-center justify-between px-2 pt-2">
-              {(() => {
-                const badge = trackTopLeftBadge(track);
-                if (badge.kind === "rating") {
-                  return <RatingChip rating={badge.rating} />;
-                }
-                if (badge.kind === "source") {
-                  return (
-                    <Chip chipKey="show" className="max-w-[90px] truncate">
-                      {badge.label}
-                    </Chip>
-                  );
-                }
-                if (badge.kind === "language") {
-                  return (
-                    <Chip language={badge.label} className="max-w-[90px] truncate">
-                      {badge.label}
-                    </Chip>
-                  );
-                }
-                return (
-                  <Chip musicKind={track.kind} className="max-w-[90px] truncate">
-                    {badge.label}
-                  </Chip>
-                );
-              })()}
-              <Chip musicKind={track.kind}>{kindLabel(track.kind)}</Chip>
-            </div>
-
-            <div className="mx-auto mt-1 h-[108px] w-[124px] shrink-0 overflow-hidden rounded-xl">
-              {track.imageUrl ? (
-                <HdImage
-                  src={track.imageUrl}
-                  alt={track.title}
-                  className="size-full object-cover"
-                />
-              ) : (
-                <div className={cn("size-full", tint.header)} />
-              )}
-            </div>
-
-            <div className="flex flex-1 flex-col items-center justify-end gap-1.5 px-2 pb-2.5 pt-1.5 text-center">
-              <div>
-                <p className="line-clamp-1 text-sm font-semibold text-white">
-                  {track.title}
-                </p>
-                <p className="text-caption font-normal text-muted">
-                  {track.artist}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center justify-center gap-1">
-                <Chip language={langLabel}>{langLabel}</Chip>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={cn(
-              "absolute inset-0 flex flex-col",
-              layerTransition,
-              hovered
-                ? "translate-y-0 scale-100 opacity-100"
-                : "pointer-events-none translate-y-2 scale-[1.02] opacity-0",
-            )}
-          >
-            <div className="relative h-[74px] w-full shrink-0 overflow-hidden">
-              {track.imageUrl ? (
-                <HdImage
-                  src={track.imageUrl}
-                  alt={track.title}
-                  className="size-full object-cover"
-                />
-              ) : (
-                <div className={cn("size-full", tint.header)} />
-              )}
-            </div>
-
-            <div className="flex h-[184px] flex-col items-center gap-1.5 bg-black px-2.5 pb-2 pt-2">
-              <div className="w-full text-center">
-                <p className="line-clamp-1 text-sm font-semibold leading-tight text-white">
-                  {track.title}
-                </p>
-                <p className="line-clamp-1 text-caption font-normal text-muted">
-                  {track.artist}
-                </p>
-              </div>
-
-              <CardBlurb reason={track.reason} text={trackDescription(track)} className="text-center" />
-
-              <div className="mt-auto flex w-full flex-col items-center gap-1.5 pt-1">
-                <div className="flex w-full items-center justify-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={handleListenNow}
-                    aria-label={`Listen to ${track.title} now`}
-                    className="flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-full border border-brand-magenta px-1.5 py-1 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
-                  >
-                    <Headphones className="size-3 shrink-0 text-brand-magenta" />
-                    Listen
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleViewDetails}
-                    aria-label={`View details for ${track.title}`}
-                    className="flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-full border border-brand-magenta px-1.5 py-1 text-micro font-normal text-white transition-colors hover:bg-brand-magenta/15"
-                  >
-                    <PlayCircle className="size-3 shrink-0 text-brand-magenta" />
-                    Details
-                  </button>
-                </div>
-                <CardAddToCollectionButton
-                  itemKind="song"
-                  itemSlug={track.id}
-                  itemTitle={track.title}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <GlassCardFrame tint={tint.glass} hovered={hovered} size={CARD_SIZE} hoverSize={HOVER_SIZE} front={front} back={back} />
     </div>
   );
 }

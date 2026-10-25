@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { Globe, Lock, Sparkles, type LucideIcon } from "lucide-react";
-import { CardHeaderImage } from "@/components/cards/card-header-image";
+import { CardArtwork, CARD_SPRING, glassEdgeClass, glassShadow, glassSurface } from "@/components/cards/glass-card-frame";
 import { COLLECTION_CARD_H } from "@/lib/card-dimensions";
 import { getAccentStyle } from "@/lib/accents";
+import { getAccentTint, getTintRgb } from "@/lib/card-theme";
 import { cn } from "@/lib/utils";
 
 export interface TileStat {
@@ -43,8 +45,9 @@ export interface TileCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>
 
 /**
  * Shared shell for collection + community cards: artwork header, one-line
- * title, an icon stat row, a two-line description and a full-width action.
- * Fixed height so grids and carousels line up.
+ * title, an icon stat row, a two-line description and a full-width action —
+ * on the same tinted glass as the poster cards. Fixed height so grids and
+ * carousels line up.
  */
 export function TileCard({
   title,
@@ -61,27 +64,40 @@ export function TileCard({
 }: TileCardProps) {
   const [hovered, setHovered] = useState(false);
   const accent = getAccentStyle(accentName);
+  const rgb = getTintRgb(getAccentTint(accentName).glass).join(",");
   const height = COLLECTION_CARD_H + (manage ? MANAGE_ROW_H : 0) - (cta ? 0 : CTA_H);
 
   return (
     <div
-      className={cn(
-        "mx-auto w-full max-w-[180px] rounded-card transition-shadow duration-300 ease-out",
-        hovered && accent.glow,
-        className,
-      )}
+      className={cn("mx-auto w-full max-w-[180px]", className)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node)) setHovered(false);
+      }}
       {...props}
     >
-      <div
-        className="flex flex-col overflow-hidden rounded-card border border-white/[0.06] bg-surface"
-        style={{ height }}
+      <motion.div
+        className="relative flex flex-col overflow-hidden rounded-card backdrop-blur-xl"
+        style={{ height, background: glassSurface(rgb) }}
+        initial={false}
+        animate={{ y: hovered ? -5 : 0, boxShadow: glassShadow(rgb, hovered) }}
+        transition={CARD_SPRING}
       >
-        <CardHeaderImage imageUrl={imageUrl} accentClass={accent.header} />
+        <div aria-hidden className={glassEdgeClass} />
 
-        <div className="flex min-h-0 flex-1 flex-col gap-2 p-3">
-          <h3 className="truncate text-center text-sm font-semibold text-white" title={title}>
+        <CardArtwork hovered={hovered} className="h-[76px] w-full shrink-0">
+          {imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={imageUrl} alt="" className="size-full object-cover" />
+          ) : (
+            <div className={cn("size-full", accent.header)} />
+          )}
+        </CardArtwork>
+
+        <div className="relative -mt-3 flex min-h-0 flex-1 flex-col gap-2 px-3 pb-3">
+          <h3 className="truncate text-center text-sm font-semibold text-white drop-shadow" title={title}>
             {title}
           </h3>
 
@@ -121,13 +137,13 @@ export function TileCard({
           )}
 
           {cta || manage ? (
-            <div className="mt-auto flex flex-col gap-1.5">
+            <div className="relative z-30 mt-auto flex flex-col gap-1.5">
               {cta}
               {manage ? <div className="flex items-center justify-center gap-2">{manage}</div> : null}
             </div>
           ) : null}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
