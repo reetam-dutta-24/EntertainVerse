@@ -13,6 +13,7 @@ import {
 } from "@/lib/services/community-chat.service";
 import { communityChatSendSchema } from "@/lib/validators/community-chat";
 import { setSocketServer } from "@/lib/socket/io-instance";
+import { registerPartyHandlers } from "@/lib/socket/parties";
 
 interface ChatJoinPayload {
   communitySlug: string;
@@ -103,6 +104,8 @@ export function attachSocketServer(httpServer: HttpServer) {
   io.on("connection", (socket) => {
     const userId = socket.data.userId as string;
     const joinedRooms = new Set<string>();
+    // Watch / listen parties and talk rooms.
+    registerPartyHandlers(io, socket, userId);
 
     socket.on("chat:join", async (payload: unknown) => {
       const parsed = parseJoinPayload(payload);

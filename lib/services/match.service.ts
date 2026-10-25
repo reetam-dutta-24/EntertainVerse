@@ -310,6 +310,9 @@ export async function createRoom(userId: string, input: CreateRoomInput): Promis
       memberLimit: capacity,
       memberCount: 1,
       members: { create: { userId, role: "ADMIN" } },
+      // Ready to go: a watch party channel and a talk room (the listen party is built in).
+      watchChannels: { create: { creatorId: userId, title: room.topic ? `Watch party · ${room.topic}`.slice(0, 80) : "Watch party", memberLimit: capacity } },
+      voiceChannels: { create: { creatorId: userId, title: "Talk room", memberLimit: Math.min(capacity, 8) } },
     },
   });
   await prisma.matchCircle.update({ where: { id: room.id }, data: { communityId: community.id } });
@@ -358,6 +361,8 @@ async function ensureRoomSpace(roomId: string) {
       memberLimit: room.capacity,
       memberCount: room.members.length,
       members: { create: room.members.map((member) => ({ userId: member.userId, role: member.userId === room.createdById ? "ADMIN" : "MEMBER" })) },
+      watchChannels: { create: { creatorId: room.createdById, title: "Watch party", memberLimit: room.capacity } },
+      voiceChannels: { create: { creatorId: room.createdById, title: "Talk room", memberLimit: Math.min(room.capacity, 8) } },
     },
   });
   await prisma.matchCircle.update({ where: { id: room.id }, data: { communityId: community.id } });

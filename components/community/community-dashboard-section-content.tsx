@@ -23,8 +23,11 @@ import {
 import type { CommunityDashboardSection } from "@/lib/community-routes";
 import type { CommunityDetail } from "@/types";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Megaphone, Radio, Sparkles, Tv } from "lucide-react";
-import { ComingSoonNotice } from "@/components/ui/coming-soon-notice";
+import { useState } from "react";
+import { Megaphone, Mic, Play, Radio, Sparkles, Tv } from "lucide-react";
+import { ListenParty } from "@/components/party/listen-party";
+import { TalkRoom } from "@/components/party/talk-room";
+import { WatchParty } from "@/components/party/watch-party";
 
 export interface CommunityDashboardSectionContentProps {
   section: CommunityDashboardSection;
@@ -73,11 +76,14 @@ function ScrollBody({
 function WatchChannelRow({
   party,
   communitySlug,
+  viewerUserId,
 }: {
   party: CommunityDetail["dashboardWatchParties"][number];
   communitySlug: string;
+  viewerUserId?: string;
 }) {
   const accent = getAccentStyle(party.accent ?? "purple");
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="flex flex-col gap-4 rounded-card border border-white/[0.08] bg-black/35 p-4 shadow-card-inner sm:flex-row sm:items-center sm:p-5">
@@ -112,7 +118,17 @@ function WatchChannelRow({
           </p>
         )}
       </div>
-      <WatchChannelActions communitySlug={communitySlug} channel={party} />
+      <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-full bg-gradient-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90 sm:w-auto"
+        >
+          <Play className="size-4" aria-hidden /> Join watch party
+        </button>
+        <WatchChannelActions communitySlug={communitySlug} channel={party} />
+      </div>
+      {open ? <WatchParty channelId={party.id} channelTitle={party.title} viewerUserId={viewerUserId} onClose={() => setOpen(false)} /> : null}
     </div>
   );
 }
@@ -125,6 +141,7 @@ function VoiceChannelRow({
   communitySlug: string;
 }) {
   const accent = getAccentStyle(channel.accent ?? "purple");
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="flex flex-col gap-4 rounded-card border border-white/[0.08] bg-black/35 p-4 shadow-card-inner sm:flex-row sm:items-center sm:p-5">
@@ -153,7 +170,17 @@ function VoiceChannelRow({
           </p>
         )}
       </div>
-      <VoiceChannelActions communitySlug={communitySlug} channel={channel} />
+      <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-full bg-gradient-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90 sm:w-auto"
+        >
+          <Mic className="size-4" aria-hidden /> Join talk room
+        </button>
+        <VoiceChannelActions communitySlug={communitySlug} channel={channel} />
+      </div>
+      {open ? <TalkRoom channelId={channel.id} channelTitle={channel.title} onClose={() => setOpen(false)} /> : null}
     </div>
   );
 }
@@ -269,10 +296,10 @@ export function CommunityDashboardSectionContent({
             <CreateWatchChannelButton communitySlug={communitySlug} />
           </SectionHeader>
           <ScrollBody className="flex flex-col gap-4">
-            <ComingSoonNotice>
-              Synced watch parties aren&rsquo;t live yet. Joining a channel lists you as a member,
-              and you watch the title on your own for now.
-            </ComingSoonNotice>
+            <p className="text-xs text-white/55">
+              🎬 Synced for everyone: the host&apos;s play, pause and seek apply to the whole party. Plays licensed video,
+              the official trailer, or a shared &ldquo;watch together&rdquo; clock for titles on your own streaming service.
+            </p>
             {community.dashboardWatchParties.length === 0 ? (
               <EmptyState compact icon={<Tv />} description="No watch channels yet." />
             ) : (
@@ -281,6 +308,7 @@ export function CommunityDashboardSectionContent({
                   key={party.id}
                   party={party}
                   communitySlug={communitySlug}
+                  viewerUserId={viewerUserId}
                 />
               ))
             )}
@@ -307,10 +335,10 @@ export function CommunityDashboardSectionContent({
             <CreateVoiceChannelButton communitySlug={communitySlug} />
           </SectionHeader>
           <ScrollBody className="flex flex-col gap-4">
-            <ComingSoonNotice>
-              Live voice chat isn&rsquo;t available yet. You can set up channels now; joining
-              opens once audio rooms launch.
-            </ComingSoonNotice>
+            <p className="text-xs text-white/55">
+              🎙️ Live voice for up to 8 people — mute, see who&apos;s talking, drop in and out. Your browser will ask for
+              the microphone.
+            </p>
             {community.dashboardVoiceChannels.length === 0 ? (
               <EmptyState compact icon={<Radio />} description="No voice channels yet." />
             ) : (
@@ -322,6 +350,18 @@ export function CommunityDashboardSectionContent({
                 />
               ))
             )}
+          </ScrollBody>
+        </>
+      );
+
+    case "listen-party":
+      return (
+        <>
+          <SectionHeader>
+            <p className="text-sm font-medium text-white/85">🎧 Listen Party — one queue, everyone hears it together</p>
+          </SectionHeader>
+          <ScrollBody>
+            <ListenParty communitySlug={communitySlug} viewerUserId={viewerUserId} />
           </ScrollBody>
         </>
       );

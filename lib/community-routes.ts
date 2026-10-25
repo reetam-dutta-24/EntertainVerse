@@ -3,6 +3,7 @@ export const COMMUNITY_DASHBOARD_SECTIONS = [
   "chat",
   "watch-channel",
   "voice-channel",
+  "listen-party",
   "announcements",
   "analytics",
   "anime-chat",

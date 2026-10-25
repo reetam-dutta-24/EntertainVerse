@@ -178,8 +178,9 @@ export function mapCommunityMember(
 const defaultDashboardNav: CommunityDashboardNavItem[] = [
   { id: "posts", label: "Posts" },
   { id: "chat", label: "General Chat" },
-  { id: "watch-channel", label: "Watch Channel" },
-  { id: "voice-channel", label: "Voice Channel" },
+  { id: "watch-channel", label: "Watch Party" },
+  { id: "listen-party", label: "Listen Party" },
+  { id: "voice-channel", label: "Talk Rooms" },
   { id: "announcements", label: "Announcements" },
   { id: "analytics", label: "Analytics" },
   { id: "anime-chat", label: "Anime Chat" },
