@@ -73,7 +73,10 @@ export function ReactionBar({ onReact }: { onReact: (emoji: string) => void }) {
 export function PartyChat({ messages, onSend, viewerUserId }: { messages: PartyChatMessage[]; onSend: (text: string) => void; viewerUserId?: string }) {
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => endRef.current?.scrollIntoView({ block: "nearest" }), [messages]);
+  // Block body: some browsers return a value from scrollIntoView, which React would treat as a cleanup.
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ block: "nearest" });
+  }, [messages]);
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
       <ol className="flex min-h-[120px] flex-1 flex-col gap-1.5 overflow-y-auto pr-1" aria-live="polite">
