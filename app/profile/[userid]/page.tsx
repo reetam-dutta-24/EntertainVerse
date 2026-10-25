@@ -33,9 +33,9 @@ export async function generateMetadata({
 }: ProfilePageProps): Promise<Metadata> {
   const { userid } = await params;
   const profile = await getUserDetail(userid);
-  if (!profile) return { title: "Profile — AniVerse" };
+  if (!profile) return { title: "Profile — EntertainVerse" };
   return {
-    title: `${profile.name} — AniVerse`,
+    title: `${profile.name} — EntertainVerse`,
     description: profile.bio,
   };
 }

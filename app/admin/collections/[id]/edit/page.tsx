@@ -8,7 +8,7 @@ import {
 } from "@/lib/services/admin-collection.service";
 
 export const metadata: Metadata = {
-  title: "Edit collection — Admin — AniVerse",
+  title: "Edit collection — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

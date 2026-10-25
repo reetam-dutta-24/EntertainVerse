@@ -15,7 +15,7 @@ import { getAiProfileInsights } from "@/lib/services/ai-profile.service";
 import { loadTasteCatalog } from "@/lib/services/taste-engine.service";
 
 /**
- * Retrieval for the AniVerse Assistant. Three sources, each searched for the question:
+ * Retrieval for the EntertainVerse Assistant. Three sources, each searched for the question:
  *  1. help articles — semantic (gemini-embedding-001, same index as the recommender)
  *     blended with keyword overlap, so it still works when embeddings are unavailable;
  *  2. the catalog — titles, songs and artists by meaning or by name;

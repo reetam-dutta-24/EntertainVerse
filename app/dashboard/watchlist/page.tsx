@@ -13,7 +13,7 @@ import {
 } from "@/lib/data/watchlist";
 
 export const metadata: Metadata = {
-  title: "Watchlist — AniVerse",
+  title: "Watchlist — EntertainVerse",
   description:
     "Save and organize anime, movies, shows, and music you plan to watch.",
 };

@@ -23,7 +23,7 @@ import {
 } from "@/lib/data/home";
 
 export const metadata: Metadata = {
-  title: "Home — AniVerse",
+  title: "Home — EntertainVerse",
   description:
     "Your entertainment hub — personalized picks, watchlists, collections, and communities.",
 };
@@ -78,7 +78,7 @@ export default async function DashboardHomePage() {
           🌌 Your Universe at a Glance
         </h2>
         <p className="mt-1 text-sm text-white/75">
-          A snapshot of your taste, saves, and activity across AniVerse.
+          A snapshot of your taste, saves, and activity across EntertainVerse.
         </p>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {statTiles(stats, roadmapTeaser).map((tile) => (
@@ -113,7 +113,7 @@ export default async function DashboardHomePage() {
 
       <ContentCarouselSection
         title="🚀 Trending this week"
-        subtitle="What everyone is watching across AniVerse"
+        subtitle="What everyone is watching across EntertainVerse"
         searchPlaceholder="Search Trending Content……. "
         items={trending}
       />

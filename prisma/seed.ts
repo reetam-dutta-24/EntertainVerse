@@ -39,10 +39,10 @@ const MEDIA_MAP = {
 } as const;
 
 const PLATFORM_ADMINS = [
-  { email: "admin@aniverse.local", password: "Admin123!", name: "AniVerse Super Admin", handle: "aniverse_admin", role: PlatformRole.SUPER_ADMIN },
-  { email: "content@aniverse.local", password: "Content123!", name: "Content Admin", handle: "content_admin", role: PlatformRole.CONTENT_ADMIN },
-  { email: "music@aniverse.local", password: "Music123!", name: "Music Admin", handle: "music_admin", role: PlatformRole.MUSIC_ADMIN },
-  { email: "artist@aniverse.local", password: "Artist123!", name: "Artist Admin", handle: "artist_admin", role: PlatformRole.ARTIST_ADMIN },
+  { email: "admin@entertainverse.local", password: "Admin123!", name: "EntertainVerse Super Admin", handle: "entertainverse_admin", role: PlatformRole.SUPER_ADMIN },
+  { email: "content@entertainverse.local", password: "Content123!", name: "Content Admin", handle: "content_admin", role: PlatformRole.CONTENT_ADMIN },
+  { email: "music@entertainverse.local", password: "Music123!", name: "Music Admin", handle: "music_admin", role: PlatformRole.MUSIC_ADMIN },
+  { email: "artist@entertainverse.local", password: "Artist123!", name: "Artist Admin", handle: "artist_admin", role: PlatformRole.ARTIST_ADMIN },
 ] as const;
 
 async function seedAdminUsers() {
@@ -107,10 +107,10 @@ function resolveNested(item: ContentSeedBase, index: number): ContentNestedSeed 
       .map((c) => c.slug),
     catalogReviews: [
       {
-        authorName: "AniVerse Curator",
+        authorName: "EntertainVerse Curator",
         authorAvatarColor: "#ff00cc",
         rating: roundRating(item.rating) ?? 8,
-        body: `${item.title} is a standout pick on AniVerse.`,
+        body: `${item.title} is a standout pick on EntertainVerse.`,
         accent: item.accent,
         likeCount: 12,
         headline: `Why ${item.title} belongs on your list`,
@@ -262,7 +262,7 @@ async function seedContent() {
       year: item.year ?? null,
       meta: item.meta ?? null,
       accent: item.accent ?? null,
-      trendingLabel: item.trendingLabel ?? `Trending on AniVerse · ${item.type.toUpperCase()}`,
+      trendingLabel: item.trendingLabel ?? `Trending on EntertainVerse · ${item.type.toUpperCase()}`,
       creditLabel: item.creditLabel ?? null,
       highlightTags: item.highlightTags ?? [],
       studio: item.studio ?? null,
@@ -387,7 +387,7 @@ async function seedMusic(
       imageUrl: item.imageUrl ?? null,
       backdropUrl: item.backdropUrl ?? item.imageUrl ?? null,
       accent: item.accent ?? null,
-      trendingLabel: item.trendingLabel ?? `Trending on AniVerse · ${item.kind.toUpperCase()}`,
+      trendingLabel: item.trendingLabel ?? `Trending on EntertainVerse · ${item.kind.toUpperCase()}`,
       creditLabel: item.creditLabel ?? `By ${item.artist}`,
       featuredRank: item.featuredRank ?? null,
       artistId,
@@ -623,7 +623,7 @@ async function main() {
     );
   }
 
-  console.log("Seeding AniVerse catalog…\n");
+  console.log("Seeding EntertainVerse catalog…\n");
   await seedAdminUsers();
   console.log("");
   const contentSlugToId = await seedContent();

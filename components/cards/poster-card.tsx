@@ -45,7 +45,7 @@ export interface PosterCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function defaultDescription(title: string) {
-  return `${title} — matched to your genres, ratings, and watch history on AniVerse.`;
+  return `${title} — matched to your genres, ratings, and watch history on EntertainVerse.`;
 }
 
 function resolveCollectionItemKind(

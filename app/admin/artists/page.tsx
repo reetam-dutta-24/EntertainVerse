@@ -7,7 +7,7 @@ import { requireArtistAdmin } from "@/lib/auth-guards";
 import { listCatalogArtists } from "@/lib/services/artist.service";
 
 export const metadata: Metadata = {
-  title: "Artists — Admin — AniVerse",
+  title: "Artists — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

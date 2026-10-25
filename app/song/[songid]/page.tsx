@@ -29,9 +29,9 @@ export async function generateMetadata({
 }: SongPageProps): Promise<Metadata> {
   const { songid } = await params;
   const song = await getSongDetail(songid);
-  if (!song) return { title: "Song — AniVerse" };
+  if (!song) return { title: "Song — EntertainVerse" };
   return {
-    title: `${song.title} — AniVerse`,
+    title: `${song.title} — EntertainVerse`,
     description: song.synopsis,
   };
 }

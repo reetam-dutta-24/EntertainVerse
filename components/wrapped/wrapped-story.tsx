@@ -68,7 +68,7 @@ function buildSlides(data: WrappedData): Slide[] {
       tone: "from-fuchsia-600/70 via-purple-900/80 to-black",
       render: () => (
         <div className="flex h-full flex-col justify-center gap-4">
-          <Pop><Kicker>AniVerse Wrapped {data.year}</Kicker></Pop>
+          <Pop><Kicker>EntertainVerse Wrapped {data.year}</Kicker></Pop>
           <Pop delay={0.15}><h2 className="text-4xl font-black leading-tight text-white sm:text-5xl">{firstName}, this was your year.</h2></Pop>
           <Pop delay={0.35}><p className="text-base text-white/75">Every title, song and late night — read by your AI taste engine.</p></Pop>
         </div>
@@ -245,7 +245,7 @@ function buildSlides(data: WrappedData): Slide[] {
       tone: "from-yellow-400/50 via-amber-950/80 to-black",
       render: () => (
         <div className="flex h-full flex-col items-start justify-center gap-4">
-          <Pop><Kicker>Among everyone on AniVerse</Kicker></Pop>
+          <Pop><Kicker>Among everyone on EntertainVerse</Kicker></Pop>
           <Pop delay={0.2}><p className="text-6xl font-black text-white">Top {data.topPercent}%</p></Pop>
           <Pop delay={0.4}><p className="text-base text-white/75">of the most dedicated fans this year, by time spent watching and listening.</p></Pop>
         </div>
@@ -346,9 +346,9 @@ export function WrappedStory({ data }: { data: WrappedData }) {
     setSharing(true);
     try {
       const blob = await renderWrappedCard(data);
-      const file = new File([blob], `aniverse-wrapped-${data.year}.png`, { type: "image/png" });
+      const file = new File([blob], `entertainverse-wrapped-${data.year}.png`, { type: "image/png" });
       if (mode === "share" && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: `My AniVerse Wrapped ${data.year}`, text: `I'm ${data.persona.name} on AniVerse ✨` });
+        await navigator.share({ files: [file], title: `My EntertainVerse Wrapped ${data.year}`, text: `I'm ${data.persona.name} on EntertainVerse ✨` });
       } else {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");

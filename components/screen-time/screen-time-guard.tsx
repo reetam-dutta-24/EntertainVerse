@@ -88,7 +88,7 @@ export function ScreenTimeGuard({ initialStatus }: { initialStatus: ScreenTimeSt
               </h2>
               <p className="mt-1 text-sm text-white/70">
                 Your daily limit of {formatLimit(status.limitMinutes)} is almost up. Finish the episode or song —
-                when time runs out, AniVerse locks until midnight.
+                when time runs out, EntertainVerse locks until midnight.
               </p>
             </div>
             <button

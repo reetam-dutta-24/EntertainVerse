@@ -15,9 +15,9 @@ export async function generateMetadata({
   const { communityid } = await params;
   const viewer = await getOptionalUser();
   const community = await getCommunityDetail(communityid, viewer?.id);
-  if (!community) return { title: "Community Dashboard — AniVerse" };
+  if (!community) return { title: "Community Dashboard — EntertainVerse" };
   return {
-    title: `${community.name} Dashboard — AniVerse`,
+    title: `${community.name} Dashboard — EntertainVerse`,
     description: `Community dashboard for ${community.name}`,
   };
 }

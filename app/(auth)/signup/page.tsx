@@ -5,7 +5,7 @@ import { redirectAuthenticatedAway } from "@/lib/auth-guards";
 import { isDiscordAuthEnabled, isGoogleAuthEnabled } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Sign up — AniVerse",
+  title: "Sign up — EntertainVerse",
   description: "Start building your personalized entertainment universe.",
 };
 

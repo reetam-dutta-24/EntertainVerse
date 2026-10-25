@@ -1,4 +1,4 @@
-// AniVerse — PostgreSQL schema
+// EntertainVerse — PostgreSQL schema
 // Designed to match the UI flows: auth, onboarding, watchlist, collections,
 // communities, reviews, notifications, and analytics.
 

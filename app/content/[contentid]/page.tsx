@@ -43,9 +43,9 @@ export async function generateMetadata({
 }: ContentPageProps): Promise<Metadata> {
   const { contentid } = await params;
   const content = await getContentDetail(contentid);
-  if (!content) return { title: "Content — AniVerse" };
+  if (!content) return { title: "Content — EntertainVerse" };
   return {
-    title: `${content.title} — AniVerse`,
+    title: `${content.title} — EntertainVerse`,
     description: content.synopsis,
   };
 }

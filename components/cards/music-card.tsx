@@ -68,9 +68,9 @@ function trackDescription(track: MusicTrack) {
     return `Soundtrack from ${track.source} · performed by ${track.artist}.`;
   }
   if (track.language) {
-    return `${track.artist} · ${shortLanguageLabel(track.language) ?? track.language} track on AniVerse.`;
+    return `${track.artist} · ${shortLanguageLabel(track.language) ?? track.language} track on EntertainVerse.`;
   }
-  return `${track.artist} · ${kindLabel(track.kind)} on AniVerse.`;
+  return `${track.artist} · ${kindLabel(track.kind)} on EntertainVerse.`;
 }
 
 const layerTransition =

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ---------------------------------- */
-/* AniVerse design tokens (from Figma) */
+/* EntertainVerse design tokens (from Figma) */
 /* ---------------------------------- */
 
 @theme {
@@ -196,7 +196,7 @@
 @utility bg-gradient-chip-rating { background-image: var(--gradient-chip-rating); }
 @utility bg-gradient-chip-default { background-image: var(--gradient-chip-default); }
 
-/* Brand gradient text, e.g. the AniVerse logo */
+/* Brand gradient text, e.g. the EntertainVerse logo */
 @utility text-gradient-brand {
   background-image: var(--gradient-brand);
   -webkit-background-clip: text;

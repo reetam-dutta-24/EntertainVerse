@@ -55,7 +55,7 @@ export function Footer() {
         <ScrollFadeIn direction="up">
         <div className="flex w-[260px] flex-col items-center gap-5 px-6 py-4">
           <p className="text-gradient-brand text-center text-heading font-semibold leading-none">
-            AniVerse
+            EntertainVerse
           </p>
           <p className="text-center text-sm text-muted">
             AI-powered discovery for anime, shows, music, collections, and fan
@@ -89,7 +89,7 @@ export function Footer() {
       <ScrollFadeIn delay={0.1}>
       <div className="flex w-full max-w-[1200px] justify-center border-t border-white/10 pt-5 lg:justify-end">
         <p className="text-xs text-muted/80">
-          © 2026 AniVerse. Built for entertainment lovers.
+          © 2026 EntertainVerse. Built for entertainment lovers.
         </p>
       </div>
       </ScrollFadeIn>

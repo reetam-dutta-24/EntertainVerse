@@ -8,7 +8,7 @@ import { requireContentAdmin } from "@/lib/auth-guards";
 import { listCatalogContent } from "@/lib/services/content.service";
 
 export const metadata: Metadata = {
-  title: "Content — Admin — AniVerse",
+  title: "Content — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

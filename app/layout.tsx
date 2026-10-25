@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AniVerse",
+  title: "EntertainVerse",
   description:
     "AI-powered discovery for anime, shows, music, collections, and fan communities.",
 };

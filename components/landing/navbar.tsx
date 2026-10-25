@@ -24,7 +24,7 @@ export function Navbar() {
       <div className="relative mx-auto flex h-14 w-full items-center justify-between px-4 sm:h-[72px] sm:px-8 lg:px-12">
         <Link href="/" className="p-1 sm:p-2">
           <span className="text-gradient-brand text-xl font-semibold leading-none sm:text-heading">
-            AniVerse
+            EntertainVerse
           </span>
         </Link>
 

@@ -24,7 +24,7 @@ export function ContentTopbar({
       <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center gap-4 px-4 sm:h-[72px] sm:gap-6 sm:px-8 lg:px-12">
         <Link href="/dashboard" className="shrink-0 p-1 sm:p-2">
           <span className="text-gradient-brand text-xl font-semibold leading-none sm:text-heading">
-            AniVerse
+            EntertainVerse
           </span>
         </Link>
 

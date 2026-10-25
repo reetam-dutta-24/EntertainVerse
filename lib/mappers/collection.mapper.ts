@@ -213,7 +213,7 @@ export function mapCollectionToDetail(
   return {
     id: row.slug,
     name: row.name,
-    description: row.description ?? `${row.name} on AniVerse.`,
+    description: row.description ?? `${row.name} on EntertainVerse.`,
     rating,
     trendingLabel:
       row.visibility === "PUBLIC"

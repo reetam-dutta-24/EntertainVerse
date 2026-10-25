@@ -25,7 +25,7 @@ export function ErrorState({
   error,
   retry,
   title = "Something went wrong",
-  description = "We hit a snag loading this part of AniVerse. It's usually temporary — try again in a moment.",
+  description = "We hit a snag loading this part of EntertainVerse. It's usually temporary — try again in a moment.",
   homeHref = "/dashboard",
   homeLabel = "Go to dashboard",
   variant = "panel",

@@ -62,7 +62,7 @@ const webDraftSchema = enrichmentSchema.extend({
   characters: z.array(z.object({ name: z.string(), role: z.string(), voiceActor: z.string() })),
 });
 
-const STYLE_GUIDE = `You prepare catalog entries for AniVerse, a discovery app for anime, shows, K-dramas, movies and documentaries.
+const STYLE_GUIDE = `You prepare catalog entries for EntertainVerse, a discovery app for anime, shows, K-dramas, movies and documentaries.
 
 House style (match it exactly):
 - description: one or two sentences, max 280 characters, spoiler-free hook in your own words.

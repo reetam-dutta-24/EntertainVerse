@@ -8,7 +8,7 @@ import { countCatalogTracks } from "@/lib/services/music.service";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
-  title: "Admin — AniVerse",
+  title: "Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 
@@ -120,7 +120,7 @@ export default async function AdminHomePage() {
           </li>
           <li>
             Sign in with your role-specific admin account (e.g.{" "}
-            <code className="text-brand-pink">content@aniverse.local</code>).
+            <code className="text-brand-pink">content@entertainverse.local</code>).
           </li>
           <li>
             Create or edit catalog items — public pages read from PostgreSQL

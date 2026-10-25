@@ -6,7 +6,7 @@ import { adminAiSettings } from "@/lib/ai/settings";
 import { contentRecordToFormInput, getContentRecordById } from "@/lib/services/content.service";
 
 export const metadata: Metadata = {
-  title: "Edit content — Admin — AniVerse",
+  title: "Edit content — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

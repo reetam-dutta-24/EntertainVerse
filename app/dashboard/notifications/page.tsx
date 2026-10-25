@@ -4,9 +4,9 @@ import { getNotificationsForUser } from "@/lib/data/notifications";
 import { getCurrentUser } from "@/lib/data/user";
 
 export const metadata: Metadata = {
-  title: "Notifications — AniVerse",
+  title: "Notifications — EntertainVerse",
   description:
-    "All your AniVerse notifications — new episodes, watch parties, community activity, and AI matches.",
+    "All your EntertainVerse notifications — new episodes, watch parties, community activity, and AI matches.",
 };
 
 export const dynamic = "force-dynamic";

@@ -24,7 +24,7 @@ export function AdminShell({
         <div className="flex items-center gap-2 px-2">
           <Shield className="size-5 text-brand-pink" />
           <div>
-            <p className="text-sm font-semibold">AniVerse Admin</p>
+            <p className="text-sm font-semibold">EntertainVerse Admin</p>
             <p className="text-caption text-white/50">Catalog CMS</p>
           </div>
         </div>

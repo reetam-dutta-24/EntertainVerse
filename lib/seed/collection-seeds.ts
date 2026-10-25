@@ -15,7 +15,7 @@ export interface CollectionSeed {
   tracks?: string[];
 }
 
-export const REETAM_EMAIL = "reetam@aniverse.local";
+export const REETAM_EMAIL = "reetam@entertainverse.local";
 
 /** Public collections owned by Reetam Dutta — one per kind plus a mixed shelf. */
 export const REETAM_COLLECTION_SEEDS: CollectionSeed[] = [
@@ -24,7 +24,7 @@ export const REETAM_COLLECTION_SEEDS: CollectionSeed[] = [
     ownerEmail: REETAM_EMAIL,
     name: "Anime Essentials",
     description:
-      "Reetam's core anime rotation — psychological thrillers, modern shonen, and series worth a full binge on AniVerse.",
+      "Reetam's core anime rotation — psychological thrillers, modern shonen, and series worth a full binge on EntertainVerse.",
     category: "Anime",
     genreLabels: ["psychological", "action", "thriller"],
     kind: "content",
@@ -87,7 +87,7 @@ export const REETAM_COLLECTION_SEEDS: CollectionSeed[] = [
     ownerEmail: REETAM_EMAIL,
     name: "Music Queue",
     description:
-      "Tracks on repeat — K-pop hits, global pop, and OST-adjacent singles pulled from the AniVerse catalog.",
+      "Tracks on repeat — K-pop hits, global pop, and OST-adjacent singles pulled from the EntertainVerse catalog.",
     category: "Music",
     genreLabels: ["kpop", "pop", "electronic"],
     kind: "music",

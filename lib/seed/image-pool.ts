@@ -1,4 +1,4 @@
-/** Curated HD Unsplash images — neon / cyber / cinematic ambience for AniVerse. */
+/** Curated HD Unsplash images — neon / cyber / cinematic ambience for EntertainVerse. */
 const BASE = "https://images.unsplash.com";
 
 export const POSTER_IMAGES = [

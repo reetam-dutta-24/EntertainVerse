@@ -92,7 +92,7 @@ export function mapTrackRecordToSongDetail(
   ];
 
   const description =
-    row.description ?? `${row.title} by ${row.artist} on AniVerse.`;
+    row.description ?? `${row.title} by ${row.artist} on EntertainVerse.`;
 
   return {
     id: slug,
@@ -102,7 +102,7 @@ export function mapTrackRecordToSongDetail(
     rating: roundRating(row.rating) ?? 0,
     creditLabel: row.creditLabel ?? `By ${row.artist}`,
     trendingLabel:
-      row.trendingLabel ?? `Trending on AniVerse · ${row.kind.toUpperCase()}`,
+      row.trendingLabel ?? `Trending on EntertainVerse · ${row.kind.toUpperCase()}`,
     genres,
     description,
     synopsis: description,

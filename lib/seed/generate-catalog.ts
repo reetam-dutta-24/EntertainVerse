@@ -243,9 +243,9 @@ const ARTIST_NAMES: Array<{
 ];
 
 const USER_PROFILES = [
-  { name: "Reetam Dutta", handle: "reetam_dutta", email: "reetam@aniverse.local", location: "Kolkata, India", bio: "Building taste profiles and binge-watching everything neon. I collect OSTs, debate rankings in communities, and keep my watchlist ruthlessly organised. Always looking for the next series that blends spectacle with real emotional weight." },
-  { name: "Aisha Khan", handle: "aisha_khan", email: "aisha@aniverse.local", location: "Mumbai, India", bio: "J-pop devotee. Frieren evangelist. Always listening to RADWIMPS. I host watch parties, curate music collections, and chase opening themes with the same energy most people reserve for season finales." },
-  { name: "Vikram Patel", handle: "vikram_patel", email: "vikram@aniverse.local", location: "Bangalore, India", bio: "K-pop curator and community watch party host. I split time between chart-topping singles, anime OST deep-dives, and building public collections other fans can actually use. If it has a great hook and a story behind it, I have probably already saved it." },
+  { name: "Reetam Dutta", handle: "reetam_dutta", email: "reetam@entertainverse.local", location: "Kolkata, India", bio: "Building taste profiles and binge-watching everything neon. I collect OSTs, debate rankings in communities, and keep my watchlist ruthlessly organised. Always looking for the next series that blends spectacle with real emotional weight." },
+  { name: "Aisha Khan", handle: "aisha_khan", email: "aisha@entertainverse.local", location: "Mumbai, India", bio: "J-pop devotee. Frieren evangelist. Always listening to RADWIMPS. I host watch parties, curate music collections, and chase opening themes with the same energy most people reserve for season finales." },
+  { name: "Vikram Patel", handle: "vikram_patel", email: "vikram@entertainverse.local", location: "Bangalore, India", bio: "K-pop curator and community watch party host. I split time between chart-topping singles, anime OST deep-dives, and building public collections other fans can actually use. If it has a great hook and a story behind it, I have probably already saved it." },
 ] as const;
 
 export interface UserSeed {
@@ -359,8 +359,8 @@ function buildContentItem(
     highlightTags: [pick(CONTENT_GENRES, index), isMovie ? "Feature Film" : `${episodes} Episodes`, "Fan Favorite"],
     trendingLabel: `Trending Globally At #${(index % 9) + 1} in ${type === "anime" ? "Anime" : type === "movie" ? "Movies" : "Shows"}`,
     creditLabel: `${studio} · ${director}`,
-    description: `${entry.title} is a ${type} experience curated for AniVerse — rich characters, layered storytelling, and unforgettable world-building. Every scene pushes the ${genreA} and ${genreB} threads forward with purpose, whether you are discovering it for the first time or revisiting a favourite moment. Fans praise its pacing, emotional weight, and the way it rewards close attention without ever feeling slow.`,
-    synopsis: `In ${entry.title}, worlds collide under electric skies. Follow unforgettable characters through ${pick(["betrayal", "redemption", "discovery", "war", "love"], index)} as the narrative unfolds across ${isMovie ? "one breathtaking film" : `${episodes ?? 12} episodes`}. A must-watch for fans of ${genreA} and ${genreB}. The story builds tension with precision, lands its biggest turns with confidence, and leaves room for debate long after the credits roll. On AniVerse, this title is a cornerstone pick for anyone building a serious watchlist.`,
+    description: `${entry.title} is a ${type} experience curated for EntertainVerse — rich characters, layered storytelling, and unforgettable world-building. Every scene pushes the ${genreA} and ${genreB} threads forward with purpose, whether you are discovering it for the first time or revisiting a favourite moment. Fans praise its pacing, emotional weight, and the way it rewards close attention without ever feeling slow.`,
+    synopsis: `In ${entry.title}, worlds collide under electric skies. Follow unforgettable characters through ${pick(["betrayal", "redemption", "discovery", "war", "love"], index)} as the narrative unfolds across ${isMovie ? "one breathtaking film" : `${episodes ?? 12} episodes`}. A must-watch for fans of ${genreA} and ${genreB}. The story builds tension with precision, lands its biggest turns with confidence, and leaves room for debate long after the credits roll. On EntertainVerse, this title is a cornerstone pick for anyone building a serious watchlist.`,
   };
 }
 
@@ -379,7 +379,7 @@ function enrichArtistSynopsis(
   artist: (typeof ARTIST_NAMES)[number],
   genre: ArtistGenre,
 ): string {
-  const lead = `${artist.title} defines the ${genre} soundscape on AniVerse — from arena anthems to intimate ballads, their catalog shapes how fans discover music and anime OSTs alike. ${
+  const lead = `${artist.title} defines the ${genre} soundscape on EntertainVerse — from arena anthems to intimate ballads, their catalog shapes how fans discover music and anime OSTs alike. ${
     artist.isGroup
       ? "As a group, their chemistry on stage and in the studio translates into performances that feel both polished and personal."
       : "Their solo work balances mainstream appeal with artistic depth, making every release feel like an event."
@@ -426,7 +426,7 @@ export function generateArtistItems(): ArtistSeed[] {
     imageUrl: artistImageUrl(artist.slug),
     synopsis: enrichArtistSynopsis(artist, genre),
     catalogReviews: [
-      review("AniVerse Curator", catalogRating(8.5, (index % 10) * 0.1), `${artist.title} delivers consistent quality across albums and live performances. Essential listening for anyone exploring ${artist.genre} on AniVerse. The production is sharp, the vocal identity is unmistakable, and the discography rewards both casual playlists and deep dives.`, pick(ACCENTS, index)),
+      review("EntertainVerse Curator", catalogRating(8.5, (index % 10) * 0.1), `${artist.title} delivers consistent quality across albums and live performances. Essential listening for anyone exploring ${artist.genre} on EntertainVerse. The production is sharp, the vocal identity is unmistakable, and the discography rewards both casual playlists and deep dives.`, pick(ACCENTS, index)),
       review(pick(USER_PROFILES, index).name, catalogRating(8, index % 5), `Been on repeat all week. ${artist.title} never misses — every track feels intentional, and the emotional range keeps me coming back. Already added three songs to my collections.`, pick(ACCENTS, index + 1)),
     ],
   };
@@ -545,7 +545,7 @@ function enrichSongDescription(
 
   if (sourceTitle) {
     parts.push(
-      `It is closely tied to ${sourceTitle} and frequently appears in anime OST and soundtrack-focused collections on AniVerse.`,
+      `It is closely tied to ${sourceTitle} and frequently appears in anime OST and soundtrack-focused collections on EntertainVerse.`,
     );
   }
 
@@ -595,11 +595,11 @@ export function generateMusicItems(artists: ArtistSeed[], content: ContentSeedBa
       imageUrl: songImageUrl(slug),
       backdropUrl: songImageUrl(slug),
       accent: pick(ACCENTS, i),
-      trendingLabel: `Trending on AniVerse · ${entry.kind.toUpperCase()}`,
+      trendingLabel: `Trending on EntertainVerse · ${entry.kind.toUpperCase()}`,
       creditLabel: `By ${artist.title}`,
       featuredRank: i < 20 ? i + 1 : undefined,
       catalogReviews: [
-        review(pick(USER_PROFILES, i).name, catalogRating(8, (i % 3) * 0.3), `${entry.title} is on loop. Perfect ${entry.kind} energy — the hook lands immediately and the production still sounds fresh on repeat. Easily one of the best tracks in ${artist.title}'s catalog on AniVerse.`, pick(ACCENTS, i)),
+        review(pick(USER_PROFILES, i).name, catalogRating(8, (i % 3) * 0.3), `${entry.title} is on loop. Perfect ${entry.kind} energy — the hook lands immediately and the production still sounds fresh on repeat. Easily one of the best tracks in ${artist.title}'s catalog on EntertainVerse.`, pick(ACCENTS, i)),
       ],
     });
   }

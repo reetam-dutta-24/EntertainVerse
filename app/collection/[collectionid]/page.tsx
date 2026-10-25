@@ -38,9 +38,9 @@ export async function generateMetadata({
 }: CollectionPageProps): Promise<Metadata> {
   const { collectionid } = await params;
   const collection = await getCollectionDetail(collectionid);
-  if (!collection) return { title: "Collection — AniVerse" };
+  if (!collection) return { title: "Collection — EntertainVerse" };
   return {
-    title: `${collection.name} — AniVerse`,
+    title: `${collection.name} — EntertainVerse`,
     description: collection.description,
   };
 }

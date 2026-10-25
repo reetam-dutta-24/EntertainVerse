@@ -14,10 +14,10 @@ export async function generateMetadata({
 }: CollectionPlayPageProps): Promise<Metadata> {
   const { collectionid } = await params;
   const collection = await getCollectionDetail(collectionid);
-  if (!collection) return { title: "Play Collection — AniVerse" };
+  if (!collection) return { title: "Play Collection — EntertainVerse" };
   return {
-    title: `Play ${collection.name} — AniVerse`,
-    description: `Listen or watch ${collection.name} in order on AniVerse.`,
+    title: `Play ${collection.name} — EntertainVerse`,
+    description: `Listen or watch ${collection.name} in order on EntertainVerse.`,
   };
 }
 

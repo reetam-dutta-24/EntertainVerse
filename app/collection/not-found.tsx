@@ -9,7 +9,7 @@ export default function NotFound() {
       description="This collection doesn't exist, was deleted, or is private to its owner."
       actions={[
         { href: "/dashboard/collections", label: "Browse collections" },
-        { href: "/search", label: "Search AniVerse" },
+        { href: "/search", label: "Search EntertainVerse" },
       ]}
     />
   );

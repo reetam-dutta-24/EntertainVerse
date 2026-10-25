@@ -6,7 +6,7 @@ import { isDiscordAuthEnabled, isGoogleAuthEnabled } from "@/lib/auth";
 import { authErrorMessage, safeCallbackUrl } from "@/lib/auth-redirect";
 
 export const metadata: Metadata = {
-  title: "Sign in — AniVerse",
+  title: "Sign in — EntertainVerse",
   description: "Sign in to continue your entertainment universe.",
 };
 

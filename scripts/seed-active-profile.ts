@@ -104,7 +104,7 @@ const COLLECTIONS = [
 
 const COMMUNITIES = [
   "jujutsu-kaisen-sorcerers", "attack-on-titan-survey-corps", "netflix-thriller-club", "anime-ost-collectors",
-  "twice-once-global", "psychological-thriller-lounge", "shonen-power-hour", "aniverse-global-lounge",
+  "twice-once-global", "psychological-thriller-lounge", "shonen-power-hour", "entertainverse-global-lounge",
 ];
 
 const POSTS = [
@@ -116,7 +116,7 @@ const POSTS = [
 const CHAT = [
   { community: "jujutsu-kaisen-sorcerers", content: "Anyone else hyped for the next season announcement? 🔥" },
   { community: "twice-once-global", content: "Feel Special still hits every single time 💖" },
-  { community: "aniverse-global-lounge", content: "Just joined — looking for thriller and shonen recs!" },
+  { community: "entertainverse-global-lounge", content: "Just joined — looking for thriller and shonen recs!" },
 ];
 
 const REVIEWS: { target: ReviewTargetType; slug: string; rating: number; headline: string; body: string }[] = [

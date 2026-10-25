@@ -308,7 +308,7 @@ export function OnboardingFlow({
           <h1 className="text-xl font-bold text-white sm:text-title">
             {isRetake
               ? `Update your taste, ${userName}`
-              : `Welcome to AniVerse, ${userName}`}
+              : `Welcome to EntertainVerse, ${userName}`}
           </h1>
           <p className="mt-3 text-sm text-muted sm:text-subtitle">
             {isRetake
@@ -412,7 +412,7 @@ export function OnboardingFlow({
             Your universe is ready, {userName}
           </h1>
           <p className="max-w-[520px] text-sm text-muted sm:text-subtitle">
-            Here&apos;s your personalized AniVerse — content, music, artists,
+            Here&apos;s your personalized EntertainVerse — content, music, artists,
             communities, and collections matched to your taste.
           </p>
         </div>

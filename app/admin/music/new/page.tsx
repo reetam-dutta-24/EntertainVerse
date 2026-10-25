@@ -5,7 +5,7 @@ import { requireMusicAdmin } from "@/lib/auth-guards";
 import type { MusicFormInput } from "@/lib/validators/admin/music";
 
 export const metadata: Metadata = {
-  title: "New track — Admin — AniVerse",
+  title: "New track — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

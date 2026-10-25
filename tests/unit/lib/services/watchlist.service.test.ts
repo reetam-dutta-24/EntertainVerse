@@ -65,7 +65,7 @@ describe("listWatchlistForUser", () => {
       watchlistPriority: "HIGH",
       watchlistStatus: "WATCHING",
       rating: 8.8,
-      description: "frieren — saved to your AniVerse watchlist.",
+      description: "frieren — saved to your EntertainVerse watchlist.",
     });
   });
 

@@ -166,7 +166,7 @@ const featuredReviews: Review[] = [
     author: { id: "u-aki", name: "Akira Tan", avatarColor: "#00e5ff" },
     rating: 10,
     content:
-      "AniVerse's AI match is scary good. It recommended Vinland Saga after my Berserk binge and now it's my favorite anime of all time.",
+      "EntertainVerse's AI match is scary good. It recommended Vinland Saga after my Berserk binge and now it's my favorite anime of all time.",
     likeCount: 3120,
     createdAt: "4 Jul, 2026",
     accent: "cyan",
@@ -196,7 +196,7 @@ const featuredReviews: Review[] = [
     author: { id: "u-yuki", name: "Yuki Sato", avatarColor: "#9d4bff" },
     rating: 10,
     content:
-      "My taste profile analytics blew my mind — 214 hours of OSTs tracked, genre patterns I never noticed. AniVerse knows me better than I do.",
+      "My taste profile analytics blew my mind — 214 hours of OSTs tracked, genre patterns I never noticed. EntertainVerse knows me better than I do.",
     likeCount: 2940,
     createdAt: "15 Jun, 2026",
     accent: "purple",

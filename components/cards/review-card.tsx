@@ -20,7 +20,7 @@ export function ReviewCard({ review, className, ...props }: ReviewCardProps) {
       {...props}
     >
       <div className="flex items-center gap-3">
-        {/* Landing-page testimonials — the authors aren't real AniVerse profiles. */}
+        {/* Landing-page testimonials — the authors aren't real EntertainVerse profiles. */}
         <AvatarStack users={[review.author]} size="md" linkProfiles={false} />
         <div className="flex flex-col">
           <p className="text-base font-semibold text-white">

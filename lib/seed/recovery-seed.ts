@@ -265,11 +265,11 @@ async function fixCommunityMembership(prisma: PrismaClient) {
   }
 
   const aisha = await prisma.user.findUnique({
-    where: { email: "aisha@aniverse.local" },
+    where: { email: "aisha@entertainverse.local" },
     select: { id: true },
   });
   const vikram = await prisma.user.findUnique({
-    where: { email: "vikram@aniverse.local" },
+    where: { email: "vikram@entertainverse.local" },
     select: { id: true },
   });
 
@@ -468,14 +468,14 @@ export async function runRecoverySeed(prisma: PrismaClient) {
 
   await seedCollectionsFromSeeds(
     prisma,
-    "aisha@aniverse.local",
+    "aisha@entertainverse.local",
     GLOBAL_COLLECTION_SEEDS.filter((s) => s.ownerEmail.includes("aisha")),
     contentSlugToId,
     trackSlugToId,
   );
   await seedCollectionsFromSeeds(
     prisma,
-    "vikram@aniverse.local",
+    "vikram@entertainverse.local",
     GLOBAL_COLLECTION_SEEDS.filter((s) => s.ownerEmail.includes("vikram")),
     contentSlugToId,
     trackSlugToId,

@@ -37,7 +37,7 @@ export interface AniBarChartProps {
   className?: string;
 }
 
-/** Dark neon-themed bar chart matching the AniVerse analytics style. */
+/** Dark neon-themed bar chart matching the EntertainVerse analytics style. */
 export function AniBarChart({
   data,
   xKey,

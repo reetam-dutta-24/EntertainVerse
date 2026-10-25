@@ -1,7 +1,7 @@
 /**
  * Server-side data cache — shared across requests in the long-running Node server.
  *
- * AniVerse runs as one Node process (`server.ts`: Next + Socket.IO), so an in-memory
+ * EntertainVerse runs as one Node process (`server.ts`: Next + Socket.IO), so an in-memory
  * cache is the fastest option and can hold values Next's serialized caches can't
  * (Maps/Sets of taste signals, Float32Array embeddings).
  *
@@ -37,9 +37,9 @@ interface Store {
   stats: { hits: number; stale: number; misses: number; invalidations: number };
 }
 
-const globalStore = globalThis as unknown as { __aniverseCache?: Store };
+const globalStore = globalThis as unknown as { __entertainverseCache?: Store };
 // One store per process, shared by Next's module graph and server.ts (and kept across HMR).
-const store: Store = (globalStore.__aniverseCache ??= {
+const store: Store = (globalStore.__entertainverseCache ??= {
   entries: new Map(),
   inflight: new Map(),
   tagIndex: new Map(),

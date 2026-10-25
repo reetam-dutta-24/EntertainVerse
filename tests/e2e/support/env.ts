@@ -8,7 +8,7 @@ export const E2E_PORT = Number(process.env.E2E_PORT ?? 3100);
 export const E2E_BASE_URL = `http://localhost:${E2E_PORT}`;
 
 /** Local default matches `npm run e2e:db`; CI passes its Postgres service URL. */
-export const E2E_DATABASE_URL = process.env.E2E_DATABASE_URL ?? "postgresql://test:test@localhost:55433/aniverse_e2e";
+export const E2E_DATABASE_URL = process.env.E2E_DATABASE_URL ?? "postgresql://test:test@localhost:55433/entertainverse_e2e";
 
 /** Environment for the app under test (overrides .env / .env.local, which Next also loads). */
 export const E2E_APP_ENV: Record<string, string> = {

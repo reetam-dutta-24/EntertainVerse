@@ -9,7 +9,7 @@ import { MEMORY_OPTIONS, type RecapDepth, type RecapOptions, type RecapResult } 
 import { cn } from "@/lib/utils";
 
 const GROUNDING_LABEL: Record<RecapResult["grounding"], string> = {
-  episodes: "Grounded in AniVerse episode guides",
+  episodes: "Grounded in EntertainVerse episode guides",
   web: "Grounded in web sources up to your stopping point",
   synopsis: "Grounded in the synopsis only — a fuller recap appears once web lookup is available",
 };

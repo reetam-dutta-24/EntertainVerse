@@ -91,7 +91,7 @@ function enrichDescription(item: CuratedDraft): CuratedDraft {
   if (synopsis && synopsis !== lead) parts.push(synopsis);
 
   parts.push(
-    `${item.title} stands out as a ${genre} ${typeLabel} with sharp pacing, layered characters, and set pieces that fans revisit on AniVerse.`,
+    `${item.title} stands out as a ${genre} ${typeLabel} with sharp pacing, layered characters, and set pieces that fans revisit on EntertainVerse.`,
   );
 
   const credit =

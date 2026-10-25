@@ -33,7 +33,7 @@ export interface AniAreaChartProps {
   className?: string;
 }
 
-/** Dark neon-themed gradient area chart matching the AniVerse analytics style. */
+/** Dark neon-themed gradient area chart matching the EntertainVerse analytics style. */
 export function AniAreaChart({
   data,
   xKey,

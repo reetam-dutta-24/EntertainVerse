@@ -23,7 +23,7 @@ import { getTasteDnaHistory } from "@/lib/services/wrapped.service";
 import { chartPalette } from "@/components/charts/chart-theme";
 
 export const metadata: Metadata = {
-  title: "Analytics — AniVerse",
+  title: "Analytics — EntertainVerse",
   description:
     "Track your watching, listening, genres, community activity, and taste patterns.",
 };
@@ -44,7 +44,7 @@ export default async function AnalyticsPage() {
         className="group flex flex-col gap-3 rounded-card border border-brand-magenta/40 bg-gradient-to-r from-brand-purple/40 via-brand-magenta/20 to-transparent p-4 transition-colors hover:border-brand-magenta/70 sm:flex-row sm:items-center sm:justify-between sm:p-5"
       >
         <span>
-          <span className="block text-base font-bold text-white sm:text-lg">🎁 Your AniVerse Wrapped {new Date().getFullYear()} is ready</span>
+          <span className="block text-base font-bold text-white sm:text-lg">🎁 Your EntertainVerse Wrapped {new Date().getFullYear()} is ready</span>
           <span className="mt-0.5 block text-xs text-muted sm:text-sm">Top titles, songs, Taste DNA eras and the persona AI named you.</span>
         </span>
         <span className="inline-flex w-full items-center justify-center rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-white sm:w-auto">

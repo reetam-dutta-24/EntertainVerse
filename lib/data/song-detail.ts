@@ -102,7 +102,7 @@ const gurengeReviews: Review[] = [
 ];
 
 const gurengeDescription =
-  "LiSA's breakout anthem for Demon Slayer: Kimetsu no Yaiba — a soaring J-rock track that mirrors Tanjiro's resolve. Blazing guitars, urgent drums, and a chorus built for stadium singalongs made Gurenge a global chart hit and one of the most recognizable anime openings of its generation. Gurenge stands out as a defining OST on AniVerse with sharp production, emotional lift, and replay value for both anime fans and music listeners.";
+  "LiSA's breakout anthem for Demon Slayer: Kimetsu no Yaiba — a soaring J-rock track that mirrors Tanjiro's resolve. Blazing guitars, urgent drums, and a chorus built for stadium singalongs made Gurenge a global chart hit and one of the most recognizable anime openings of its generation. Gurenge stands out as a defining OST on EntertainVerse with sharp production, emotional lift, and replay value for both anime fans and music listeners.";
 
 const gurengeDetail: ContentDetail = {
   id: "gurenge",
@@ -253,14 +253,14 @@ function buildDetailFromTrack(
   track: MusicTrack,
   similar: MusicTrack[],
 ): ContentDetail {
-  const description = `${track.title} by ${track.artist}${track.source ? ` — featured in ${track.source}` : ""}. A standout track matched to your listening history, genres, and mood preferences on AniVerse. ${track.title} delivers memorable hooks, polished production, and the kind of replay value fans expect from top-tier catalog picks.`;
+  const description = `${track.title} by ${track.artist}${track.source ? ` — featured in ${track.source}` : ""}. A standout track matched to your listening history, genres, and mood preferences on EntertainVerse. ${track.title} delivers memorable hooks, polished production, and the kind of replay value fans expect from top-tier catalog picks.`;
   return {
     id: track.id,
     title: track.title,
     type: "song",
     rating: track.rating ?? 8.8,
     creditLabel: `By ${track.artist}${track.source ? ` (From ${track.source})` : ""}`,
-    trendingLabel: `Trending on AniVerse · ${track.kind.toUpperCase()}`,
+    trendingLabel: `Trending on EntertainVerse · ${track.kind.toUpperCase()}`,
     genres: track.language
       ? [g(track.language.toLowerCase(), track.language)]
       : [g("music", "Music")],

@@ -47,7 +47,7 @@ const webDraftSchema = enrichmentSchema.extend({
   members: z.array(z.object({ name: z.string(), role: z.string() })),
 });
 
-const STYLE_GUIDE = `You prepare artist profiles for AniVerse, a discovery app for anime, shows and their music (J-Pop, K-Pop, OST artists and more).
+const STYLE_GUIDE = `You prepare artist profiles for EntertainVerse, a discovery app for anime, shows and their music (J-Pop, K-Pop, OST artists and more).
 
 House style (match it exactly):
 - nativeTitle: the stage name written in its original script, e.g. "트와이스" for TWICE or "ヨルシカ" for Yorushika. Never a legal or birth name; "" when the official name is already in Latin letters (e.g. LiSA) or you're unsure.

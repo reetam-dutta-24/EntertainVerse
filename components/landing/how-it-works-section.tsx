@@ -14,7 +14,7 @@ const steps = [
   {
     number: "02",
     title: "Get matched",
-    body: "AniVerse creates your AI-powered taste profile.",
+    body: "EntertainVerse creates your AI-powered taste profile.",
   },
   {
     number: "03",
@@ -28,7 +28,7 @@ const steps = [
   },
 ];
 
-/** "How AniVerse Works" — four numbered step cards on black. */
+/** "How EntertainVerse Works" — four numbered step cards on black. */
 export function HowItWorksSection() {
   return (
     <section
@@ -37,8 +37,8 @@ export function HowItWorksSection() {
     >
       <ScrollFadeIn>
         <SectionHeader
-          title="How AniVerse Works"
-          subtitle="Start with your taste. AniVerse does the rest."
+          title="How EntertainVerse Works"
+          subtitle="Start with your taste. EntertainVerse does the rest."
         />
       </ScrollFadeIn>
       <div className="w-full overflow-x-auto py-6">

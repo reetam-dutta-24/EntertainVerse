@@ -6,7 +6,7 @@ import { getQuizCatalog } from "@/lib/services/ai-mode.service";
 import { getAiProfile } from "@/lib/services/ai-profile.service";
 
 export const metadata: Metadata = {
-  title: "AI mode — AniVerse",
+  title: "AI mode — EntertainVerse",
   description: "Answer a one-minute quiz or chat with AI — get anime, shows, films and music that fit your mood, with reasons.",
 };
 

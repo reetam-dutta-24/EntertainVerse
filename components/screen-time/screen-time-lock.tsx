@@ -54,7 +54,7 @@ export function ScreenTimeLock({ limitMinutes, unlocksAt }: { limitMinutes: numb
             That&apos;s today&apos;s {formatLimit(limitMinutes)}
           </h1>
           <p className="mt-2 text-sm text-white/70">
-            You asked AniVerse to stop you here — and it&apos;s holding you to it. Go do something offline;
+            You asked EntertainVerse to stop you here — and it&apos;s holding you to it. Go do something offline;
             your watchlist, roadmap and playlists will be waiting.
           </p>
         </div>

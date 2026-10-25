@@ -5,7 +5,7 @@ import { adminAiSettings } from "@/lib/ai/settings";
 import type { ContentFormInput } from "@/lib/validators/admin/content";
 
 export const metadata: Metadata = {
-  title: "New content — Admin — AniVerse",
+  title: "New content — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

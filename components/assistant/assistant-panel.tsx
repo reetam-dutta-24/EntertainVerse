@@ -30,8 +30,8 @@ export function AssistantLauncher() {
     <button
       type="button"
       onClick={() => setOpen(true)}
-      aria-label="Open AniVerse Assistant (Ctrl + /)"
-      title="Ask AniVerse Assistant · Ctrl + /"
+      aria-label="Open EntertainVerse Assistant (Ctrl + /)"
+      title="Ask EntertainVerse Assistant · Ctrl + /"
       className="group fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] right-4 z-[250] inline-flex cursor-pointer items-center gap-2 rounded-full bg-gradient-brand p-3 text-sm font-semibold text-white shadow-glow-pink transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:px-4 lg:bottom-6 lg:right-6"
     >
       <Sparkles className="size-5 transition-transform group-hover:rotate-12" aria-hidden />
@@ -103,7 +103,7 @@ function Thinking() {
           <span key={dot} className="size-1.5 rounded-full bg-brand-pink motion-safe:animate-bounce" style={{ animationDelay: `${dot * 120}ms` }} />
         ))}
       </span>
-      Searching AniVerse help, catalog and your stats…
+      Searching EntertainVerse help, catalog and your stats…
     </div>
   );
 }
@@ -158,7 +158,7 @@ function EmptyState() {
         <Orb size="size-12" />
         <div>
           <h3 className="text-xl font-bold text-white">Hi {userName.split(" ")[0]} 👋</h3>
-          <p className="mt-1 text-sm text-white/60">Ask me anything about AniVerse — features, settings, titles in the catalog, or your own stats.</p>
+          <p className="mt-1 text-sm text-white/60">Ask me anything about EntertainVerse — features, settings, titles in the catalog, or your own stats.</p>
         </div>
       </div>
       <div className="flex flex-col gap-2">
@@ -225,8 +225,8 @@ function Composer() {
               submit();
             }
           }}
-          placeholder="Ask about AniVerse…"
-          aria-label="Ask the AniVerse Assistant"
+          placeholder="Ask about EntertainVerse…"
+          aria-label="Ask the EntertainVerse Assistant"
           className="max-h-40 min-h-[36px] flex-1 resize-none bg-transparent py-2 text-sm text-white placeholder:text-white/35 focus:outline-none"
         />
         {streaming ? (
@@ -244,7 +244,7 @@ function Composer() {
           </button>
         )}
       </form>
-      <p className="mt-1.5 px-1 text-center text-[11px] text-white/35">Answers come from AniVerse help, catalog and your stats · can make mistakes</p>
+      <p className="mt-1.5 px-1 text-center text-[11px] text-white/35">Answers come from EntertainVerse help, catalog and your stats · can make mistakes</p>
     </div>
   );
 }
@@ -280,7 +280,7 @@ export function AssistantPanel() {
       {open ? (
         <motion.aside
           key="assistant"
-          aria-label="AniVerse Assistant"
+          aria-label="EntertainVerse Assistant"
           initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 32 }}
           animate={{ opacity: 1, x: 0 }}
           exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 32 }}
@@ -293,9 +293,9 @@ export function AssistantPanel() {
           <header className="relative flex items-center gap-3 border-b border-white/10 px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
             <Orb pulse={streaming} />
             <div className="min-w-0 flex-1">
-              <h2 className="truncate text-sm font-bold text-white">AniVerse Assistant</h2>
+              <h2 className="truncate text-sm font-bold text-white">EntertainVerse Assistant</h2>
               <p className="flex items-center gap-1.5 truncate text-caption text-white/50">
-                <span className="size-1.5 rounded-full bg-emerald-400" aria-hidden /> Grounded in AniVerse help &amp; catalog
+                <span className="size-1.5 rounded-full bg-emerald-400" aria-hidden /> Grounded in EntertainVerse help &amp; catalog
               </p>
             </div>
             {messages.length ? (

@@ -99,7 +99,7 @@ export function mapArtistRecordToDetail(row: ArtistRecordFull): ArtistDetail {
     { id: "debut", label: "Debut", value: row.debutYear ? String(row.debutYear) : "—" },
   ];
 
-  const description = row.synopsis?.trim() || `${row.title} on AniVerse.`;
+  const description = row.synopsis?.trim() || `${row.title} on EntertainVerse.`;
 
   return {
     id: slug,

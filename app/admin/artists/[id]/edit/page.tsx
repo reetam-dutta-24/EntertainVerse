@@ -6,7 +6,7 @@ import { requireArtistAdmin } from "@/lib/auth-guards";
 import { artistRecordToFormInput, getArtistRecordById } from "@/lib/services/artist.service";
 
 export const metadata: Metadata = {
-  title: "Edit artist — Admin — AniVerse",
+  title: "Edit artist — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

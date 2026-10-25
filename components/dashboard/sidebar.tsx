@@ -62,9 +62,9 @@ export function DashboardSidebar({
       <Link
         href="/dashboard"
         onClick={onNavigate}
-        className="px-2 text-xl font-semibold tracking-wide text-white"
+        className="px-2 text-xl font-semibold tracking-wide text-white lg:text-lg lg:tracking-normal"
       >
-        AniVerse
+        EntertainVerse
       </Link>
 
       <nav className="mt-8 flex flex-col gap-1.5">

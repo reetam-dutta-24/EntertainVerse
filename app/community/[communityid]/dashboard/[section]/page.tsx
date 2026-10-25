@@ -31,14 +31,14 @@ export async function generateMetadata({
   const { communityid, section } = await params;
   const community = await getCommunityDetail(communityid);
   if (!community || !isCommunityDashboardSection(section)) {
-    return { title: "Community Dashboard — AniVerse" };
+    return { title: "Community Dashboard — EntertainVerse" };
   }
 
   const navLabel =
     community.dashboardNav.find((item) => item.id === section)?.label ?? section;
 
   return {
-    title: `${community.name} — ${navLabel} — AniVerse`,
+    title: `${community.name} — ${navLabel} — EntertainVerse`,
   };
 }
 

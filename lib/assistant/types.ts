@@ -1,4 +1,4 @@
-/** Client-safe shapes for the AniVerse Assistant. */
+/** Client-safe shapes for the EntertainVerse Assistant. */
 
 export interface AssistantSource {
   kind: "help" | "title" | "song" | "artist";

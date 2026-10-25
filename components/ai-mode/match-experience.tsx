@@ -183,7 +183,7 @@ export function MatchExperience({ initialProfile, initialRooms, initialInvites, 
     try {
       await api("/api/dm/send", {
         method: "POST",
-        body: JSON.stringify({ recipientHandle: handle, content: `👋 Hey ${name.split(" ")[0]}! We're both in “${room.title}” on AniVerse.` }),
+        body: JSON.stringify({ recipientHandle: handle, content: `👋 Hey ${name.split(" ")[0]}! We're both in “${room.title}” on EntertainVerse.` }),
       });
       toast(`Said hi to ${name} — continue in Messages.`, "success");
     } catch (dmError) {
@@ -337,7 +337,7 @@ export function MatchExperience({ initialProfile, initialRooms, initialInvites, 
               <Radio className="size-4 text-brand-pink" aria-hidden /> Open an AI room
             </h2>
             <p className="mt-1 text-xs text-white/55">
-              Everyone opted in within your reach who matches you 60%+ gets a popup and a notification (while AniVerse is
+              Everyone opted in within your reach who matches you 60%+ gets a popup and a notification (while EntertainVerse is
               small, the closest matches we have). First come, first in.
             </p>
           </div>

@@ -16,7 +16,7 @@ export function mapWatchlistItemToContent(
     matchScore: item.matchScore ?? 78 + (index % 19),
     description:
       item.description ??
-      `${item.title} — saved to your AniVerse watchlist.`,
+      `${item.title} — saved to your EntertainVerse watchlist.`,
     watchlistItemId: row.id,
     watchlistStatus: row.status,
     watchlistPriority: row.priority,

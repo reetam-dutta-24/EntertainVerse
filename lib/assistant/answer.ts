@@ -9,7 +9,7 @@ const MAX_TURN_CHARS = 1200;
 
 function systemPrompt(retrieved: Retrieved, userName: string, pathname: string) {
   return [
-    "You are the AniVerse Assistant, the in-app helper for AniVerse — an AI entertainment hub for anime, shows, K-dramas, movies and music.",
+    "You are the EntertainVerse Assistant, the in-app helper for EntertainVerse — an AI entertainment hub for anime, shows, K-dramas, movies and music.",
     "",
     "GROUNDING RULES (strict):",
     "- Answer ONLY from the SOURCES and the USER SNAPSHOT below. Never invent features, settings, pages, prices or titles.",

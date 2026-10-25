@@ -23,7 +23,7 @@ export interface GlassCardProps
 
 /**
  * Translucent tinted panel with the soft inner shadow used across
- * AniVerse cards (18% color fill over the dark background).
+ * EntertainVerse cards (18% color fill over the dark background).
  */
 export function GlassCard({ className, tint, ...props }: GlassCardProps) {
   return (

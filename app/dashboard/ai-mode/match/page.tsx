@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/data/user";
 import { getMatchProfile, listMyRooms, listRoomInvites, suggestRoom } from "@/lib/services/match.service";
 
 export const metadata: Metadata = {
-  title: "AI Match rooms — AniVerse",
+  title: "AI Match rooms — EntertainVerse",
   description: "Open a room and everyone who shares your taste gets invited — watch parties, listen parties, talk rooms and chat.",
 };
 

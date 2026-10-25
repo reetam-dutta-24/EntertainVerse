@@ -10,7 +10,7 @@ import type { RecapDepth, RecapOptions, RecapResult } from "@/lib/recap/types";
 
 /**
  * "Catch me up" — retrieval-augmented recaps. We first retrieve what's known about
- * exactly the part the user has seen (AniVerse's own episode descriptions; web search
+ * exactly the part the user has seen (EntertainVerse's own episode descriptions; web search
  * limited to that point when the catalog has none), then the model writes a recap
  * grounded only in that text and never past the stopping point. Recaps are cached
  * and shared per title / stopping point / depth.

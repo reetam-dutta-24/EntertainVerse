@@ -11,7 +11,7 @@ import {
 import { getCurrentUser } from "@/lib/data/user";
 
 export const metadata: Metadata = {
-  title: "Community — AniVerse",
+  title: "Community — EntertainVerse",
   description:
     "Discover communities, join discussions, and connect with anime and media fans.",
 };

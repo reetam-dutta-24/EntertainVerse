@@ -17,7 +17,7 @@ export interface CommunitySeed {
 export const GLOBAL_COLLECTION_SEEDS: CollectionSeed[] = [
   {
     slug: "aisha-kdrama-vault",
-    ownerEmail: "aisha@aniverse.local",
+    ownerEmail: "aisha@entertainverse.local",
     name: "K-Drama Vault",
     description:
       "Aisha's curated K-drama and global series picks — romance, thriller, and binge-worthy finales.",
@@ -31,7 +31,7 @@ export const GLOBAL_COLLECTION_SEEDS: CollectionSeed[] = [
   },
   {
     slug: "vikram-cinephile-list",
-    ownerEmail: "vikram@aniverse.local",
+    ownerEmail: "vikram@entertainverse.local",
     name: "Cinephile Shortlist",
     description:
       "Vikram's public film shelf — prestige cinema, sci-fi, and rewatch essentials from around the world.",
@@ -45,7 +45,7 @@ export const GLOBAL_COLLECTION_SEEDS: CollectionSeed[] = [
   },
   {
     slug: "aisha-global-pop-playlist",
-    ownerEmail: "aisha@aniverse.local",
+    ownerEmail: "aisha@entertainverse.local",
     name: "Global Pop Rotation",
     description: "Cross-language pop and electronic singles Aisha keeps on repeat.",
     category: "Music",
@@ -58,7 +58,7 @@ export const GLOBAL_COLLECTION_SEEDS: CollectionSeed[] = [
   },
   {
     slug: "vikram-anime-night",
-    ownerEmail: "vikram@aniverse.local",
+    ownerEmail: "vikram@entertainverse.local",
     name: "Anime Night Picks",
     description: "Community-friendly anime starters Vikram recommends for watch parties.",
     category: "Anime",
@@ -71,7 +71,7 @@ export const GLOBAL_COLLECTION_SEEDS: CollectionSeed[] = [
   },
   {
     slug: "global-mixed-discoveries",
-    ownerEmail: "vikram@aniverse.local",
+    ownerEmail: "vikram@entertainverse.local",
     name: "Global Discoveries",
     description: "Mixed-format public shelf for titles you may not have explored yet.",
     category: "Mixed",
@@ -87,7 +87,7 @@ export const GLOBAL_COLLECTION_SEEDS: CollectionSeed[] = [
 export const GLOBAL_COMMUNITY_SEEDS: CommunitySeed[] = [
   {
     slug: "demon-slayer-corps",
-    ownerEmail: "aisha@aniverse.local",
+    ownerEmail: "aisha@entertainverse.local",
     name: "Demon Slayer Corps",
     description:
       "Celebrate Demon Slayer: Kimetsu no Yaiba — arcs, battles, breathing styles, and weekly episode threads.",
@@ -104,7 +104,7 @@ export const GLOBAL_COMMUNITY_SEEDS: CommunitySeed[] = [
   },
   {
     slug: "netflix-thriller-club",
-    ownerEmail: "vikram@aniverse.local",
+    ownerEmail: "vikram@entertainverse.local",
     name: "Netflix Thriller Club",
     description:
       "Money Heist, Elite, Alice in Borderland, and every prestige thriller worth debating.",
@@ -121,7 +121,7 @@ export const GLOBAL_COMMUNITY_SEEDS: CommunitySeed[] = [
   },
   {
     slug: "kpop-chart-room",
-    ownerEmail: "aisha@aniverse.local",
+    ownerEmail: "aisha@entertainverse.local",
     name: "K-Pop Chart Room",
     description: "TWICE, BTS, BLACKPINK, NewJeans — comebacks, playlists, and fan picks.",
     category: "Music",
@@ -137,7 +137,7 @@ export const GLOBAL_COMMUNITY_SEEDS: CommunitySeed[] = [
   },
   {
     slug: "prestige-cinema-society",
-    ownerEmail: "vikram@aniverse.local",
+    ownerEmail: "vikram@entertainverse.local",
     name: "Prestige Cinema Society",
     description: "Feature films, directors, and soundtracks — from Parasite to Interstellar.",
     category: "Movies",
@@ -153,9 +153,9 @@ export const GLOBAL_COMMUNITY_SEEDS: CommunitySeed[] = [
   },
   {
     slug: "isekai-explorers",
-    ownerEmail: "aisha@aniverse.local",
+    ownerEmail: "aisha@entertainverse.local",
     name: "Isekai Explorers",
-    description: "Portal fantasy, game worlds, and the best isekai recommendations on AniVerse.",
+    description: "Portal fantasy, game worlds, and the best isekai recommendations on EntertainVerse.",
     category: "Anime",
     visibility: "PUBLIC",
     activityLevel: "moderate",

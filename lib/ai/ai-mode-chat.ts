@@ -68,7 +68,7 @@ const FOLLOW_UPS: Record<AiMode, string> = {
 
 function systemPrompt(mode: AiMode) {
   const doing = mode === "watch" ? "watch" : "listen to";
-  return `You are AniVerse's AI mode — a warm, concise taste guide. In this chat you learn what the user wants to ${doing}, so the app can recommend from its own catalog.
+  return `You are EntertainVerse's AI mode — a warm, concise taste guide. In this chat you learn what the user wants to ${doing}, so the app can recommend from its own catalog.
 
 Every turn:
 - prefs: the COMPLETE current answers. Keep earlier answers unless the user changes them. Use only the ids listed below; leave a field empty when it is unknown.

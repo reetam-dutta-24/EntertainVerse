@@ -1,5 +1,5 @@
 {
-  "name": "aniverse-application",
+  "name": "entertainverse-application",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,7 +13,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "tsx scripts/e2e-prepare-db.ts && playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "e2e:db": "docker run -d --name aniverse-e2e-db -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test -e POSTGRES_DB=aniverse_e2e -p 55433:5432 postgres:16",
+    "e2e:db": "docker run -d --name entertainverse-e2e-db -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test -e POSTGRES_DB=entertainverse_e2e -p 55433:5432 postgres:16",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",

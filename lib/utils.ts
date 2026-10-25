@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
 /**
- * tailwind-merge doesn't know the custom AniVerse theme utilities, so we
+ * tailwind-merge doesn't know the custom EntertainVerse theme utilities, so we
  * register them in their proper conflict groups (e.g. `text-title` is a
  * font size, not a text color).
  */

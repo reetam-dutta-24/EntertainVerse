@@ -8,7 +8,7 @@ import { requireMusicAdmin } from "@/lib/auth-guards";
 import { listCatalogTracks } from "@/lib/services/music.service";
 
 export const metadata: Metadata = {
-  title: "Music — Admin — AniVerse",
+  title: "Music — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

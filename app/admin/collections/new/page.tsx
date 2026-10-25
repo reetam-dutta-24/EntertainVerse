@@ -4,7 +4,7 @@ import { requireSuperAdmin } from "@/lib/auth-guards";
 import type { AdminCollectionFormInput } from "@/lib/validators/admin/collection";
 
 export const metadata: Metadata = {
-  title: "New collection — Admin — AniVerse",
+  title: "New collection — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

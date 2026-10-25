@@ -6,7 +6,7 @@ import { requireMusicAdmin } from "@/lib/auth-guards";
 import { getTrackRecordById, trackRecordToFormInput, trackRecordToLinkedSelections } from "@/lib/services/music.service";
 
 export const metadata: Metadata = {
-  title: "Edit track — Admin — AniVerse",
+  title: "Edit track — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

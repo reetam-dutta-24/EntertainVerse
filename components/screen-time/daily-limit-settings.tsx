@@ -31,8 +31,8 @@ export function DailyLimitSettings({ initialStatus }: { initialStatus: ScreenTim
       const confirmed = await confirmAction({
         title: current === null ? `Limit yourself to ${formatLimit(limit)} a day?` : `Lower your limit to ${formatLimit(limit)}?`,
         description: overNow
-          ? `You've already spent ${status.usedMinutes} min here today, so AniVerse locks right away until midnight. This is strict: raising the limit or switching it off only takes effect tomorrow.`
-          : "This is strict on purpose: 5 minutes before the limit you get a warning, then AniVerse locks until midnight. Raising the limit or switching it off only takes effect tomorrow.",
+          ? `You've already spent ${status.usedMinutes} min here today, so EntertainVerse locks right away until midnight. This is strict: raising the limit or switching it off only takes effect tomorrow.`
+          : "This is strict on purpose: 5 minutes before the limit you get a warning, then EntertainVerse locks until midnight. Raising the limit or switching it off only takes effect tomorrow.",
         confirmLabel: overNow ? "Lock me out now" : "Turn on",
         destructive: overNow,
       });
@@ -73,7 +73,7 @@ export function DailyLimitSettings({ initialStatus }: { initialStatus: ScreenTim
             </span>
             <div className="text-sm text-white/70">
               <p>
-                Choose the most time you want to spend on AniVerse each day — watching and listening included. Five minutes
+                Choose the most time you want to spend on EntertainVerse each day — watching and listening included. Five minutes
                 before the end you get a warning; then the app locks until midnight.
               </p>
               <p className="mt-1 flex items-center gap-1.5 text-xs text-white/50">

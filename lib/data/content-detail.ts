@@ -496,7 +496,7 @@ const jjkReviews: Review[] = [
 ];
 
 const jjkSynopsis =
-  "A boy swallows a cursed talisman and becomes the vessel of a demon. He enrolls at a shaman school to find the remaining fingers and survive a war between sorcerers and curses. Alongside Megumi, Nobara, and Satoru Gojo, Yuji Itadori faces brutal missions where failure means death. Dark stylish action with MAPPA animation, cursed energy battles, and stakes that escalate from school trials to the devastation of Shibuya. Jujutsu Kaisen stands out as a thriller anime with sharp pacing, layered characters, and set pieces that fans revisit on AniVerse. Released in 2019 by MAPPA, directed by Sunghoo Park, it continues to draw new viewers alongside devoted fans who appreciate its craft and emotional payoff.";
+  "A boy swallows a cursed talisman and becomes the vessel of a demon. He enrolls at a shaman school to find the remaining fingers and survive a war between sorcerers and curses. Alongside Megumi, Nobara, and Satoru Gojo, Yuji Itadori faces brutal missions where failure means death. Dark stylish action with MAPPA animation, cursed energy battles, and stakes that escalate from school trials to the devastation of Shibuya. Jujutsu Kaisen stands out as a thriller anime with sharp pacing, layered characters, and set pieces that fans revisit on EntertainVerse. Released in 2019 by MAPPA, directed by Sunghoo Park, it continues to draw new viewers alongside devoted fans who appreciate its craft and emotional payoff.";
 
 const jjkDetail: ContentDetail = {
   id: "jujutsu-kaisen",
@@ -629,13 +629,13 @@ function buildDetailFromItem(
   const slug = item.id.replace(/-t$/, "");
   const description =
     item.description ??
-    `${item.title} follows a gripping story of conflict and survival, as its cast faces rising stakes, sharp animation, and emotional twists across every season. Discover episodes, characters, soundtracks, and fan communities curated for your taste. Watch trailers, track your progress, and join discussions with fans who share your genres and ratings on AniVerse. ${item.title} stands out with sharp pacing, layered characters, and set pieces that fans revisit on AniVerse.`;
+    `${item.title} follows a gripping story of conflict and survival, as its cast faces rising stakes, sharp animation, and emotional twists across every season. Discover episodes, characters, soundtracks, and fan communities curated for your taste. Watch trailers, track your progress, and join discussions with fans who share your genres and ratings on EntertainVerse. ${item.title} stands out with sharp pacing, layered characters, and set pieces that fans revisit on EntertainVerse.`;
   return {
     id: item.id,
     title: item.title,
     type: item.type,
     rating: item.rating ?? 8.5,
-    trendingLabel: `Trending on AniVerse · ${item.type}`,
+    trendingLabel: `Trending on EntertainVerse · ${item.type}`,
     genres: item.genres,
     description,
     synopsis: description,

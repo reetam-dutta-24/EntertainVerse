@@ -102,7 +102,7 @@ export function ContentHeroActions({ content }: ContentHeroActionsProps) {
   async function handleShare() {
     const ok = await shareCurrentUrl({
       title: content.title,
-      text: `Check out ${content.title} on AniVerse`,
+      text: `Check out ${content.title} on EntertainVerse`,
       preferClipboard: true,
     });
     if (ok) {

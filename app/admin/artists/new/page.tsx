@@ -5,7 +5,7 @@ import { requireArtistAdmin } from "@/lib/auth-guards";
 import type { ArtistFormInput } from "@/lib/validators/admin/artist";
 
 export const metadata: Metadata = {
-  title: "New artist — Admin — AniVerse",
+  title: "New artist — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

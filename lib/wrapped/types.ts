@@ -1,4 +1,4 @@
-/** Client-safe shapes for Taste DNA history and AniVerse Wrapped. */
+/** Client-safe shapes for Taste DNA history and EntertainVerse Wrapped. */
 
 export interface DnaTrait {
   id: string;
@@ -74,7 +74,7 @@ export interface WrappedData {
   /** e.g. "🌙 Night owl" */
   timeOfDay: { label: string; emoji: string; share: number } | null;
   longestStreak: number;
-  /** "Top 5%" of AniVerse users by time spent, when there are enough users to compare. */
+  /** "Top 5%" of EntertainVerse users by time spent, when there are enough users to compare. */
   topPercent: number | null;
   persona: { name: string; tagline: string; intro: string };
 }

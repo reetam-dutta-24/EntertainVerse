@@ -8,7 +8,7 @@ import { requireSuperAdmin } from "@/lib/auth-guards";
 import { listAdminCollections } from "@/lib/services/admin-collection.service";
 
 export const metadata: Metadata = {
-  title: "Collections — Admin — AniVerse",
+  title: "Collections — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

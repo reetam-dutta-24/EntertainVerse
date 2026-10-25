@@ -12,7 +12,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Heart } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Favourites — AniVerse",
+  title: "Favourites — EntertainVerse",
   description: "Your favourited anime, shows, movies, songs, artists, collections, and communities.",
 };
 

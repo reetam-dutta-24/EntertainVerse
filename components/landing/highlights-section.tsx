@@ -61,7 +61,7 @@ export function HighlightsSection() {
       <ScrollFadeIn>
         <SectionHeader
           title="One hub for your entertainment world"
-          subtitle="From recommendations to communities, AniVerse keeps your taste organized."
+          subtitle="From recommendations to communities, EntertainVerse keeps your taste organized."
         />
       </ScrollFadeIn>
 

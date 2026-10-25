@@ -7,7 +7,7 @@ import type { CatalogCandidate } from "@/lib/catalog-import/types";
  * User-Agent and at most one request per second, so calls are queued.
  */
 const API = "https://musicbrainz.org/ws/2";
-const USER_AGENT = `AniVerse/1.0 ( ${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"} )`;
+const USER_AGENT = `EntertainVerse/1.0 ( ${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"} )`;
 
 let queue: Promise<unknown> = Promise.resolve();
 let lastCall = 0;

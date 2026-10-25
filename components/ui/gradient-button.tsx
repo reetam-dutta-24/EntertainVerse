@@ -9,7 +9,7 @@ export interface GradientButtonProps
   loading?: boolean;
 }
 
-/** The AniVerse primary CTA: brand magenta-to-purple gradient. Max one per view region. */
+/** The EntertainVerse primary CTA: brand magenta-to-purple gradient. Max one per view region. */
 export function GradientButton({
   className,
   size,

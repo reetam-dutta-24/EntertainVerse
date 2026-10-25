@@ -182,7 +182,7 @@ export function AddReviewButton({
       <ReviewFormShell
         open={open}
         title="Write a Review"
-        description="Share your take with the AniVerse community."
+        description="Share your take with the EntertainVerse community."
         submitLabel="Publish review"
         onClose={() => setOpen(false)}
         onSubmit={handleSubmit}

@@ -9,7 +9,7 @@ import { centroid, dot, embeddingKey, loadEmbeddingIndex, type Vector } from "@/
 import type { DnaEra, DnaMonth, DnaTrait, TasteDnaHistory, WrappedData, WrappedItem } from "@/lib/wrapped/types";
 
 /**
- * Taste DNA history + AniVerse Wrapped. Both are computed live from real activity:
+ * Taste DNA history + EntertainVerse Wrapped. Both are computed live from real activity:
  * every month's watching/listening (minutes) and favorites become a point in the
  * embedding space, and that point is read against the trait vocabulary — so you can
  * see your taste drift month by month, not just where it is today.
@@ -406,7 +406,7 @@ function fallbackPersona(data: Omit<WrappedData, "persona">): WrappedData["perso
     tagline: vibe ? `${vibe.emoji} ${data.vibes.map((entry) => entry.label).join(" · ")}` : "Still writing your story",
     intro: data.topTitles[0]
       ? `${data.topTitles[0].title} defined your year — and your taste kept moving the whole way.`
-      : "Your AniVerse year is just getting started.",
+      : "Your EntertainVerse year is just getting started.",
   };
 }
 

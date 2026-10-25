@@ -100,7 +100,7 @@ export async function runAiReview(request: AiReviewRequest, report: ProgressRepo
     depth: "deep",
     schema: reviewSchema,
     system:
-      `You review ${request.subject} for AniVerse before an admin publishes them. Find values that are wrong, ` +
+      `You review ${request.subject} for EntertainVerse before an admin publishes them. Find values that are wrong, ` +
       "inconsistent with each other, implausible for this title, badly formatted, or important but missing.\n\n" +
       `${request.houseRules}\n\n` +
       "Rules:\n- When reference facts are provided, treat them as the source of truth and flag every conflict as an error.\n" +

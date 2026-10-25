@@ -4,7 +4,7 @@ import { requireSuperAdmin } from "@/lib/auth-guards";
 import type { AdminCommunityFormInput } from "@/lib/validators/admin/community";
 
 export const metadata: Metadata = {
-  title: "New community — Admin — AniVerse",
+  title: "New community — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

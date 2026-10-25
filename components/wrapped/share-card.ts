@@ -48,7 +48,7 @@ export async function renderWrappedCard(data: WrappedData): Promise<Blob> {
   const pad = 96;
   ctx.fillStyle = "#ff7ae0";
   ctx.font = font(700, 40);
-  ctx.fillText(`ANIVERSE WRAPPED ${data.year}`, pad, 190);
+  ctx.fillText(`ENTERTAINVERSE WRAPPED ${data.year}`, pad, 190);
 
   ctx.fillStyle = "rgba(255,255,255,0.7)";
   ctx.font = font(500, 44);
@@ -65,7 +65,7 @@ export async function renderWrappedCard(data: WrappedData): Promise<Blob> {
     { label: "Hours watched", value: String(Math.round(data.totals.watchMinutes / 60)) },
     { label: "Hours listened", value: String(Math.round(data.totals.listenMinutes / 60)) },
     { label: "Titles", value: String(data.totals.titles) },
-    { label: data.topPercent ? "Of AniVerse" : "Active days", value: data.topPercent ? `Top ${data.topPercent}%` : String(data.totals.activeDays) },
+    { label: data.topPercent ? "Of EntertainVerse" : "Active days", value: data.topPercent ? `Top ${data.topPercent}%` : String(data.totals.activeDays) },
   ];
   const tileTop = Math.max(y + 60, 880);
   const tileWidth = (width - pad * 2 - 40) / 2;
@@ -108,7 +108,7 @@ export async function renderWrappedCard(data: WrappedData): Promise<Blob> {
   }
   ctx.fillStyle = "rgba(255,255,255,0.45)";
   ctx.font = font(500, 32);
-  ctx.fillText("Made with AniVerse · your AI entertainment hub", pad, 1820);
+  ctx.fillText("Made with EntertainVerse · your AI entertainment hub", pad, 1820);
 
   return new Promise((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Couldn't create the image."))), "image/png"));
 }

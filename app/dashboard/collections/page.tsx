@@ -13,7 +13,7 @@ import {
 } from "@/lib/data/collections";
 
 export const metadata: Metadata = {
-  title: "Collections — AniVerse",
+  title: "Collections — EntertainVerse",
   description:
     "Organize your favorite anime, movies, shows, songs, and playlists.",
 };

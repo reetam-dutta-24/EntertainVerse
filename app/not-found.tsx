@@ -10,7 +10,7 @@ export default function NotFound() {
       description="This page doesn't exist or may have been moved. Let's get you back to familiar worlds."
       actions={[
         { href: "/dashboard", label: "Back to dashboard" },
-        { href: "/search", label: "Search AniVerse" },
+        { href: "/search", label: "Search EntertainVerse" },
         { href: "/", label: "Home" },
       ]}
     />

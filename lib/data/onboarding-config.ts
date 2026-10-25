@@ -342,7 +342,7 @@ export function buildOnboardingSteps(catalog: OnboardingCatalog): OnboardingStep
       id: "goals",
       section: "you",
       kind: "chips",
-      title: "🚀 What brings you to AniVerse?",
+      title: "🚀 What brings you to EntertainVerse?",
       subtitle: "Pick up to 4 — we'll surface those features first.",
       min: 1,
       max: 4,

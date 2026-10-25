@@ -8,7 +8,7 @@ import {
 } from "@/lib/services/admin-community.service";
 
 export const metadata: Metadata = {
-  title: "Edit community — Admin — AniVerse",
+  title: "Edit community — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

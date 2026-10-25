@@ -4,7 +4,7 @@ import { getCurrentUser } from "@/lib/data/user";
 import { getActiveRoadmapView } from "@/lib/services/roadmap.service";
 
 export const metadata: Metadata = {
-  title: "Your roadmap — AniVerse",
+  title: "Your roadmap — EntertainVerse",
   description: "An ordered, time-budgeted plan of what to watch or listen to next, with an AI analysis of your taste.",
 };
 

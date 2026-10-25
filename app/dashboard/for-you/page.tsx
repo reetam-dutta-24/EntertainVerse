@@ -9,7 +9,7 @@ import { getForYouFeed } from "@/lib/data/for-you";
 import { getCurrentUser } from "@/lib/data/user";
 
 export const metadata: Metadata = {
-  title: "For You — AniVerse",
+  title: "For You — EntertainVerse",
   description:
     "Personalized anime, movies, shows, and music picked from your AI taste profile.",
 };

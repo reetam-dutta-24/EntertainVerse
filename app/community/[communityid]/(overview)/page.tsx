@@ -31,9 +31,9 @@ export async function generateMetadata({
 }: CommunityPageProps): Promise<Metadata> {
   const { communityid } = await params;
   const community = await getCommunityDetail(communityid);
-  if (!community) return { title: "Community — AniVerse" };
+  if (!community) return { title: "Community — EntertainVerse" };
   return {
-    title: `${community.name} — AniVerse`,
+    title: `${community.name} — EntertainVerse`,
     description: community.description,
   };
 }

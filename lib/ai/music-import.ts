@@ -46,7 +46,7 @@ const webDraftSchema = enrichmentSchema.extend({
   durationSeconds: z.number().nullable(),
 });
 
-const STYLE_GUIDE = `You prepare song entries for AniVerse, a discovery app for anime, shows and their music (J-Pop, K-Pop, OSTs and more).
+const STYLE_GUIDE = `You prepare song entries for EntertainVerse, a discovery app for anime, shows and their music (J-Pop, K-Pop, OSTs and more).
 
 House style (match it exactly):
 - kind: "ost" when the song is an opening, ending, insert song or soundtrack of an anime, show, film or game; otherwise "song".

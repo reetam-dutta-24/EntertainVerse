@@ -245,8 +245,8 @@ export function ProfileListeningPanel({
                 </button>
                 <ShareUrlButton
                   label="Share profile"
-                  title={`${userName} on AniVerse`}
-                  text={`Check out ${userName}'s profile on AniVerse`}
+                  title={`${userName} on EntertainVerse`}
+                  text={`Check out ${userName}'s profile on EntertainVerse`}
                 />
               </div>
             ) : (

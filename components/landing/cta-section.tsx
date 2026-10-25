@@ -3,7 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ScrollFadeIn } from "@/components/landing/scroll-fade-in";
 import { cn } from "@/lib/utils";
 
-/** Full-width gradient CTA banner: "Create your AniVerse". */
+/** Full-width gradient CTA banner: "Create your EntertainVerse". */
 export function CtaSection() {
   return (
     <section
@@ -13,7 +13,7 @@ export function CtaSection() {
       <ScrollFadeIn direction="up" amount={0.35}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h2 className="text-title font-bold text-white">
-          Create your <span className="text-brand-pink">AniVerse</span>
+          Create your <span className="text-brand-pink">EntertainVerse</span>
         </h2>
         <p className="text-subtitle text-muted">
           Your next favorite anime, song, artist, or community is waiting

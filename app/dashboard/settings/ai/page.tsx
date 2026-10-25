@@ -5,8 +5,8 @@ import { getCurrentUser } from "@/lib/data/user";
 import { getAiProfile, getAiProfileInsights } from "@/lib/services/ai-profile.service";
 
 export const metadata: Metadata = {
-  title: "AI profile — AniVerse",
-  description: "See, edit, download or wipe what AniVerse's recommender knows about your taste.",
+  title: "AI profile — EntertainVerse",
+  description: "See, edit, download or wipe what EntertainVerse's recommender knows about your taste.",
 };
 
 export default async function AiProfilePage() {

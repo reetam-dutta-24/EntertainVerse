@@ -161,7 +161,7 @@ export async function exportAiProfile(userId: string) {
   const [profile, insights] = await Promise.all([getAiProfile(userId), getAiProfileInsights(userId)]);
   return {
     exportedAt: new Date().toISOString(),
-    note: "Everything AniVerse's recommender uses about you. Watch/listen history is summarised; full history is on your profile.",
+    note: "Everything EntertainVerse's recommender uses about you. Watch/listen history is summarised; full history is on your profile.",
     controls: { learnFromActivity: profile.learnFromActivity },
     answers: { watch: profile.watch, listen: profile.listen },
     learned: insights,

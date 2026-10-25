@@ -19,7 +19,7 @@ import {
 } from "@/lib/data/discover";
 
 export const metadata: Metadata = {
-  title: "Discover — AniVerse",
+  title: "Discover — EntertainVerse",
   description:
     "Explore trending anime, movies, shows, K-dramas, and music picked for your taste.",
 };
@@ -55,7 +55,7 @@ export default async function DiscoverPage() {
 
       <ContentCarouselSection
         title="🚀 Trending this week"
-        subtitle="Most watched across AniVerse"
+        subtitle="Most watched across EntertainVerse"
         searchPlaceholder="Search Trending Content……. "
         items={trending}
       />
@@ -90,7 +90,7 @@ export default async function DiscoverPage() {
 
       <MusicCarouselSection
         title="📈 Trending songs / OSTs / artists"
-        subtitle="Most played anime songs, soundtracks, and artists across AniVerse"
+        subtitle="Most played anime songs, soundtracks, and artists across EntertainVerse"
         searchPlaceholder="Search Trending Music…… "
         tracks={trendingMusic}
       />

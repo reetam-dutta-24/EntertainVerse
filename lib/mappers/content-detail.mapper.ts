@@ -171,7 +171,7 @@ export function mapContentRecordToDetail(
   const description =
     row.description?.trim() ||
     row.synopsis?.trim() ||
-    `${row.title} on AniVerse.`;
+    `${row.title} on EntertainVerse.`;
   const related =
     row.relatedFrom.length > 0
       ? mapRelated(row)
@@ -185,7 +185,7 @@ export function mapContentRecordToDetail(
     rating: roundRating(row.rating) ?? 0,
     trendingLabel:
       row.trendingLabel ??
-      `Trending on AniVerse · ${prismaMediaTypeToApp(row.type).toUpperCase()}`,
+      `Trending on EntertainVerse · ${prismaMediaTypeToApp(row.type).toUpperCase()}`,
     genres: row.genres.map((g) => mapGenre(g.genre)),
     description,
     synopsis: description,

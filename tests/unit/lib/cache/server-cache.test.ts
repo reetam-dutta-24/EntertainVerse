@@ -6,7 +6,7 @@ let cache: CacheModule;
 // The store lives on globalThis and is captured at import time: drop it and
 // re-import so every test starts with an empty cache.
 beforeEach(async () => {
-  delete (globalThis as { __aniverseCache?: unknown }).__aniverseCache;
+  delete (globalThis as { __entertainverseCache?: unknown }).__entertainverseCache;
   vi.resetModules();
   vi.useFakeTimers({ now: new Date("2026-01-01T00:00:00Z") });
   cache = await import("@/lib/cache/server-cache");

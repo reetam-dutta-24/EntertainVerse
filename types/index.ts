@@ -1,4 +1,4 @@
-/** Shared domain types for the AniVerse application. */
+/** Shared domain types for the EntertainVerse application. */
 
 import type { ListenLink } from "@/lib/listen-links";
 

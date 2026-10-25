@@ -83,7 +83,7 @@ export function CommunityWallpaperPanel({
             <ShareUrlButton
               label="Share community"
               title={communityName}
-              text={`Join ${communityName} on AniVerse`}
+              text={`Join ${communityName} on EntertainVerse`}
             />
           </div>
 

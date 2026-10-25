@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   const reetam = await prisma.user.findUnique({
-    where: { email: "reetam@aniverse.local" },
+    where: { email: "reetam@entertainverse.local" },
     select: { id: true },
   });
   if (!reetam) throw new Error("no reetam");

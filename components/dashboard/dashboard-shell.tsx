@@ -17,7 +17,7 @@ export interface DashboardShellProps {
 
 /**
  * Responsive dashboard chrome — drawer sidebar on mobile, fixed rail on desktop, and the
- * AniVerse Assistant on the right (docked from xl, overlay on laptops, a sheet on phones).
+ * EntertainVerse Assistant on the right (docked from xl, overlay on laptops, a sheet on phones).
  */
 export function DashboardShell({ user, children }: DashboardShellProps) {
   return (

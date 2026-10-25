@@ -243,7 +243,7 @@ function buildMilestones(input: {
       id: "watch-100",
       emoji: "🎬",
       title: "100h Watch Club",
-      detail: `${formatHours(input.watchMinutes)} watched on AniVerse`,
+      detail: `${formatHours(input.watchMinutes)} watched on EntertainVerse`,
     });
   }
 

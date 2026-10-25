@@ -149,7 +149,7 @@ export function generateSeriesNested(
         number: e,
         title: customTitle ?? `${prefix} ${e}`,
         duration: "24 Min",
-        description: `${customTitle ?? `${prefix} ${e}`} advances the season with sharper stakes and stronger character choices. Watch on AniVerse to follow how each scene feeds the larger story. The episode balances momentum with quieter moments that make the payoff land harder.`,
+        description: `${customTitle ?? `${prefix} ${e}`} advances the season with sharper stakes and stronger character choices. Watch on EntertainVerse to follow how each scene feeds the larger story. The episode balances momentum with quieter moments that make the payoff land harder.`,
         language: "japanese",
         rating: roundRating(8.2 + (e % 6) * 0.1) ?? 8.2,
       });
@@ -173,7 +173,7 @@ export function generateMovieNested(
         number: 1,
         title,
         duration: runtime,
-        description: `Watch ${title} in full on AniVerse. This complete viewing packages the film's key emotional turns, visual highlights, and finale in one uninterrupted session. Ideal for first-time viewers and rewatchers who want the full experience without breaking the mood.`,
+        description: `Watch ${title} in full on EntertainVerse. This complete viewing packages the film's key emotional turns, visual highlights, and finale in one uninterrupted session. Ideal for first-time viewers and rewatchers who want the full experience without breaking the mood.`,
         language: "japanese",
         rating: 8.5,
       },

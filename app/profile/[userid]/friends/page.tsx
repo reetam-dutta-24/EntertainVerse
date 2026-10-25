@@ -22,10 +22,10 @@ export async function generateMetadata({
 }: FriendsPageProps): Promise<Metadata> {
   const { userid } = await params;
   const profile = await getUserDetail(userid);
-  if (!profile) return { title: "Friends — AniVerse" };
+  if (!profile) return { title: "Friends — EntertainVerse" };
   return {
-    title: `${profile.name}'s Friends — AniVerse`,
-    description: `Friends of ${profile.name} on AniVerse`,
+    title: `${profile.name}'s Friends — EntertainVerse`,
+    description: `Friends of ${profile.name} on EntertainVerse`,
   };
 }
 

@@ -90,7 +90,7 @@ const copy: Record<
   },
   aiprofile: {
     message:
-      "Everything AniVerse's AI uses to recommend for you — in plain words, and fully in your control.",
+      "Everything EntertainVerse's AI uses to recommend for you — in plain words, and fully in your control.",
     highlights: [
       "🧬 How your taste reads",
       "📈 What it learned from activity",
@@ -100,7 +100,7 @@ const copy: Record<
   },
   settings: {
     message:
-      "Manage your profile, notifications, privacy, and how AniVerse works for you.",
+      "Manage your profile, notifications, privacy, and how EntertainVerse works for you.",
     highlights: [
       "👤 Profile & account details",
       "🔔 Notification preferences",

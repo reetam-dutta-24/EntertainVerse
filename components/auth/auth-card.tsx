@@ -39,7 +39,7 @@ export function AuthCard({
         <p className="flex items-center gap-1.5">
           {sparkle ? <Sparkles className="size-5 text-white" /> : null}
           <span className="text-gradient-brand text-heading font-semibold leading-none">
-            AniVerse
+            EntertainVerse
           </span>
         </p>
         <h1 className="mt-2 text-2xl font-bold text-white">{title}</h1>

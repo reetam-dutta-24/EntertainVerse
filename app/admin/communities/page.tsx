@@ -8,7 +8,7 @@ import { requireSuperAdmin } from "@/lib/auth-guards";
 import { listAdminCommunities } from "@/lib/services/admin-community.service";
 
 export const metadata: Metadata = {
-  title: "Communities — Admin — AniVerse",
+  title: "Communities — Admin — EntertainVerse",
   robots: { index: false, follow: false },
 };
 

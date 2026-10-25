@@ -27,7 +27,7 @@ export interface ArtistCardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 function artistDescription(item: ContentItem) {
   const meta = item.meta ?? "Artist";
-  return `${item.title} — ${meta} matched to your listening taste and fandoms on AniVerse.`;
+  return `${item.title} — ${meta} matched to your listening taste and fandoms on EntertainVerse.`;
 }
 
 const layerTransition =

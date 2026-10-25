@@ -1,5 +1,5 @@
 /**
- * AniVerse help knowledge base — the documents the assistant retrieves from.
+ * EntertainVerse help knowledge base — the documents the assistant retrieves from.
  * One article per feature, written for users. Each is embedded (kind "help") with the
  * catalog, so retrieval finds it by meaning; `keywords` back up lexical matching.
  * Keep these in sync with the product — the assistant only knows what's written here.
@@ -18,11 +18,11 @@ export interface HelpArticle {
 export const HELP_ARTICLES: HelpArticle[] = [
   {
     id: "about",
-    title: "What AniVerse is",
+    title: "What EntertainVerse is",
     route: "/dashboard",
     routeLabel: "Home",
-    keywords: ["aniverse", "about", "what is", "overview", "features", "app"],
-    body: `AniVerse is an AI-powered entertainment hub for anime, shows, K-dramas, movies, documentaries and music. You discover titles matched to your taste with a reason for every pick, plan what to watch with AI roadmaps, save favourites, a watchlist and collections, join fan communities with live watch parties, listen parties and voice talk rooms, meet people with similar taste through AI Match, message friends, and see your habits in Analytics and Wrapped. AniVerse is legal-first: it shows official trailers, 30-second song previews and "where to watch / listen" links to licensed services — it never hosts pirated video or audio, and never shows lyrics.`,
+    keywords: ["entertainverse", "aniverse", "about", "what is", "overview", "features", "app"],
+    body: `EntertainVerse is an AI-powered entertainment hub for anime, shows, K-dramas, movies, documentaries and music. You discover titles matched to your taste with a reason for every pick, plan what to watch with AI roadmaps, save favourites, a watchlist and collections, join fan communities with live watch parties, listen parties and voice talk rooms, meet people with similar taste through AI Match, message friends, and see your habits in Analytics and Wrapped. EntertainVerse is legal-first: it shows official trailers, 30-second song previews and "where to watch / listen" links to licensed services — it never hosts pirated video or audio, and never shows lyrics.`,
   },
   {
     id: "navigation",
@@ -90,13 +90,13 @@ export const HELP_ARTICLES: HelpArticle[] = [
     id: "recap",
     title: "Catch me up (AI recaps)",
     keywords: ["catch me up", "recap", "summary", "where i left off", "previously on", "forgot", "remember", "spoiler", "what happened"],
-    body: `"Catch me up" on a show, anime or film page writes a recap of only what you've already seen. Tell it where you stopped — season and episode, or how far into a film (it prefills a guess from your watch history) — and how much you remember (almost nothing, bits and pieces, most of it). It first looks up what happens up to that point in AniVerse's episode guides, or searches the web limited to that point, and then writes the recap with a strict rule never to go past your stopping point. You get the key beats, who's who, where things stand and what to keep in mind, with sources. Recaps are saved and shared, so repeat requests are instant.`,
+    body: `"Catch me up" on a show, anime or film page writes a recap of only what you've already seen. Tell it where you stopped — season and episode, or how far into a film (it prefills a guess from your watch history) — and how much you remember (almost nothing, bits and pieces, most of it). It first looks up what happens up to that point in EntertainVerse's episode guides, or searches the web limited to that point, and then writes the recap with a strict rule never to go past your stopping point. You get the key beats, who's who, where things stand and what to keep in mind, with sources. Recaps are saved and shared, so repeat requests are instant.`,
   },
   {
     id: "music",
     title: "Songs, artists and listening",
     keywords: ["song", "music", "artist", "preview", "listen", "spotify", "apple music", "youtube music", "follow artist", "ost", "soundtrack", "lyrics"],
-    body: `Song pages play the official 30-second preview and link to licensed services (Spotify, Apple Music, YouTube Music and others) to hear the full track; full audio plays only where an admin added a licensed file. AniVerse never shows lyrics. Artist pages show members, discography and listen links; you can follow and favourite artists, which shapes your music recommendations. Soundtracks (OSTs) link back to the show or film they come from.`,
+    body: `Song pages play the official 30-second preview and link to licensed services (Spotify, Apple Music, YouTube Music and others) to hear the full track; full audio plays only where an admin added a licensed file. EntertainVerse never shows lyrics. Artist pages show members, discography and listen links; you can follow and favourite artists, which shapes your music recommendations. Soundtracks (OSTs) link back to the show or film they come from.`,
   },
   {
     id: "library",
@@ -152,7 +152,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     route: "/dashboard/ai-mode/match",
     routeLabel: "AI Match",
     keywords: ["ai match", "match", "meet people", "find friends", "nearby", "room", "invite", "popup", "similar taste", "matching", "people like me"],
-    body: `AI Match connects you with people who share your taste. Turn it on in AI Mode → AI Match: choose how far to look (nearby — needs your approximate location, your country, or worldwide) and what you're looking for. Open a room with a topic and size (3–12 people, open for 24 hours); AniVerse scores every opted-in user by taste similarity, shared favourites, personality and distance, and invites strong matches (60%+) or the best available. They get a popup and a notification and can join in one tap. Each room gets its own private community with a watch party and a talk room, and room members can DM each other. To limit spam, a person receives at most a few room invites per day.`,
+    body: `AI Match connects you with people who share your taste. Turn it on in AI Mode → AI Match: choose how far to look (nearby — needs your approximate location, your country, or worldwide) and what you're looking for. Open a room with a topic and size (3–12 people, open for 24 hours); EntertainVerse scores every opted-in user by taste similarity, shared favourites, personality and distance, and invites strong matches (60%+) or the best available. They get a popup and a notification and can join in one tap. Each room gets its own private community with a watch party and a talk room, and room members can DM each other. To limit spam, a person receives at most a few room invites per day.`,
   },
   {
     id: "messages",
@@ -166,7 +166,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     id: "profiles",
     title: "Profiles",
     keywords: ["profile", "my profile", "edit profile", "avatar", "bio", "public profile", "private profile", "activity", "followers"],
-    body: `Your profile shows your recent activity, favourite shows and movies, followed artists, favourite songs, collections, communities, friends and reviews. Edit your name, bio and avatar from your profile. In Settings → Privacy you can make your profile private (only friends see it), and hide your activity or watch history. Click anyone's avatar anywhere in AniVerse to open their profile.`,
+    body: `Your profile shows your recent activity, favourite shows and movies, followed artists, favourite songs, collections, communities, friends and reviews. Edit your name, bio and avatar from your profile. In Settings → Privacy you can make your profile private (only friends see it), and hide your activity or watch history. Click anyone's avatar anywhere in EntertainVerse to open their profile.`,
   },
   {
     id: "analytics",
@@ -178,11 +178,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
   },
   {
     id: "wrapped",
-    title: "AniVerse Wrapped",
+    title: "EntertainVerse Wrapped",
     route: "/dashboard/wrapped",
     routeLabel: "Wrapped",
     keywords: ["wrapped", "year in review", "recap of my year", "share card", "persona", "spotify wrapped", "top of the year"],
-    body: `Wrapped is a Spotify-Wrapped-style story of your year built from real activity: hours watched and listened, your #1 title and top five, top format and genres, your Taste DNA vibes and eras, top artist, songs and music mood, your rhythm (time of day, biggest day, longest streak), your top-% rank among AniVerse users, and an AI-named persona. Tap to advance, hold to pause, use arrow keys on a keyboard. At the end, share or save a 1080×1920 card for stories.`,
+    body: `Wrapped is a Spotify-Wrapped-style story of your year built from real activity: hours watched and listened, your #1 title and top five, top format and genres, your Taste DNA vibes and eras, top artist, songs and music mood, your rhythm (time of day, biggest day, longest streak), your top-% rank among EntertainVerse users, and an AI-named persona. Tap to advance, hold to pause, use arrow keys on a keyboard. At the end, share or save a 1080×1920 card for stories.`,
   },
   {
     id: "daily-limit",
@@ -190,7 +190,7 @@ export const HELP_ARTICLES: HelpArticle[] = [
     route: "/dashboard/settings",
     routeLabel: "Settings",
     keywords: ["daily limit", "screen time", "time limit", "lock", "locked", "binge", "wellbeing", "timer", "midnight"],
-    body: `Settings → Daily limit lets you set how much time you want on AniVerse per day. You get a warning 5 minutes before the limit, and when it's reached the app locks until midnight in your time zone — it's strict on purpose. While a limit is active you can't change your time zone to get around it. Turn the limit off or change it in Settings when you're not locked.`,
+    body: `Settings → Daily limit lets you set how much time you want on EntertainVerse per day. You get a warning 5 minutes before the limit, and when it's reached the app locks until midnight in your time zone — it's strict on purpose. While a limit is active you can't change your time zone to get around it. Turn the limit off or change it in Settings when you're not locked.`,
   },
   {
     id: "settings",
@@ -210,13 +210,13 @@ export const HELP_ARTICLES: HelpArticle[] = [
     id: "legal",
     title: "Why can't I stream everything here?",
     keywords: ["stream", "free", "pirate", "download", "full episode", "full movie", "full song", "legal", "copyright", "watch full"],
-    body: `AniVerse is legal-first. It doesn't host or scrape copyrighted video or audio. You get official trailers, official 30-second song previews and links to licensed services in your region ("where to watch / listen"). Full episodes, films or songs play inside AniVerse only where an admin has added a properly licensed source.`,
+    body: `EntertainVerse is legal-first. It doesn't host or scrape copyrighted video or audio. You get official trailers, official 30-second song previews and links to licensed services in your region ("where to watch / listen"). Full episodes, films or songs play inside EntertainVerse only where an admin has added a properly licensed source.`,
   },
   {
     id: "assistant",
     title: "About this assistant",
     keywords: ["assistant", "chatbot", "help", "you", "who are you", "how do you work", "ai help"],
-    body: `The AniVerse Assistant answers questions about the app, the catalog and your own account. It retrieves from AniVerse's help articles, the catalog (titles, songs, artists) and a private snapshot of your own stats, then answers only from what it found, with links. It can't change settings or take actions for you — it tells you where to go. Your conversation stays in your browser.`,
+    body: `The EntertainVerse Assistant answers questions about the app, the catalog and your own account. It retrieves from EntertainVerse's help articles, the catalog (titles, songs, artists) and a private snapshot of your own stats, then answers only from what it found, with links. It can't change settings or take actions for you — it tells you where to go. Your conversation stays in your browser.`,
   },
 ];
 
@@ -240,5 +240,5 @@ export function suggestedQuestions(pathname: string): string[] {
     [/^\/content\//, ["What does Catch me up do?", "Where can I watch this legally?", "Recommend something similar"]],
     [/^\/song\//, ["Why only a 30-second preview?", "Where can I hear the full song?", "Recommend similar songs"]],
   ];
-  return rules.find(([pattern]) => pattern.test(pathname))?.[1] ?? ["What can I do on AniVerse?", "Why was this recommended to me?", "How do watch parties work?", "Suggest an anime for tonight"];
+  return rules.find(([pattern]) => pattern.test(pathname))?.[1] ?? ["What can I do on EntertainVerse?", "Why was this recommended to me?", "How do watch parties work?", "Suggest an anime for tonight"];
 }

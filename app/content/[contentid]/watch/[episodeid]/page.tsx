@@ -13,10 +13,10 @@ export async function generateMetadata({
 }: ContentEpisodeWatchPageProps): Promise<Metadata> {
   const { contentid, episodeid } = await params;
   const session = await getContentPlaySession(contentid, episodeid);
-  if (!session) return { title: "Watch — AniVerse" };
+  if (!session) return { title: "Watch — EntertainVerse" };
   return {
-    title: `Watch ${session.contentTitle} — AniVerse`,
-    description: `Stream ${session.contentTitle} on AniVerse.`,
+    title: `Watch ${session.contentTitle} — EntertainVerse`,
+    description: `Stream ${session.contentTitle} on EntertainVerse.`,
   };
 }
 

@@ -33,7 +33,7 @@ export function AppLoadingScreen({ label = "Loading your universe…" }: { label
         <span className="absolute inset-2 animate-pulse rounded-full bg-gradient-brand opacity-60 blur-md motion-reduce:animate-none" />
         <Sparkles className="relative size-9 text-white" aria-hidden />
       </div>
-      <span className="text-gradient-brand text-xl font-semibold">AniVerse</span>
+      <span className="text-gradient-brand text-xl font-semibold">EntertainVerse</span>
       <p role="status" className="text-sm text-muted/80">
         {label}
       </p>

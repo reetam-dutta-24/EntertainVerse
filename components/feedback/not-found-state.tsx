@@ -25,7 +25,7 @@ export function NotFoundState({
   icon: Icon = Compass,
   actions = [
     { href: "/dashboard", label: "Back to dashboard" },
-    { href: "/search", label: "Search AniVerse" },
+    { href: "/search", label: "Search EntertainVerse" },
   ],
   variant = "panel",
 }: NotFoundStateProps) {

@@ -7,9 +7,9 @@ import { getSettingsData } from "@/lib/data/settings";
 import { getCurrentUser } from "@/lib/data/user";
 
 export const metadata: Metadata = {
-  title: "Settings — AniVerse",
+  title: "Settings — EntertainVerse",
   description:
-    "Manage your AniVerse profile, notifications, privacy, and app preferences.",
+    "Manage your EntertainVerse profile, notifications, privacy, and app preferences.",
 };
 
 export default async function SettingsPage() {

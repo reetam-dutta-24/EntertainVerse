@@ -30,7 +30,7 @@ export interface ChipProps extends React.HTMLAttributes<HTMLSpanElement> {
   musicKind?: string;
   /** Catalog accent gradient — e.g. artist hero stat/genre chips. */
   accent?: AccentColor | string;
-  /** Main AniVerse brand gradient. */
+  /** Main EntertainVerse brand gradient. */
   brand?: boolean;
   /** @deprecated Use chipKey/genreId/mediaType instead. */
   variant?: keyof typeof legacyVariantMap;

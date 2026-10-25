@@ -284,7 +284,7 @@ export function mapCommunityToDetail(
       { id: row.category.toLowerCase(), label: row.category },
       { id: "community", label: "Community" },
     ],
-    description: row.description ?? `${row.name} on AniVerse.`,
+    description: row.description ?? `${row.name} on EntertainVerse.`,
     primaryTags: [row.category, row.visibility === "PUBLIC" ? "Public" : "Private"],
     matchScore: avgMatch,
     category: row.category,

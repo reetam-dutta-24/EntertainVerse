@@ -12,10 +12,10 @@ export async function generateMetadata({
 }: SearchPageProps): Promise<Metadata> {
   const { q } = await searchParams;
   const query = q?.trim();
-  if (!query) return { title: "Search — AniVerse" };
+  if (!query) return { title: "Search — EntertainVerse" };
   return {
-    title: `${query} — Search — AniVerse`,
-    description: `Search results for ${query} on AniVerse`,
+    title: `${query} — Search — EntertainVerse`,
+    description: `Search results for ${query} on EntertainVerse`,
   };
 }
 

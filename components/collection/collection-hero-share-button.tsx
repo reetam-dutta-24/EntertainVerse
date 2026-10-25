@@ -24,7 +24,7 @@ export function CollectionHeroShareButton({
   async function handleShare() {
     const ok = await shareCurrentUrl({
       title: collectionName,
-      text: `Check out ${collectionName} on AniVerse`,
+      text: `Check out ${collectionName} on EntertainVerse`,
       preferClipboard: true,
     });
     if (ok) {

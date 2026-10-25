@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-/** Shared theming for AniVerse analytics charts. */
+/** Shared theming for EntertainVerse analytics charts. */
 
 /** Named series colours — distinct hues that stay readable on the dark surface. */
 export const chartPalette = {
