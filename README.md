@@ -475,6 +475,10 @@ Shared building blocks: `Button` / `GradientButton`, `EmptyState`, `useConfirm()
 
 ---
 
+## Deployment in EC2 Instance (t3.small) in AWS
+<img width="2868" height="1528" alt="image" src="https://github.com/user-attachments/assets/ca182eb8-ae1c-4b38-a16c-5d934f9c4817" />
+
+
 ## Status & what's left
 
 | Area | Status |
