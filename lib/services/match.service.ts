@@ -5,12 +5,13 @@ import { VOCAB, WATCH_THEMES, WATCH_VIBES } from "@/lib/ai-profile/vocabulary";
 import { centroid, dot, embeddingKey, loadEmbeddingIndex, type Vector } from "@/lib/recommender/embeddings";
 import { createNotification } from "@/lib/services/notification.service";
 import { loadTasteCatalog, loadTasteSignals, tasteCentroids, type TasteSignals } from "@/lib/services/taste-engine.service";
-import type { CircleProposal, CircleView, MatchPerson, MatchProfileView, MatchScope } from "@/lib/match/types";
+import type { MatchProfileView, MatchScope, RoomInvite, RoomView } from "@/lib/match/types";
 
 /**
- * AI Match: groups people with similar taste and personality — nearby, in the same
- * country, or worldwide. Only opted-in users are ever matched; location is coarse
- * (~10 km) and only turned into a rough distance label, never shown.
+ * AI Match rooms: a user opens a room; everyone opted in within its reach whose taste
+ * and personality match theirs gets a popup and a notification, and joins in one tap.
+ * Only opted-in users are ever matched; location is coarse (~10 km) and only turned
+ * into a rough distance label, never shown.
  */
 
 const NEARBY_KM = 50;
@@ -185,25 +186,6 @@ async function groupVibe(people: Person[]) {
   };
 }
 
-async function personView(me: Person, other: Person): Promise<MatchPerson> {
-  const user = await prisma.user.findUnique({
-    where: { id: other.userId },
-    select: { name: true, handle: true, avatarColor: true, avatarUrl: true },
-  });
-  const match = await describeMatch(me, other);
-  return {
-    userId: other.userId,
-    name: user?.name ?? "AniVerse user",
-    handle: user?.handle ?? "",
-    avatarColor: user?.avatarColor ?? "#ff00cc",
-    avatarUrl: user?.avatarUrl ?? undefined,
-    intro: other.profile.intro ?? undefined,
-    matchScore: match.score,
-    reasons: match.reasons,
-    distanceLabel: match.distanceLabel,
-  };
-}
-
 export class MatchNotReadyError extends Error {
   constructor(message: string) {
     super(message);
@@ -211,209 +193,321 @@ export class MatchNotReadyError extends Error {
   }
 }
 
-/**
- * Propose a circle: rank opted-in people in scope by taste match, then add members
- * greedily so the group fits together (each pick also has to fit those already in).
- */
-export async function proposeCircle(userId: string, excludeIds: string[] = []): Promise<CircleProposal> {
-  const myProfile = await prisma.matchProfile.findUnique({ where: { userId } });
-  if (!myProfile?.enabled) throw new MatchNotReadyError("Turn on AI Match first.");
-  if (myProfile.scope === "nearby" && (myProfile.latitude === null || myProfile.longitude === null)) {
-    throw new MatchNotReadyError("Share your approximate location to match nearby, or switch to My country / Worldwide.");
-  }
+// ---- rooms -------------------------------------------------------------------------------
 
-  const others = await prisma.matchProfile.findMany({
-    where: { enabled: true, userId: { notIn: [userId, ...excludeIds] } },
-  });
-  const me = await loadPerson(myProfile);
-  const people = (await Promise.all(others.map(loadPerson))).filter((other) => inScope(me, other));
-  if (!people.length) {
-    throw new MatchNotReadyError(
-      myProfile.scope === "world" ? "Nobody else has turned on AI Match yet — check back soon." : "No matches in this area yet — try a wider scope.",
-    );
-  }
+/** Invite everyone at or above this match; below it only if nobody clears the bar. */
+const STRONG_MATCH = 60;
+/** Most invites one room can send (keeps fan-out sane with many users). */
+const MAX_INVITES = 100;
+/** Most room popups one person gets per day. */
+const DAILY_INVITE_CAP = 5;
+const ROOM_TTL_MS = 24 * 3_600_000;
+const MIN_CAPACITY = 3;
+const MAX_CAPACITY = 12;
 
-  const scored = await Promise.all(people.map(async (other) => ({ other, match: await describeMatch(me, other) })));
-  scored.sort((a, b) => b.match.score - a.match.score);
-
-  const wanted = Math.max(MIN_GROUP, Math.min(MAX_GROUP, myProfile.groupSize)) - 1;
-  const picked: Person[] = [];
-  const pool = [...scored];
-  while (picked.length < wanted && pool.length) {
-    let bestIndex = 0;
-    let bestValue = -Infinity;
-    pool.forEach((entry, index) => {
-      const cohesion = picked.length
-        ? picked.reduce((sum, member) => sum + toPercent(tasteSimilarity(member, entry.other)), 0) / picked.length
-        : entry.match.score;
-      const value = entry.match.score * 0.6 + cohesion * 0.4;
-      if (value > bestValue) {
-        bestValue = value;
-        bestIndex = index;
-      }
-    });
-    picked.push(pool.splice(bestIndex, 1)[0]!.other);
-  }
-
-  const vibe = await groupVibe([me, ...picked]);
-  return { ...vibe, members: await Promise.all(picked.map((other) => personView(me, other))) };
+/** A name and vibe for a new room, from the creator's own taste. */
+export async function suggestRoom(userId: string) {
+  const profile = await prisma.matchProfile.findUnique({ where: { userId } });
+  if (!profile) return { title: "Your Taste Room", vibe: "" };
+  return groupVibe([await loadPerson(profile)]);
 }
 
-// ---- circles -----------------------------------------------------------------------------
+const INVITE_LINES = [
+  (name: string, title: string, score: number) => `🎉 ${name} just opened “${title}” — you're a ${score}% match!`,
+  (name: string, title: string, score: number) => `🔥 Your kind of people: ${name}'s room “${title}” matches you ${score}%.`,
+  (name: string, title: string, score: number) => `✨ ${score}% vibe match — ${name} wants you in “${title}”.`,
+];
 
-export async function createCircle(userId: string, input: { title: string; vibe: string; memberIds: string[] }) {
-  const memberIds = [...new Set(input.memberIds)].filter((id) => id !== userId).slice(0, MAX_GROUP - 1);
-  if (!memberIds.length) throw new MatchNotReadyError("Pick at least one person to invite.");
-  const [myProfile, profiles] = await Promise.all([
-    prisma.matchProfile.findUnique({ where: { userId } }),
-    prisma.matchProfile.findMany({ where: { userId: { in: memberIds }, enabled: true } }),
-  ]);
+function inviteLine(seed: string, name: string, title: string, score: number) {
+  const index = [...seed].reduce((sum, char) => sum + char.charCodeAt(0), 0) % INVITE_LINES.length;
+  return INVITE_LINES[index]!(name, title, score);
+}
+
+export interface CreateRoomInput {
+  title: string;
+  topic?: string;
+  scope: MatchScope;
+  capacity: number;
+}
+
+export interface CreateRoomResult {
+  roomId: string;
+  communitySlug: string;
+  invited: number;
+  /** "strong": everyone ≥ 60%; "best-available": nobody cleared the bar, so the best we have. */
+  mode: "strong" | "best-available" | "none";
+}
+
+/**
+ * Open a room: score every opted-in person in its reach against the creator, invite
+ * all strong matches (or, while the app is small, the best available), and pop it up
+ * for them. Joining is one tap, first come first served until it's full.
+ */
+export async function createRoom(userId: string, input: CreateRoomInput): Promise<CreateRoomResult> {
+  const myProfile = await prisma.matchProfile.findUnique({ where: { userId } });
   if (!myProfile?.enabled) throw new MatchNotReadyError("Turn on AI Match first.");
-  // Only people who opted in can be invited.
-  const me = await loadPerson(myProfile);
-  const invitees = await Promise.all(profiles.map(loadPerson));
-  if (!invitees.length) throw new MatchNotReadyError("Those people aren't available for matching any more.");
-  const views = await Promise.all(invitees.map((other) => personView(me, other)));
-  const inviter = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+  if (input.scope === "nearby" && (myProfile.latitude === null || myProfile.longitude === null)) {
+    throw new MatchNotReadyError("Share your approximate location in AI Match settings to open a nearby room.");
+  }
+  const capacity = Math.max(MIN_CAPACITY, Math.min(MAX_CAPACITY, Math.round(input.capacity)));
+  const me = await loadPerson({ ...myProfile, scope: input.scope });
 
-  const circle = await prisma.matchCircle.create({
+  // People already at today's popup cap are skipped.
+  const since = new Date(Date.now() - 86_400_000);
+  const busy = await prisma.matchCircleMember.groupBy({
+    by: ["userId"],
+    where: { createdAt: { gte: since }, status: "INVITED" },
+    _count: { userId: true },
+  });
+  const capped = new Set(busy.filter((row) => row._count.userId >= DAILY_INVITE_CAP).map((row) => row.userId));
+  const others = await prisma.matchProfile.findMany({
+    where: { enabled: true, userId: { notIn: [userId, ...capped] } },
+  });
+  const people = (await Promise.all(others.map(loadPerson))).filter((other) => inScope(me, other));
+  const scored = (await Promise.all(people.map(async (other) => ({ other, match: await describeMatch(me, other) })))).sort(
+    (a, b) => b.match.score - a.match.score,
+  );
+  const strong = scored.filter((entry) => entry.match.score >= STRONG_MATCH);
+  const invitees = (strong.length ? strong : scored.slice(0, Math.max(5, capacity * 2))).slice(0, MAX_INVITES);
+  const mode: CreateRoomResult["mode"] = !invitees.length ? "none" : strong.length ? "strong" : "best-available";
+
+  const vibe = (await groupVibe([me])).vibe;
+  const title = input.title.trim().slice(0, 60) || "Your Taste Room";
+  const creator = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+
+  const room = await prisma.matchCircle.create({
     data: {
-      title: input.title.trim().slice(0, 60) || "Your Taste Circle",
-      vibe: input.vibe.trim().slice(0, 120),
+      title,
+      vibe,
+      topic: input.topic?.trim().slice(0, 120) || null,
       createdById: userId,
+      scope: input.scope,
+      capacity,
+      expiresAt: new Date(Date.now() + ROOM_TTL_MS),
+      invitedCount: invitees.length,
       members: {
         create: [
-          { userId, status: "ACCEPTED", matchScore: 100, reason: "Started this circle", respondedAt: new Date() },
-          ...views.map((view) => ({
-            userId: view.userId,
-            matchScore: view.matchScore,
-            reason: [...view.reasons.slice(0, 2), view.distanceLabel].join(" · "),
+          { userId, status: "ACCEPTED", matchScore: 100, reason: "Opened this room", respondedAt: new Date() },
+          ...invitees.map(({ other, match }) => ({
+            userId: other.userId,
+            matchScore: match.score,
+            reason: [...match.reasons.slice(0, 2), match.distanceLabel].join(" · "),
           })),
         ],
       },
     },
   });
-  await Promise.all(
-    views.map((view) =>
-      createNotification({
-        userId: view.userId,
-        title: `${inviter?.name ?? "Someone"} invited you to “${circle.title}”`,
-        category: "ai-match",
-        description: `AI Match thinks you'd click: ${view.reasons[0] ?? "similar taste"}.`,
-        href: "/dashboard/ai-mode/match",
-        actionType: "match-invite",
-        actionRefId: circle.id,
-      }).catch(() => undefined),
-    ),
-  );
-  return circle.id;
-}
-
-/** The circle's private space: a private community with chat, posts and rooms. */
-async function activateCircle(circleId: string) {
-  const circle = await prisma.matchCircle.findUnique({ where: { id: circleId }, include: { members: true } });
-  if (!circle) return;
-  const accepted = circle.members.filter((member) => member.status === "ACCEPTED");
-  if (accepted.length < 2) return;
-
-  if (!circle.communityId) {
-    const community = await prisma.community.create({
-      data: {
-        slug: `circle-${circle.id.slice(-10).toLowerCase()}`,
-        name: circle.title,
-        category: "Circle",
-        description: `An AI Match circle · ${circle.vibe}. Chat, share what you're watching and set up rooms together.`,
-        visibility: "PRIVATE",
-        activityLevel: "active",
-        accent: "purple",
-        memberLimit: MAX_GROUP,
-        memberCount: accepted.length,
-        members: {
-          create: accepted.map((member) => ({ userId: member.userId, role: member.userId === circle.createdById ? "ADMIN" : "MEMBER" })),
-        },
-      },
-    });
-    await prisma.matchCircle.update({ where: { id: circle.id }, data: { status: "ACTIVE", communityId: community.id } });
-    return;
-  }
-  for (const member of accepted) {
-    await prisma.communityMember.upsert({
-      where: { userId_communityId: { userId: member.userId, communityId: circle.communityId } },
-      create: { userId: member.userId, communityId: circle.communityId },
-      update: {},
-    });
-  }
-  await prisma.community.update({ where: { id: circle.communityId }, data: { memberCount: accepted.length } });
-}
-
-export async function respondToCircle(userId: string, circleId: string, action: "accept" | "decline" | "leave") {
-  const membership = await prisma.matchCircleMember.findUnique({ where: { circleId_userId: { circleId, userId } }, include: { circle: true } });
-  if (!membership) throw new MatchNotReadyError("That circle doesn't exist any more.");
-
-  if (action === "leave") {
-    await prisma.matchCircleMember.update({ where: { id: membership.id }, data: { status: "LEFT", respondedAt: new Date() } });
-    if (membership.circle.communityId) {
-      await prisma.communityMember.deleteMany({ where: { userId, communityId: membership.circle.communityId } });
-      const remaining = await prisma.matchCircleMember.count({ where: { circleId, status: "ACCEPTED" } });
-      await prisma.community.update({ where: { id: membership.circle.communityId }, data: { memberCount: remaining } });
-    }
-    return;
-  }
-  if (membership.status !== "INVITED") return;
-  await prisma.matchCircleMember.update({
-    where: { id: membership.id },
-    data: { status: action === "accept" ? "ACCEPTED" : "DECLINED", respondedAt: new Date() },
-  });
-  if (action === "accept") {
-    await activateCircle(circleId);
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
-    await createNotification({
-      userId: membership.circle.createdById,
-      title: `${user?.name ?? "Someone"} joined “${membership.circle.title}”`,
-      category: "ai-match",
-      href: "/dashboard/ai-mode/match",
-      actionType: "match-joined",
-      actionRefId: circleId,
-    }).catch(() => undefined);
-  }
-}
-
-export async function listMyCircles(userId: string): Promise<CircleView[]> {
-  const rows = await prisma.matchCircle.findMany({
-    where: { members: { some: { userId, status: { in: ["INVITED", "ACCEPTED"] } } } },
-    include: {
-      members: {
-        orderBy: { createdAt: "asc" },
-        include: { user: { select: { name: true, handle: true, avatarColor: true, avatarUrl: true } } },
-      },
+  // The room's space exists from the start, so joining drops people straight in.
+  const community = await prisma.community.create({
+    data: {
+      slug: `room-${room.id.slice(-10).toLowerCase()}`,
+      name: title,
+      category: "AI Room",
+      description: `An AI Match room${room.topic ? ` · ${room.topic}` : ""} · ${vibe}`,
+      visibility: "PRIVATE",
+      activityLevel: "active",
+      accent: "purple",
+      memberLimit: capacity,
+      memberCount: 1,
+      members: { create: { userId, role: "ADMIN" } },
     },
+  });
+  await prisma.matchCircle.update({ where: { id: room.id }, data: { communityId: community.id } });
+
+  if (invitees.length) {
+    await prisma.notification.createMany({
+      data: invitees.map(({ other, match }) => ({
+        userId: other.userId,
+        title: inviteLine(room.id + other.userId, creator?.name ?? "Someone", title, match.score),
+        category: "ai-match",
+        description: `${match.reasons[0] ?? "Similar taste"} · ${match.distanceLabel}${room.topic ? ` · ${room.topic}` : ""}`,
+        href: "/dashboard/ai-mode/match",
+        actionType: "match-room",
+        actionRefId: room.id,
+      })),
+    });
+  }
+  return { roomId: room.id, communitySlug: community.slug, invited: invitees.length, mode };
+}
+
+async function roomForMember(userId: string, roomId: string) {
+  const membership = await prisma.matchCircleMember.findUnique({
+    where: { circleId_userId: { circleId: roomId, userId } },
+    include: { circle: true },
+  });
+  if (!membership) {
+    const exists = await prisma.matchCircle.count({ where: { id: roomId } });
+    throw new MatchNotReadyError(exists ? "This room is invite-only — you weren't matched into it." : "That room doesn't exist any more.");
+  }
+  return membership;
+}
+
+/** Rooms from before spaces existed get their private community on first join. */
+async function ensureRoomSpace(roomId: string) {
+  const room = await prisma.matchCircle.findUnique({ where: { id: roomId }, include: { members: { where: { status: "ACCEPTED" } } } });
+  if (!room || room.communityId) return room?.communityId ?? null;
+  const community = await prisma.community.create({
+    data: {
+      slug: `room-${room.id.slice(-10).toLowerCase()}`,
+      name: room.title,
+      category: "AI Room",
+      description: `An AI Match room${room.topic ? ` · ${room.topic}` : ""} · ${room.vibe}`,
+      visibility: "PRIVATE",
+      activityLevel: "active",
+      accent: "purple",
+      memberLimit: room.capacity,
+      memberCount: room.members.length,
+      members: { create: room.members.map((member) => ({ userId: member.userId, role: member.userId === room.createdById ? "ADMIN" : "MEMBER" })) },
+    },
+  });
+  await prisma.matchCircle.update({ where: { id: room.id }, data: { communityId: community.id } });
+  return community.id;
+}
+
+/** One tap: join if invited, not expired and not full. */
+export async function joinRoom(userId: string, roomId: string) {
+  const membership = await roomForMember(userId, roomId);
+  const room = membership.circle;
+  if (membership.status === "ACCEPTED") return room;
+  if (membership.status !== "INVITED") throw new MatchNotReadyError("This invite isn't open any more.");
+  if (room.expiresAt && room.expiresAt < new Date()) throw new MatchNotReadyError("This room's invite has expired.");
+
+  await ensureRoomSpace(roomId);
+  const communityId = (await prisma.matchCircle.findUnique({ where: { id: roomId }, select: { communityId: true } }))?.communityId;
+  const joined = await prisma.$transaction(async (tx) => {
+    const members = await tx.matchCircleMember.count({ where: { circleId: roomId, status: "ACCEPTED" } });
+    if (members >= room.capacity) return false;
+    await tx.matchCircleMember.update({ where: { id: membership.id }, data: { status: "ACCEPTED", respondedAt: new Date(), seenAt: new Date() } });
+    if (communityId) {
+      await tx.communityMember.upsert({
+        where: { userId_communityId: { userId, communityId } },
+        create: { userId, communityId },
+        update: {},
+      });
+      await tx.community.update({ where: { id: communityId }, data: { memberCount: members + 1 } });
+    }
+    if (members + 1 >= room.capacity) await tx.matchCircle.update({ where: { id: roomId }, data: { status: "FULL" } });
+    return true;
+  });
+  if (!joined) throw new MatchNotReadyError("Too late — this room just filled up.");
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+  await createNotification({
+    userId: room.createdById,
+    title: `${user?.name ?? "Someone"} joined “${room.title}”`,
+    category: "ai-match",
+    href: "/dashboard/ai-mode/match",
+    actionType: "match-joined",
+    actionRefId: roomId,
+  }).catch(() => undefined);
+  return room;
+}
+
+export async function declineRoom(userId: string, roomId: string) {
+  const membership = await roomForMember(userId, roomId);
+  if (membership.status !== "INVITED") return;
+  await prisma.matchCircleMember.update({ where: { id: membership.id }, data: { status: "DECLINED", respondedAt: new Date(), seenAt: new Date() } });
+}
+
+/** The invite popup was shown — it won't pop again (it stays in notifications and the page). */
+export async function markRoomInviteSeen(userId: string, roomId: string) {
+  await prisma.matchCircleMember.updateMany({ where: { circleId: roomId, userId, seenAt: null }, data: { seenAt: new Date() } });
+}
+
+export async function leaveRoom(userId: string, roomId: string) {
+  const membership = await roomForMember(userId, roomId);
+  if (membership.status !== "ACCEPTED") return;
+  await prisma.matchCircleMember.update({ where: { id: membership.id }, data: { status: "LEFT", respondedAt: new Date() } });
+  const room = membership.circle;
+  if (room.communityId) {
+    await prisma.communityMember.deleteMany({ where: { userId, communityId: room.communityId } });
+    const remaining = await prisma.matchCircleMember.count({ where: { circleId: roomId, status: "ACCEPTED" } });
+    await prisma.community.update({ where: { id: room.communityId }, data: { memberCount: remaining } });
+    if (room.status === "FULL" && remaining < room.capacity) await prisma.matchCircle.update({ where: { id: roomId }, data: { status: "OPEN" } });
+  }
+}
+
+const roomInclude = {
+  members: {
+    orderBy: { createdAt: "asc" as const },
+    include: { user: { select: { name: true, handle: true, avatarColor: true, avatarUrl: true } } },
+  },
+};
+
+async function communitySlugs(communityIds: string[]) {
+  const rows = await prisma.community.findMany({ where: { id: { in: communityIds } }, select: { id: true, slug: true } });
+  return new Map(rows.map((row) => [row.id, row.slug]));
+}
+
+/** Open invites for this user (newest first); `unseenOnly` for the popup. */
+export async function listRoomInvites(userId: string, { unseenOnly = false } = {}): Promise<RoomInvite[]> {
+  const rows = await prisma.matchCircleMember.findMany({
+    where: {
+      userId,
+      status: "INVITED",
+      ...(unseenOnly ? { seenAt: null } : {}),
+      circle: { status: "OPEN", OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
+    },
+    include: { circle: { include: roomInclude } },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+  return rows.map((row) => {
+    const room = row.circle;
+    const creator = room.members.find((member) => member.userId === room.createdById);
+    const joined = room.members.filter((member) => member.status === "ACCEPTED");
+    return {
+      roomId: room.id,
+      title: room.title,
+      vibe: room.vibe,
+      topic: room.topic ?? undefined,
+      scope: room.scope as MatchScope,
+      creatorName: creator?.user.name ?? "Someone",
+      creatorHandle: creator?.user.handle ?? "",
+      creatorAvatarColor: creator?.user.avatarColor ?? "#ff00cc",
+      creatorAvatarUrl: creator?.user.avatarUrl ?? undefined,
+      matchScore: row.matchScore,
+      reason: row.reason,
+      headline: inviteLine(room.id + userId, creator?.user.name ?? "Someone", room.title, row.matchScore),
+      joinedCount: joined.length,
+      capacity: room.capacity,
+      expiresAt: room.expiresAt?.toISOString(),
+    };
+  });
+}
+
+/** Rooms the user is in. */
+export async function listMyRooms(userId: string): Promise<RoomView[]> {
+  const rows = await prisma.matchCircle.findMany({
+    where: { members: { some: { userId, status: "ACCEPTED" } } },
+    include: roomInclude,
     orderBy: { updatedAt: "desc" },
   });
-  const communities = await prisma.community.findMany({
-    where: { id: { in: rows.flatMap((row) => row.communityId ?? []) } },
-    select: { id: true, slug: true },
-  });
-  const slugOf = new Map(communities.map((community) => [community.id, community.slug]));
+  for (const row of rows) if (!row.communityId) row.communityId = await ensureRoomSpace(row.id);
+  const slugs = await communitySlugs(rows.flatMap((row) => row.communityId ?? []));
   return rows.map((row) => ({
     id: row.id,
     title: row.title,
     vibe: row.vibe,
-    status: row.status as CircleView["status"],
-    myStatus: (row.members.find((member) => member.userId === userId)?.status ?? "INVITED") as CircleView["myStatus"],
+    topic: row.topic ?? undefined,
+    scope: row.scope as MatchScope,
+    status: row.status as RoomView["status"],
+    capacity: row.capacity,
+    invitedCount: row.invitedCount,
     createdByMe: row.createdById === userId,
-    communitySlug: row.communityId ? slugOf.get(row.communityId) : undefined,
+    communitySlug: row.communityId ? slugs.get(row.communityId) : undefined,
     members: row.members
-      .filter((member) => member.status !== "DECLINED" && member.status !== "LEFT")
+      .filter((member) => member.status === "ACCEPTED")
       .map((member) => ({
         userId: member.userId,
         name: member.user.name,
         handle: member.user.handle,
         avatarColor: member.user.avatarColor,
         avatarUrl: member.user.avatarUrl ?? undefined,
-        status: member.status as CircleView["members"][number]["status"],
         matchScore: member.matchScore,
         reason: member.reason,
         isMe: member.userId === userId,
+        isHost: member.userId === row.createdById,
       })),
   }));
 }

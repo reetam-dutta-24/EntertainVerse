@@ -1165,16 +1165,28 @@ model MatchProfile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-/// A group the matcher proposed. Becomes ACTIVE (with a private community space for
-/// chat, posts and rooms) once the creator and at least one invitee have accepted.
+/// An AI Match room. The creator opens it; every opted-in user in its reach who
+/// matches them well enough gets a popup + notification and can join in one tap
+/// until the room is full. Its private community is the room's space (chat, posts,
+/// watch / voice rooms).
 model MatchCircle {
   id          String   @id @default(cuid())
   title       String
   /// What the group shares, e.g. "Mind-bending thrillers · Death Note fans".
   vibe        String
+  /// What the room is for, e.g. "Death Note rewatch, ep 1 tonight".
+  topic       String?
   createdById String
-  /// FORMING | ACTIVE
-  status      String   @default("FORMING")
+  /// OPEN (accepting joins) | FULL
+  status      String   @default("OPEN")
+  /// nearby | country | world — who was invited.
+  scope       String   @default("world")
+  /// Max members including the creator.
+  capacity    Int      @default(6)
+  /// Invites stop working after this.
+  expiresAt   DateTime?
+  /// How many people were invited when the room opened.
+  invitedCount Int     @default(0)
   communityId String?  @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -1193,6 +1205,8 @@ model MatchCircleMember {
   /// Why they were matched, e.g. "Both love Death Note · ~12 km away".
   reason     String    @default("")
   respondedAt DateTime?
+  /// When the invite popup was shown (it only pops once).
+  seenAt     DateTime?
   createdAt  DateTime  @default(now())
 
   circle MatchCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)

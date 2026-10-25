@@ -1,5 +1,6 @@
 import { ContentTopbar } from "@/components/content/content-topbar";
 import { ScreenTimeGate } from "@/components/screen-time/screen-time-gate";
+import { MatchInvitePopup } from "@/components/ai-mode/match-invite-popup";
 import { auth } from "@/lib/auth";
 import { getOptionalTopbarUser } from "@/lib/data/user";
 
@@ -19,6 +20,8 @@ export async function AppContentLayout({
   return (
     <ScreenTimeGate userId={session?.user?.id}>
       <div className="min-h-dvh bg-background">
+        {/* Room invites pop up on every signed-in page. */}
+        {session?.user?.id ? <MatchInvitePopup /> : null}
         <ContentTopbar user={user} />
         <main className={mainClassName}>{children}</main>
       </div>

@@ -17,46 +17,51 @@ export interface MatchProfileView {
   groupSize: number;
 }
 
-export interface MatchPerson {
-  userId: string;
-  name: string;
-  handle: string;
-  avatarColor: string;
-  avatarUrl?: string;
-  intro?: string;
-  /** 0–100 taste match. */
-  matchScore: number;
-  reasons: string[];
-  /** "~12 km away", "Also in India", "Across the world". */
-  distanceLabel: string;
-}
-
-export interface CircleProposal {
+export interface RoomInvite {
+  roomId: string;
   title: string;
   vibe: string;
-  members: MatchPerson[];
+  topic?: string;
+  scope: MatchScope;
+  creatorName: string;
+  creatorHandle: string;
+  creatorAvatarColor: string;
+  creatorAvatarUrl?: string;
+  /** 0–100 match with the room's creator. */
+  matchScore: number;
+  /** Why they were invited, e.g. "Both into Death Note · Also in India". */
+  reason: string;
+  /** The catchy popup line. */
+  headline: string;
+  joinedCount: number;
+  capacity: number;
+  expiresAt?: string;
 }
 
-export interface CircleMemberView {
+export interface RoomMemberView {
   userId: string;
   name: string;
   handle: string;
   avatarColor: string;
   avatarUrl?: string;
-  status: "INVITED" | "ACCEPTED" | "DECLINED" | "LEFT";
   matchScore: number;
   reason: string;
   isMe: boolean;
+  isHost: boolean;
 }
 
-export interface CircleView {
+export interface RoomView {
   id: string;
   title: string;
   vibe: string;
-  status: "FORMING" | "ACTIVE";
-  myStatus: CircleMemberView["status"];
+  topic?: string;
+  scope: MatchScope;
+  /** OPEN: still taking members · FULL: at capacity. */
+  status: "OPEN" | "FULL";
+  capacity: number;
+  invitedCount: number;
   createdByMe: boolean;
-  /** Private community space (chat, posts, rooms) once active. */
+  /** The room's private space (chat, posts, watch / voice rooms). */
   communitySlug?: string;
-  members: CircleMemberView[];
+  members: RoomMemberView[];
 }

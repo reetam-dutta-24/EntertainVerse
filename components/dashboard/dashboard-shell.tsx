@@ -5,6 +5,7 @@ import { DashboardBottomNav } from "@/components/dashboard/dashboard-bottom-nav"
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import type { DashboardUser } from "@/components/dashboard/user-profile-menu";
+import { MatchInvitePopup } from "@/components/ai-mode/match-invite-popup";
 
 export interface DashboardShellProps {
   user: DashboardUser;
@@ -17,6 +18,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
 
   return (
     <div className="min-h-dvh bg-background">
+      <MatchInvitePopup />
       <DashboardSidebar
         user={user}
         mobileOpen={navOpen}
