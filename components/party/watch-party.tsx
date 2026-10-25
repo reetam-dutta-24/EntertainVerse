@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Clapperboard, ExternalLink, Pause, Play, RotateCcw, RotateCw, Tv, X } from "lucide-react";
 import { GroupPicksPanel } from "@/components/party/group-picks";
@@ -178,7 +179,8 @@ export function WatchParty({ channelId, channelTitle, viewerUserId, onClose }: W
   const total = media?.durationSec ?? 0;
   const shown = scrub ?? position;
 
-  return (
+  // Portalled to <body>: inside the community panel a transformed ancestor would clip a `fixed` overlay.
+  return createPortal(
     <div role="dialog" aria-modal="true" aria-label={`Watch party: ${channelTitle}`} className="fixed inset-0 z-[300] flex flex-col bg-background/98 backdrop-blur">
       <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-3 sm:px-6">
         <div className="min-w-0">
@@ -193,7 +195,7 @@ export function WatchParty({ channelId, channelTitle, viewerUserId, onClose }: W
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-6 lg:flex-row lg:overflow-hidden">
-        <div className="flex min-w-0 flex-col gap-3 lg:flex-[2]">
+        <div className="flex min-w-0 shrink-0 flex-col gap-3 lg:min-h-0 lg:flex-[2] lg:overflow-y-auto lg:pr-1">
           <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
             {media?.mode === "video" ? <VideoPlayer state={state!} skew={skewMs} onBlocked={() => setBlocked(true)} /> : null}
             {media?.mode === "youtube" ? <YouTubePlayer state={state!} skew={skewMs} /> : null}
@@ -283,12 +285,13 @@ export function WatchParty({ channelId, channelTitle, viewerUserId, onClose }: W
           {error ? <p className="text-sm text-amber-100">{error}</p> : null}
         </div>
 
-        <aside className="flex min-h-[320px] flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 lg:flex-1">
+        <aside className="flex min-h-[320px] shrink-0 flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 lg:min-h-0 lg:flex-1 lg:shrink">
           {state ? <MemberStrip members={state.members} hostId={state.hostId} /> : null}
           <ReactionBar onReact={react} />
           <PartyChat messages={chat} onSend={sendChat} viewerUserId={viewerUserId} />
         </aside>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
