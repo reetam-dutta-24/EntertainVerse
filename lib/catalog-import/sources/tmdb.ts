@@ -73,6 +73,13 @@ function pickTrailer(videos: TmdbVideo[]): string {
   return best ? `https://www.youtube.com/watch?v=${best.key}` : "";
 }
 
+/** Official trailer for a TMDB title ("" when there is none). Cached for a week. */
+export async function fetchTmdbTrailer(id: number, kind: "movie" | "tv"): Promise<string> {
+  if (!isTmdbConfigured()) return "";
+  const data = await tmdb<{ results: TmdbVideo[] }>(`/${kind}/${id}/videos`, {}, 604_800);
+  return pickTrailer(data.results);
+}
+
 export interface WatchProvider {
   id: number;
   name: string;

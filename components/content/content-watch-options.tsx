@@ -33,7 +33,7 @@ export async function ContentWatchOptions({ title, trailerUrl, tmdbId, tmdbKind 
 
   return (
     <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 sm:px-8 lg:px-12">
-      <h2 className="text-lg font-bold text-white sm:text-xl">🎬 Trailer &amp; where to watch</h2>
+      <h2 className="text-lg font-bold text-white sm:text-xl">{hasTrailer ? "🎬 Trailer & where to watch" : "📺 Where to watch"}</h2>
       <div className={hasTrailer && hasProviders ? "grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]" : "grid gap-6"}>
         {hasTrailer ? <TrailerFacade url={trailerUrl!} title={title} /> : null}
 

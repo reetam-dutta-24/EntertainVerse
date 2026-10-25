@@ -15,6 +15,7 @@ import { ContentHeroActions } from "@/components/content/content-hero-actions";
 import { ContentDescription } from "@/components/content/content-description";
 import { ContentHeroCollectionButton } from "@/components/content/content-hero-collection-button";
 import { ContentHeroPosterActions } from "@/components/content/content-hero-poster-actions";
+import { HeroTrailerToggle } from "@/components/content/hero-trailer-toggle";
 import { ContentEngagementPanel } from "@/components/content/content-engagement-panel";
 import { SongHeroPosterPanel } from "@/components/song/song-hero-poster-panel";
 import { SongHeroWatchlistButton } from "@/components/song/song-hero-watchlist-button";
@@ -303,6 +304,7 @@ export function ContentDetailHero({
               alt={content.title}
               priority
             />
+            {!songMedia && content.trailerUrl ? <HeroTrailerToggle trailerUrl={content.trailerUrl} title={content.title} /> : null}
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0"

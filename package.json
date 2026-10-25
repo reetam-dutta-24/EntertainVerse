@@ -16,6 +16,7 @@
     "db:recovery": "npx tsx scripts/seed-recovery.ts",
     "db:reset": "npx tsx prisma/seed.ts --wipe",
     "embed:catalog": "tsx --conditions=react-server --env-file=.env.local scripts/embed-catalog.ts",
+    "backfill:trailers": "tsx --conditions=react-server --env-file=.env.local scripts/backfill-trailers.ts",
     "eval:recommender": "tsx --conditions=react-server --env-file=.env.local scripts/eval-recommender.ts",
     "postinstall": "prisma generate"
   },

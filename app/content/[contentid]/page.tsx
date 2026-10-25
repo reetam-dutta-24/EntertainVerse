@@ -88,7 +88,6 @@ export default async function ContentDetailPage({ params }: ContentPageProps) {
 
       <ContentWatchOptions
         title={content.title}
-        trailerUrl={content.trailerUrl}
         tmdbId={content.tmdbId}
         tmdbKind={content.tmdbKind}
       />
