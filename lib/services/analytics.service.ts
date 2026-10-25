@@ -1,5 +1,8 @@
 import type { MediaType, WatchlistStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { dot, embeddingKey, loadEmbeddingIndex, type Vector } from "@/lib/recommender/embeddings";
+import { getAiProfileInsights } from "@/lib/services/ai-profile.service";
+import { loadTasteCatalog, loadTasteSignals, tasteCentroids } from "@/lib/services/taste-engine.service";
 import type {
   AnalyticsData,
   AnalyticsKpi,
@@ -28,9 +31,24 @@ const CONTENT_TYPE_LABELS: Record<MediaType, string> = {
 
 const WEEKDAY_ORDER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
-function chartDayIndex(day: number): number {
-  return day === 0 ? 6 : day - 1;
+const WEEKDAY_INDEX: Record<string, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+
+/** Weekday (Mon = 0) and hour in the user's own time zone — not the server's. */
+function localClock(date: Date, timezone?: string) {
+  try {
+    const parts = Object.fromEntries(
+      new Intl.DateTimeFormat("en-US", { timeZone: timezone, weekday: "short", hour: "2-digit", hourCycle: "h23" })
+        .formatToParts(date)
+        .map((part) => [part.type, part.value]),
+    );
+    return { weekday: WEEKDAY_INDEX[parts.weekday as string] ?? 0, hour: Number(parts.hour) % 24 };
+  } catch {
+    return { weekday: date.getDay() === 0 ? 6 : date.getDay() - 1, hour: date.getHours() };
+  }
 }
+
+/** Weekly rhythm and peak hours look at the last 12 weeks. */
+const RHYTHM_WEEKS = 12;
 
 const PEAK_SLOTS = [
   { label: "6-9 AM", start: 6, end: 9 },
@@ -181,7 +199,7 @@ function buildMilestones(input: {
   streak: number;
   listenMinutes: number;
   watchMinutes: number;
-  aiTasteScore: number;
+  roadmapStepsDone: number;
 }): AnalyticsData["milestones"] {
   const milestones: AnalyticsData["milestones"] = [];
 
@@ -229,12 +247,12 @@ function buildMilestones(input: {
     });
   }
 
-  if (input.aiTasteScore >= 90) {
+  if (input.roadmapStepsDone > 0) {
     milestones.push({
-      id: "ai-match",
-      emoji: "🎯",
-      title: `${input.aiTasteScore}% AI Match`,
-      detail: "Taste profile all-time high",
+      id: "roadmap",
+      emoji: "🗺️",
+      title: `${input.roadmapStepsDone} Roadmap Step${input.roadmapStepsDone === 1 ? "" : "s"} Done`,
+      detail: "Following your AI roadmap",
     });
   }
 
@@ -261,7 +279,6 @@ export async function getAnalyticsForUser(
   const yearStart = months[0].start;
 
   const [
-    user,
     tasteProfile,
     watchEvents,
     listenEvents,
@@ -270,15 +287,9 @@ export async function getAnalyticsForUser(
     ratings,
     posts,
     chatMessages,
+    screenTime,
+    roadmapStepsDone,
   ] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        aiTasteScore: true,
-        createdAt: true,
-        onboardingCompletedAt: true,
-      },
-    }),
     prisma.tasteProfile.findUnique({ where: { userId } }),
     prisma.watchEvent.findMany({
       where: { userId, watchedAt: { gte: yearStart } },
@@ -312,7 +323,10 @@ export async function getAnalyticsForUser(
       where: { authorId: userId },
       select: { createdAt: true },
     }),
+    prisma.screenTimeSettings.findUnique({ where: { userId }, select: { timezone: true } }),
+    prisma.aiRoadmapStep.count({ where: { status: "DONE", roadmap: { userId } } }),
   ]);
+  const timezone = screenTime?.timezone;
 
   const totalWatchMinutes = watchEvents.reduce(
     (sum, event) => sum + event.minutes,
@@ -371,7 +385,33 @@ export async function getAnalyticsForUser(
       ? allScores.reduce((sum, score) => sum + score, 0) / allScores.length
       : 0;
 
-  const aiTasteScore = user?.aiTasteScore ?? tasteProfile?.tasteScore ?? 0;
+  // Taste fit: how close each month's watching sits to the user's taste centroid in
+  // embedding space, scaled against the whole catalog (0% = least like you, 100% = most).
+  const [signals, catalog, index] = await Promise.all([loadTasteSignals(userId), loadTasteCatalog(), loadEmbeddingIndex()]);
+  const centroid: Vector | null = index.size ? (await tasteCentroids(signals)).content : null;
+  const catalogFits = centroid
+    ? catalog.content.flatMap((row) => {
+        const vector = index.vectors.get(embeddingKey("content", row.id));
+        return vector ? [dot(vector, centroid)] : [];
+      })
+    : [];
+  const fitMin = catalogFits.length ? Math.min(...catalogFits) : 0;
+  const fitSpan = (catalogFits.length ? Math.max(...catalogFits) : 1) - fitMin || 1;
+  const monthFit = (start: Date, end: Date): number | null => {
+    if (!centroid) return null;
+    let weighted = 0;
+    let minutes = 0;
+    for (const event of watchEvents) {
+      if (!inRange(event.watchedAt, start, end)) continue;
+      const vector = index.vectors.get(embeddingKey("content", event.contentId));
+      if (!vector) continue;
+      weighted += dot(vector, centroid) * event.minutes;
+      minutes += event.minutes;
+    }
+    return minutes ? Math.round(((weighted / minutes - fitMin) / fitSpan) * 100) : null;
+  };
+  const currentFit = monthFit(currentMonth.start, currentMonth.end);
+  const previousFit = monthFit(previousMonth.start, previousMonth.end);
 
   const activityDates = [
     ...watchEvents.map((event) => event.watchedAt),
@@ -428,11 +468,13 @@ export async function getAnalyticsForUser(
       ...formatDelta(avgRating, avgRating, { steadyLabel: "steady" }),
     },
     {
-      id: "match",
+      id: "taste-fit",
       emoji: "🎯",
-      label: "AI Match Accuracy",
-      value: aiTasteScore > 0 ? `${aiTasteScore}%` : "—",
-      ...formatDelta(aiTasteScore, aiTasteScore, { steadyLabel: "steady" }),
+      label: "Taste Fit (this month)",
+      value: currentFit !== null ? `${currentFit}%` : "—",
+      ...(currentFit !== null && previousFit !== null
+        ? formatDelta(currentFit, previousFit, { unit: " pts" })
+        : { delta: currentFit !== null ? "first month" : "watch something", deltaUp: currentFit !== null }),
     },
     {
       id: "streak",
@@ -514,7 +556,10 @@ export async function getAnalyticsForUser(
       value: Number((minutes / 60).toFixed(1)),
     }));
 
-  const tasteProfileData = asTasteBreakdown(tasteProfile?.tasteBreakdown);
+  // Live taste traits from the recommender (embeddings); the old onboarding breakdown only as a fallback.
+  const insights = await getAiProfileInsights(userId).catch(() => null);
+  const liveTraits = (insights?.watchTraits ?? []).slice(0, 6).map((trait) => ({ axis: trait.label, value: trait.score }));
+  const tasteProfileData = liveTraits.length >= 3 ? liveTraits : asTasteBreakdown(tasteProfile?.tasteBreakdown);
   const tasteProfileChart =
     tasteProfileData.length > 0
       ? tasteProfileData
@@ -526,24 +571,24 @@ export async function getAnalyticsForUser(
           ),
         }));
 
+  const rhythmStart = new Date(now.getTime() - RHYTHM_WEEKS * 7 * 86_400_000);
+  const recentWatch = watchEvents.filter((event) => event.watchedAt >= rhythmStart);
+  const recentListen = listenEvents.filter((event) => event.listenedAt >= rhythmStart);
   const weeklyWatch = Array.from({ length: 7 }, () => 0);
   const weeklyListen = Array.from({ length: 7 }, () => 0);
-  for (const event of watchEvents) {
-    weeklyWatch[chartDayIndex(event.watchedAt.getDay())] += event.minutes;
-  }
-  for (const event of listenEvents) {
-    weeklyListen[chartDayIndex(event.listenedAt.getDay())] += event.minutes;
-  }
+  for (const event of recentWatch) weeklyWatch[localClock(event.watchedAt, timezone).weekday]! += event.minutes;
+  for (const event of recentListen) weeklyListen[localClock(event.listenedAt, timezone).weekday]! += event.minutes;
 
+  // Average hours on each weekday across the last 12 weeks.
   const weeklyActivity = WEEKDAY_ORDER.map((day, index) => ({
     day,
-    watching: Number((weeklyWatch[index] / 60 / 4).toFixed(1)),
-    listening: Number((weeklyListen[index] / 60 / 4).toFixed(1)),
+    watching: Number((weeklyWatch[index]! / 60 / RHYTHM_WEEKS).toFixed(2)),
+    listening: Number((weeklyListen[index]! / 60 / RHYTHM_WEEKS).toFixed(2)),
   }));
 
   const peakHours = PEAK_SLOTS.map((slot) => {
     const minutesInSlot = (date: Date, minutes: number) => {
-      const hour = date.getHours();
+      const hour = localClock(date, timezone).hour;
       const inSlot =
         slot.start < slot.end
           ? hour >= slot.start && hour < slot.end
@@ -552,34 +597,17 @@ export async function getAnalyticsForUser(
     };
 
     const totalMinutes =
-      watchEvents.reduce(
-        (sum, event) => sum + minutesInSlot(event.watchedAt, event.minutes),
-        0,
-      ) +
-      listenEvents.reduce(
-        (sum, event) => sum + minutesInSlot(event.listenedAt, event.minutes),
-        0,
-      );
+      recentWatch.reduce((sum, event) => sum + minutesInSlot(event.watchedAt, event.minutes), 0) +
+      recentListen.reduce((sum, event) => sum + minutesInSlot(event.listenedAt, event.minutes), 0);
 
+    // Hours per week in this slot, averaged over the last 12 weeks.
     return {
       slot: slot.label,
-      hours: Number((totalMinutes / 60 / 4).toFixed(1)),
+      hours: Number((totalMinutes / 60 / RHYTHM_WEEKS).toFixed(2)),
     };
   });
 
-  const accountStart = user?.onboardingCompletedAt ?? user?.createdAt ?? now;
-  const matchAccuracy = months.map((month) => {
-    const progress = Math.min(
-      1,
-      (month.end.getTime() - accountStart.getTime()) /
-        Math.max(now.getTime() - accountStart.getTime(), 1),
-    );
-    const floor = Math.max(70, aiTasteScore - 18);
-    return {
-      month: month.key,
-      accuracy: Math.round(floor + (aiTasteScore - floor) * progress),
-    };
-  });
+  const tasteFit = months.map((month) => ({ month: month.key, fit: monthFit(month.start, month.end) }));
 
   const ratingBuckets = new Map<string, number>();
   for (const score of allScores) {
@@ -732,7 +760,7 @@ export async function getAnalyticsForUser(
     streak,
     listenMinutes: totalListenMinutes,
     watchMinutes: totalWatchMinutes,
-    aiTasteScore,
+    roadmapStepsDone,
   });
 
   return {
@@ -743,7 +771,7 @@ export async function getAnalyticsForUser(
     tasteProfile: tasteProfileChart,
     weeklyActivity,
     peakHours,
-    matchAccuracy,
+    tasteFit,
     ratingsGiven,
     communityEngagement,
     contentTypes,
@@ -752,6 +780,7 @@ export async function getAnalyticsForUser(
     monthComparison,
     milestones,
     summary: {
+      generatedAt: now.toISOString(),
       watchlistTotal: watchlistItems.length,
       currentMonthLabel: currentMonth.key,
       previousMonthLabel: previousMonth.key,

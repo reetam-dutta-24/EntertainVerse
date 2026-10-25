@@ -14,6 +14,7 @@ import {
   AniRadarChart,
 } from "@/components/charts";
 import { WelcomeBanner } from "@/components/dashboard";
+import { AnalyticsLiveRefresh } from "@/components/analytics/analytics-live-refresh";
 import { getAnalyticsData } from "@/lib/data/analytics";
 import { getCurrentUser } from "@/lib/data/user";
 import { chartPalette } from "@/components/charts/chart-theme";
@@ -33,6 +34,7 @@ export default async function AnalyticsPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="analytics" />
+      <AnalyticsLiveRefresh generatedAt={data.summary.generatedAt} />
 
       {/* 1 — Headline KPIs */}
       <AnalyticsKpiGrid kpis={data.kpis} />
@@ -74,8 +76,8 @@ export default async function AnalyticsPage() {
           <AniPieChart data={data.genreDistribution} height={300} />
         </ChartPanel>
         <ChartPanel
-          title="🧠 AI taste profile"
-          subtitle="How strongly each mood defines your taste"
+          title="🧠 Your taste reads as"
+          subtitle="Live from the recommender — how strongly each vibe fits what you love"
         >
           <AniRadarChart data={data.tasteProfile} name="Taste Score" height={300} />
         </ChartPanel>
@@ -85,7 +87,7 @@ export default async function AnalyticsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <ChartPanel
           title="📅 Weekly activity"
-          subtitle="Average daily hours by weekday"
+          subtitle="Average hours per weekday · last 12 weeks, your time zone"
         >
           <AniBarChart
             data={data.weeklyActivity}
@@ -99,7 +101,7 @@ export default async function AnalyticsPage() {
         </ChartPanel>
         <ChartPanel
           title="⏰ Peak activity hours"
-          subtitle="When you watch and listen the most"
+          subtitle="Hours per week in each slot · last 12 weeks, your time zone"
         >
           <AniBarChart
             data={data.peakHours}
@@ -115,14 +117,14 @@ export default async function AnalyticsPage() {
       {/* 9 + 10 — AI accuracy trend + month comparison */}
       <div className="grid gap-6 lg:grid-cols-3">
         <ChartPanel
-          title="🎯 AI match accuracy"
-          subtitle="How well recommendations fit you over time"
+          title="🎯 Taste fit"
+          subtitle="How close each month's watching was to your taste (embeddings) — higher means you watched more of what you love"
           className="lg:col-span-2"
         >
           <AniLineChart
-            data={data.matchAccuracy}
+            data={data.tasteFit}
             xKey="month"
-            series={[{ key: "accuracy", label: "Accuracy %", color: chartPalette.green }]}
+            series={[{ key: "fit", label: "Taste fit %", color: chartPalette.green }]}
             height={280}
           />
         </ChartPanel>

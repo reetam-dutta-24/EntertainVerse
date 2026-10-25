@@ -1,13 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { usePlaybackMinutes } from "@/hooks/use-playback-minutes";
 
+/** Logs real viewing time while the watch page is open and visible (one session per visit). */
 export function ContentWatchTracker({ contentSlug }: { contentSlug: string }) {
-  useEffect(() => {
-    void fetch(`/api/content/${encodeURIComponent(contentSlug)}/watch-event`, {
-      method: "POST",
-    }).catch(() => undefined);
-  }, [contentSlug]);
-
+  usePlaybackMinutes(`/api/content/${encodeURIComponent(contentSlug)}/watch-event`, true, { requireVisible: true });
   return null;
 }

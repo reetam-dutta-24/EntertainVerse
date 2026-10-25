@@ -33,7 +33,8 @@ export interface AnalyticsData {
   tasteProfile: { axis: string; value: number }[];
   weeklyActivity: { day: string; watching: number; listening: number }[];
   peakHours: { slot: string; hours: number }[];
-  matchAccuracy: { month: string; accuracy: number }[];
+  /** Monthly taste fit 0–100 (null = nothing watched that month). */
+  tasteFit: { month: string; fit: number | null }[];
   ratingsGiven: { rating: string; titles: number }[];
   communityEngagement: {
     month: string;
@@ -47,6 +48,8 @@ export interface AnalyticsData {
   monthComparison: MonthComparisonRow[];
   milestones: { id: string; emoji: string; title: string; detail: string }[];
   summary: {
+    /** When this snapshot was computed (ISO). */
+    generatedAt: string;
     watchlistTotal: number;
     currentMonthLabel: string;
     previousMonthLabel: string;

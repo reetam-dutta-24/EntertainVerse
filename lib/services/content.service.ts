@@ -386,22 +386,6 @@ export async function recordContentPageView(contentSlug: string) {
   return updated.viewCount;
 }
 
-export async function recordContentWatchEvent(userId: string, contentSlug: string) {
-  const content = await prisma.content.findUnique({
-    where: { slug: contentSlug },
-    select: { id: true },
-  });
-  if (!content) return null;
-
-  return prisma.watchEvent.create({
-    data: {
-      userId,
-      contentId: content.id,
-      minutes: 1,
-    },
-  });
-}
-
 export function formatEngagementCount(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`;

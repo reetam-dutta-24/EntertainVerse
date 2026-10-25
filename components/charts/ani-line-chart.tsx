@@ -26,7 +26,8 @@ export interface AniLineChartSeries {
 }
 
 export interface AniLineChartProps {
-  data: Record<string, string | number>[];
+  /** `null` values leave a gap in the line (e.g. a month with no data). */
+  data: Record<string, string | number | null>[];
   /** Key in each data row used for the x-axis (e.g. "month"). */
   xKey: string;
   series: AniLineChartSeries[];

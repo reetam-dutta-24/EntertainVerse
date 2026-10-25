@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pause, PlayCircle, Plus, Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getTrackPreviewUrl } from "@/lib/music-preview";
+import { usePlaybackMinutes } from "@/hooks/use-playback-minutes";
 import { getPlayAccentTheme, getPlayFairyInnerGlow } from "@/lib/play-ambient";
 import {
   detailHeroBtnBase,
@@ -63,6 +64,8 @@ export function SongHeroPosterPanel({
   const playLabel = resumeLabel ? `Continue from ${resumeLabel}` : "Play now";
   const progressMax = duration || durationSeconds || 1;
   const effectiveVolume = muted ? 0 : volume;
+  // Real listening time for analytics, the recommender and roadmaps.
+  usePlaybackMinutes(`/api/song/${encodeURIComponent(songSlug)}/listen`, isPlaying);
 
   const syncDuration = useCallback(() => {
     const audio = audioRef.current;

@@ -41,6 +41,7 @@ import type {
   CollectionPlayTrack,
 } from "@/types";
 import { usePlayerShortcuts } from "@/hooks/use-player-shortcuts";
+import { usePlaybackMinutes } from "@/hooks/use-playback-minutes";
 import { PreviewBadge } from "@/components/ui/coming-soon-notice";
 
 interface CollectionPlayViewProps {
@@ -277,6 +278,8 @@ function MusicPlayQueue({
   const canManage = queue.canManage ?? false;
 
   const currentTrack = tracks[currentIndex];
+  // Real listening time per track (demo tracks outside the catalog are ignored server-side).
+  usePlaybackMinutes(currentTrack ? `/api/song/${encodeURIComponent(currentTrack.id)}/listen` : null, isPlaying);
 
   const playIndex = useCallback(
     async (index: number, autoplay = true) => {
