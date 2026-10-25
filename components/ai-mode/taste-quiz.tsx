@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
 import { answerFor, quizFor, withAnswer, type QuizQuestion } from "@/lib/ai-profile/quiz";
@@ -61,12 +61,15 @@ export function TasteQuiz<P extends WatchPrefs | ListenPrefs>({ mode, initial, o
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [prefs, setPrefs] = useState<P>(initial);
+  /** Single-choice cards auto-advance; ignore taps until the next card is in. */
+  const advancing = useRef(false);
   const question = questions[index]!;
   const selected = answerFor(prefs, question);
   const isLast = index === questions.length - 1;
   const canContinue = question.optional || selected.length > 0;
 
   function go(step: number) {
+    advancing.current = false;
     const next = index + step;
     if (next < 0) return onCancel();
     if (next >= questions.length) return onDone(prefs);
@@ -75,6 +78,7 @@ export function TasteQuiz<P extends WatchPrefs | ListenPrefs>({ mode, initial, o
   }
 
   function toggle(id: string) {
+    if (advancing.current) return;
     let values: string[];
     if (question.kind === "multi") {
       values = selected.includes(id) ? selected.filter((value) => value !== id) : [...selected, id];
@@ -86,6 +90,7 @@ export function TasteQuiz<P extends WatchPrefs | ListenPrefs>({ mode, initial, o
     setPrefs(nextPrefs);
     // Single picks move on by themselves — feels like flipping cards.
     if (question.kind !== "multi" && values.length) {
+      advancing.current = true;
       window.setTimeout(() => (isLast ? onDone(nextPrefs) : go(1)), 260);
     }
   }

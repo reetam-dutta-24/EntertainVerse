@@ -52,8 +52,35 @@ What remains for “done done”:
 | Realtime | Socket.IO 4 (`/api/socket/io`) |
 | Charts | Recharts 3 |
 | Security | bcryptjs passwords |
+| AI | Google Gemini (`@google/genai`; Claude optional) — Flash / Flash-Lite + `gemini-embedding-001` |
 
 > Use `npm run dev` / `npm start` (runs `tsx server.ts`). Plain `npm run dev:next` starts Next **without** Socket.IO — community chat and live DMs will not work.
+
+---
+
+## AI Features
+
+AniVerse tackles choice paralysis — paying for streaming apps and still scrolling for 20 minutes — with an AI layer that understands taste, plans what to watch next, and explains every pick.
+
+| Feature | What it does | Where |
+|---|---|---|
+| **Hybrid recommender** | Blends explicit taste (50%), semantic similarity from a pre-trained embedding model (35%) and item-item collaborative filtering (15%). Learns from watch/listen history with a 30-day half-life. | For You, Discover, Home, detail "more like this" |
+| **"Why this?" on every card** | Spoiler-free reasons: *"Because you loved Squid Game · Thriller & Drama"*, *"Fits your vibe · Cozy & Funny"*, *"Has Money Heist + 4 more you love"* | Every recommended card |
+| **AI mode** | Watch or Listen. Answer by an animated taste quiz **or** a chat — Gemini turns free text into structured answers, one follow-up at a time, never inventing titles. | `/dashboard/ai-mode`, Home spotlight, For You, Discover |
+| **AI roadmaps** | An ordered, time-budgeted plan with a written taste analysis. Steps tick off from real activity, stalled steps get a swap, and an adjust-chat ("make it shorter") rebuilds the rest. | `/dashboard/ai-mode/roadmap` |
+| **Smart collections** | Weekly collection ideas built from the user's strongest learned vibes — mostly their own titles plus close picks. Suggestions only; the user saves or dismisses. | Collections page |
+| **Social recommendations** | Public collections and communities ranked by taste fit, titles you love inside them, and "kindred" members who share your favorites. | Home, Collections, Community |
+| **AI profile controls** | See the taste map, what was learned, every answer (removable); switch off learning, download the data (JSON), or wipe it. | Settings → What the AI knows |
+| **Admin AI import & review** | Imports titles, songs and artists from TMDB, AniList, Apple Music, Deezer and MusicBrainz — facts mapped in code, editorial fields drafted by the model — then an AI review checks the whole form. | Admin CMS |
+
+**How it's built**
+
+- **Embeddings:** every catalog item becomes a spoiler-free document (type, genres, tags, credits, synopsis) encoded by `gemini-embedding-001` (768-d), stored in `CatalogEmbedding` and re-embedded only when its text changes. The catalog is small, so similarity search is an in-memory dot product — no vector database.
+- **Grounded generation:** the LLM only ever chooses from catalog IDs the recommender hands it (schema-enforced enums), so it can't recommend titles that don't exist.
+- **Free-tier aware:** two Gemini tiers — Flash for heavy work (falls back automatically when its ~20/day quota is used up) and Flash-Lite for high-volume chat; embeddings are paced to 100/min; without any AI key everything falls back to the taste engine.
+- **Evaluation:** `npm run eval:recommender` runs a leave-one-out test (hide each favorite, see if it comes back). Latest results are in [docs/recommender-evaluation.md](docs/recommender-evaluation.md) — on titles the full hybrid reached MRR@20 **0.350** vs **0.203** for a popularity baseline and **0.189** for the taste engine alone (small seeded dataset; treat as indicative).
+
+After setting `GEMINI_API_KEY`, run `npm run embed:catalog` once.
 
 ---
 
@@ -398,6 +425,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run db:seed` | Seed catalog + admins + demo users |
 | `npm run db:reset` | Wipe + reseed |
 | `npm run db:recovery` | Recovery seed script |
+| `npm run embed:catalog` | Embed the catalog for the recommender (incremental; `-- --force` to redo all) |
+| `npm run eval:recommender` | Offline leave-one-out evaluation → `docs/recommender-evaluation.md` |
 
 ---
 

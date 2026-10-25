@@ -590,6 +590,8 @@ interface RankOptions {
   maxRating?: number;
   /** Leave out these slugs (already shown elsewhere on the page). */
   exclude?: Set<string>;
+  /** Evaluation only: switch hybrid layers off to measure what each adds. */
+  layers?: { semantic?: boolean; collaborative?: boolean };
 }
 
 /** Score + rank catalog content for a set of signals. */
@@ -622,8 +624,9 @@ export async function rankContent(
     });
 
   // "More like X" compares against X itself; otherwise against the user's taste centroid.
-  const semantic = semanticScores(pool, ctx.vectorOf, similarRow ? (ctx.vectorOf(similarRow) ?? null) : ctx.profile);
-  const collab = collabScores(ctx.collab);
+  const semanticTarget = similarRow ? (ctx.vectorOf(similarRow) ?? null) : ctx.profile;
+  const semantic = semanticScores(pool, ctx.vectorOf, options.layers?.semantic === false ? null : semanticTarget);
+  const collab = options.layers?.collaborative === false ? () => undefined : collabScores(ctx.collab);
 
   const scored = pool.map((row) => {
     let score = blendScore(scoreContentRow(row, v), semantic.get(row.slug), collab(row.slug));
@@ -647,7 +650,14 @@ export async function rankContent(
 
 export async function rankTracks(
   signals: TasteSignals,
-  options: { limit?: number; kinds?: string[]; /** Skip favorites and heavily played tracks. */ excludeKnown?: boolean } = {},
+  options: {
+    limit?: number;
+    kinds?: string[];
+    /** Skip favorites and heavily played tracks. */
+    excludeKnown?: boolean;
+    /** Evaluation only: switch hybrid layers off. */
+    layers?: { semantic?: boolean; collaborative?: boolean };
+  } = {},
 ): Promise<MusicTrack[]> {
   const catalog = await loadTasteCatalog();
   const v = buildVector(signals, catalog.content);
@@ -656,8 +666,8 @@ export async function rankTracks(
   const pool = catalog.tracks.filter(
     (row) => (!options.kinds || options.kinds.includes(row.kind)) && !(options.excludeKnown && known(row.slug)),
   );
-  const semantic = semanticScores(pool, ctx.trackVector, ctx.profile);
-  const collab = collabScores(ctx.collab);
+  const semantic = semanticScores(pool, ctx.trackVector, options.layers?.semantic === false ? null : ctx.profile);
+  const collab = options.layers?.collaborative === false ? () => undefined : collabScores(ctx.collab);
   return pool
     .map((row) => ({ row, score: blendScore(scoreTrackRow(row, v, signals), semantic.get(row.slug), collab(row.slug)) }))
     .sort((a, b) => b.score - a.score)
