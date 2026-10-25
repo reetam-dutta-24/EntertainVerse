@@ -17,6 +17,7 @@ export default defineConfig({
     // with a `// @vitest-environment jsdom` comment.
     environment: "node",
     include: ["tests/unit/**/*.test.{ts,tsx}"],
+    mockReset: true,
     restoreMocks: true,
     unstubEnvs: true,
     coverage: {
