@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   AnalyticsKpiGrid,
   ChartPanel,
@@ -15,8 +16,10 @@ import {
 } from "@/components/charts";
 import { WelcomeBanner } from "@/components/dashboard";
 import { AnalyticsLiveRefresh } from "@/components/analytics/analytics-live-refresh";
+import { TasteDnaHistoryPanel } from "@/components/analytics/taste-dna-history";
 import { getAnalyticsData } from "@/lib/data/analytics";
 import { getCurrentUser } from "@/lib/data/user";
+import { getTasteDnaHistory } from "@/lib/services/wrapped.service";
 import { chartPalette } from "@/components/charts/chart-theme";
 
 export const metadata: Metadata = {
@@ -29,12 +32,25 @@ export const dynamic = "force-dynamic";
 
 export default async function AnalyticsPage() {
   const user = await getCurrentUser();
-  const data = await getAnalyticsData(user.id);
+  const [data, dna] = await Promise.all([getAnalyticsData(user.id), getTasteDnaHistory(user.id)]);
 
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="analytics" />
       <AnalyticsLiveRefresh generatedAt={data.summary.generatedAt} />
+
+      <Link
+        href="/dashboard/wrapped"
+        className="group flex flex-col gap-3 rounded-card border border-brand-magenta/40 bg-gradient-to-r from-brand-purple/40 via-brand-magenta/20 to-transparent p-4 transition-colors hover:border-brand-magenta/70 sm:flex-row sm:items-center sm:justify-between sm:p-5"
+      >
+        <span>
+          <span className="block text-base font-bold text-white sm:text-lg">🎁 Your AniVerse Wrapped {new Date().getFullYear()} is ready</span>
+          <span className="mt-0.5 block text-xs text-muted sm:text-sm">Top titles, songs, Taste DNA eras and the persona AI named you.</span>
+        </span>
+        <span className="inline-flex w-full items-center justify-center rounded-full bg-gradient-brand px-5 py-2 text-sm font-semibold text-white sm:w-auto">
+          Play my Wrapped
+        </span>
+      </Link>
 
       {/* 1 — Headline KPIs */}
       <AnalyticsKpiGrid kpis={data.kpis} />
@@ -82,6 +98,14 @@ export default async function AnalyticsPage() {
           <AniRadarChart data={data.tasteProfile} name="Taste Score" height={300} />
         </ChartPanel>
       </div>
+
+      {/* Taste DNA history */}
+      <ChartPanel
+        title="🧬 Taste DNA history"
+        subtitle="Your strongest traits month by month, read from what you watched and favorited (embeddings) — and the eras they formed"
+      >
+        <TasteDnaHistoryPanel dna={dna} />
+      </ChartPanel>
 
       {/* 7 + 8 — Weekly rhythm + peak hours */}
       <div className="grid gap-6 lg:grid-cols-2">
