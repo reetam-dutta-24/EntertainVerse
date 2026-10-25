@@ -17,7 +17,7 @@ export default async function SettingsPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="settings" />
-      <SettingsView data={data} userId={user.id} />
+      <SettingsView data={data} />
     </div>
   );
 }

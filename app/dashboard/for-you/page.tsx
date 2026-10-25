@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import {
-  AiTasteProfileBar,
   ContentCarouselSection,
   MusicCarouselSection,
   WelcomeBanner,
 } from "@/components/dashboard";
 import { AiModeLauncher } from "@/components/ai-mode/ai-mode-launcher";
-import { getAiTasteProfileScore, getForYouFeed } from "@/lib/data/for-you";
+import { getForYouFeed } from "@/lib/data/for-you";
 import { getCurrentUser } from "@/lib/data/user";
 
 export const metadata: Metadata = {
@@ -17,17 +16,12 @@ export const metadata: Metadata = {
 
 export default async function ForYouPage() {
   const user = await getCurrentUser();
-  const [tasteScore, feed] = await Promise.all([
-    getAiTasteProfileScore(user.id),
-    getForYouFeed(user.id),
-  ]);
+  const feed = await getForYouFeed(user.id);
 
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-5 sm:gap-6">
       <WelcomeBanner userName={user.name} variant="foryou" />
       <AiModeLauncher defaultMode="watch" />
-
-      <AiTasteProfileBar score={tasteScore} />
 
       {feed.shelves.map((shelf) =>
         shelf.kind === "music" ? (

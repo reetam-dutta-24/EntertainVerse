@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import {
-  AiTasteProfileBar,
   CollectionGridSection,
   CommunityGridSection,
   ContentCarouselSection,
@@ -8,7 +7,7 @@ import {
   MusicCarouselSection,
   WelcomeBanner,
 } from "@/components/dashboard";
-import { AiModeSpotlight } from "@/components/ai-mode/ai-mode-spotlight";
+import { AiModeSpotlight, type RoadmapTeaser } from "@/components/ai-mode/ai-mode-spotlight";
 import { getCurrentUser } from "@/lib/data/user";
 import { getTonightsPicks } from "@/lib/services/ai-mode.service";
 import { getRoadmapTeaser } from "@/lib/services/roadmap.service";
@@ -29,8 +28,8 @@ export const metadata: Metadata = {
     "Your entertainment hub — personalized picks, watchlists, collections, and communities.",
 };
 
-const statTiles = (stats: HomeStats) => [
-  { emoji: "🧠", label: "AI Taste Profile", value: `${stats.aiTasteScore}%` },
+const statTiles = (stats: HomeStats, roadmap: RoadmapTeaser | null) => [
+  { emoji: "🗺️", label: "Roadmap Done", value: roadmap ? `${roadmap.doneSteps}/${roadmap.totalSteps}` : "—" },
   { emoji: "📋", label: "Watchlist Saved", value: String(stats.watchlistSaved) },
   { emoji: "⏳", label: "Pending", value: String(stats.watchlistPending) },
   { emoji: "📒", label: "Collections", value: String(stats.collections) },
@@ -74,8 +73,6 @@ export default async function DashboardHomePage() {
 
       <AiModeSpotlight watch={tonight.watch} listen={tonight.listen} roadmap={roadmapTeaser} />
 
-      <AiTasteProfileBar score={stats.aiTasteScore} />
-
       <section className="rounded-2xl bg-surface/40 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
         <h2 className="text-lg font-bold text-white sm:text-xl">
           🌌 Your Universe at a Glance
@@ -84,7 +81,7 @@ export default async function DashboardHomePage() {
           A snapshot of your taste, saves, and activity across AniVerse.
         </p>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {statTiles(stats).map((tile) => (
+          {statTiles(stats, roadmapTeaser).map((tile) => (
             <div
               key={tile.label}
               className="bg-gradient-brand flex flex-col items-center gap-1.5 rounded-xl px-3 py-3 text-center shadow-[0_2px_10px_rgba(255,0,204,0.12)] sm:px-4 sm:py-4"

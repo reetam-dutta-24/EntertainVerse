@@ -1,7 +1,3 @@
-export {
-  AiTasteProfileBar,
-  type AiTasteProfileBarProps,
-} from "./ai-taste-profile-bar";
 export { DashboardSidebar, type DashboardSidebarProps } from "./sidebar";
 export { DashboardShell, type DashboardShellProps } from "./dashboard-shell";
 export {

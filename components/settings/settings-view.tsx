@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useClientValue } from "@/hooks/use-prop-sync";
 import Link from "next/link";
 import { useAppRouter } from "@/hooks/use-app-router";
 import { signOut } from "next-auth/react";
@@ -26,7 +25,6 @@ import {
   type PrivacyPreferences,
   type SettingsData,
 } from "@/lib/data/settings";
-import { getOnboardingProfile } from "@/lib/onboarding-store";
 import { ONBOARDING_RETAKE_PATH } from "@/lib/onboarding-routes";
 import { cn } from "@/lib/utils";
 import { useConfirm, useToast } from "@/components/feedback/feedback-provider";
@@ -45,21 +43,15 @@ function Divider() {
 
 export interface SettingsViewProps {
   data: SettingsData;
-  userId: string;
 }
 
 /** App settings — notifications, privacy, preferences, account danger zone. */
-export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
+export function SettingsView({ data: initialData }: SettingsViewProps) {
   const router = useAppRouter();
   const [data, setData] = useState(initialData);
   const [notifications, setNotifications] = useState(initialData.notifications);
   const [privacy, setPrivacy] = useState(initialData.privacy);
   const [preferences, setPreferences] = useState(initialData.preferences);
-  const storedTasteScore = useClientValue(
-    () => getOnboardingProfile(userId)?.recommendations.tasteScore ?? null,
-    null,
-  );
-  const tasteScore = storedTasteScore || initialData.tasteScore;
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -292,13 +284,12 @@ export function SettingsView({ data: initialData, userId }: SettingsViewProps) {
       <SettingsSection title="🧠 Taste & AI" subtitle="Your personalized match engine — see, edit or wipe what it knows">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <span className="flex size-12 items-center justify-center rounded-full bg-gradient-brand">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-brand">
               <Sparkles className="size-5 text-white" />
             </span>
-            <div>
-              <p className="text-sm font-semibold text-white">AI Taste Profile</p>
-              <p className="text-2xl font-bold text-brand-pink">{tasteScore}%</p>
-            </div>
+            <p className="text-sm text-white/70">
+              Your taste map, what was learned from activity, and your AI-mode answers — all editable.
+            </p>
           </div>
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
             <Link
