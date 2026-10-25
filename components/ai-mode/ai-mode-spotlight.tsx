@@ -97,6 +97,12 @@ export function AiModeSpotlight({
             >
               <Headphones className="size-4" aria-hidden /> Music mode
             </Link>
+            <Link
+              href="/dashboard/ai-mode/match"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm text-white/70 transition-colors hover:text-white sm:w-auto"
+            >
+              👥 Find your people
+            </Link>
           </div>
           <Link
             href="/dashboard/ai-mode/roadmap?mode=watch"

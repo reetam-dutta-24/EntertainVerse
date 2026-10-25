@@ -160,6 +160,17 @@ export function AiModeExperience({ initialMode, initialStart, initialWatch, init
                 </button>
               </div>
               <Link
+                href="/dashboard/ai-mode/match"
+                className="group flex items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-4 text-left transition-all hover:-translate-y-0.5 hover:border-brand-magenta/50 hover:bg-white/[0.07]"
+              >
+                <span className="text-3xl" aria-hidden>👥</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-base font-bold text-white">AI Match — find your people</span>
+                  <span className="mt-0.5 block text-sm text-white/60">Get grouped with people who share your taste, nearby or worldwide — chat, share and watch together.</span>
+                </span>
+                <span className="hidden text-sm font-semibold text-brand-pink sm:block">Open →</span>
+              </Link>
+              <Link
                 href={`/dashboard/ai-mode/roadmap?mode=${mode}`}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-brand-magenta/40 px-5 py-2.5 text-sm text-white/85 transition-colors hover:bg-brand-magenta/15 sm:w-auto sm:self-start"
               >

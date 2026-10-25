@@ -47,6 +47,8 @@ model User {
   aiCollectionIdeas     AiCollectionSuggestion[]
   screenTime            ScreenTimeSettings?
   screenTimeDays        ScreenTimeDay[]
+  matchProfile          MatchProfile?
+  matchCircles          MatchCircleMember[]
   preferences           UserPreferences?
   watchlistItems        WatchlistItem[]
   collectionFavorites   CollectionFavorite[]
@@ -1136,4 +1138,66 @@ model ScreenTimeDay {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, day])
+}
+
+// ─── AI Match ────────────────────────────────────────────────────────────────
+
+/// Opt-in for AI Match: get grouped with people of similar taste and personality,
+/// nearby or worldwide. Location is coarse (rounded to ~10 km) and never shown to others.
+model MatchProfile {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  enabled   Boolean  @default(true)
+  /// nearby | country | world
+  scope     String   @default("world")
+  /// Rounded to one decimal (~10 km); null when the user only shares a country.
+  latitude  Float?
+  longitude Float?
+  /// ISO 3166-1 alpha-2, e.g. "IN".
+  country   String?
+  /// One line about what they're into, shown to circle-mates.
+  intro     String?
+  /// Preferred circle size including the user (3-6).
+  groupSize Int      @default(4)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// A group the matcher proposed. Becomes ACTIVE (with a private community space for
+/// chat, posts and rooms) once the creator and at least one invitee have accepted.
+model MatchCircle {
+  id          String   @id @default(cuid())
+  title       String
+  /// What the group shares, e.g. "Mind-bending thrillers · Death Note fans".
+  vibe        String
+  createdById String
+  /// FORMING | ACTIVE
+  status      String   @default("FORMING")
+  communityId String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members MatchCircleMember[]
+}
+
+model MatchCircleMember {
+  id         String    @id @default(cuid())
+  circleId   String
+  userId     String
+  /// INVITED | ACCEPTED | DECLINED | LEFT
+  status     String    @default("INVITED")
+  /// 0-100 taste match with the creator when proposed.
+  matchScore Int       @default(0)
+  /// Why they were matched, e.g. "Both love Death Note · ~12 km away".
+  reason     String    @default("")
+  respondedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  circle MatchCircle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([circleId, userId])
+  @@index([userId, status])
 }

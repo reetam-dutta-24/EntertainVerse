@@ -2,6 +2,25 @@ import { prisma } from "@/lib/prisma";
 import { areUsersFriends } from "@/lib/services/follow.service";
 import { formatPostedAt } from "@/lib/format-dates";
 
+/** Members of the same active AI Match circle (both accepted) can message each other. */
+async function areCircleMates(userAId: string, userBId: string) {
+  const shared = await prisma.matchCircle.count({
+    where: {
+      status: "ACTIVE",
+      AND: [
+        { members: { some: { userId: userAId, status: "ACCEPTED" } } },
+        { members: { some: { userId: userBId, status: "ACCEPTED" } } },
+      ],
+    },
+  });
+  return shared > 0;
+}
+
+/** DMs are for friends — and for people in your AI Match circles. */
+async function canDirectMessage(userAId: string, userBId: string) {
+  return (await areUsersFriends(userAId, userBId)) || (await areCircleMates(userAId, userBId));
+}
+
 export class DmNotFoundError extends Error {
   constructor(message = "Conversation not found.") {
     super(message);
@@ -25,10 +44,10 @@ export function normalizeParticipantPair(userAId: string, userBId: string) {
 export async function getOrCreateConversation(userAId: string, userBId: string) {
   if (userAId === userBId) throw new DmForbiddenError("Cannot message yourself.");
 
-  const friends = await areUsersFriends(userAId, userBId);
-  if (!friends) {
+  const allowed = await canDirectMessage(userAId, userBId);
+  if (!allowed) {
     throw new DmForbiddenError(
-      "You can only message users who are your friends. Send a friend request first.",
+      "You can only message friends or people in your AI Match circles. Send a friend request first.",
     );
   }
 
@@ -137,9 +156,9 @@ export async function listMessagesForConversation(
     conversation.participantLowId === userId
       ? conversation.participantHighId
       : conversation.participantLowId;
-  if (!(await areUsersFriends(userId, peerId))) {
+  if (!(await canDirectMessage(userId, peerId))) {
     throw new DmForbiddenError(
-      "You can only message users who are your friends.",
+      "You can only message friends or people in your AI Match circles.",
     );
   }
 
