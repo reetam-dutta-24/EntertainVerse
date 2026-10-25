@@ -195,7 +195,8 @@ export function WatchParty({ channelId, channelTitle, viewerUserId, onClose }: W
       </header>
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4 sm:p-6 lg:flex-row lg:overflow-hidden">
-        <div className="flex min-w-0 shrink-0 flex-col gap-3 lg:min-h-0 lg:flex-[2] lg:overflow-y-auto lg:pr-1">
+        {/* Children must not shrink, or the 16:9 player collapses once this column scrolls. */}
+        <div className="flex min-w-0 shrink-0 flex-col gap-3 lg:min-h-0 lg:flex-[2] lg:overflow-y-auto lg:pr-1 [&>*]:shrink-0">
           <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
             {media?.mode === "video" ? <VideoPlayer state={state!} skew={skewMs} onBlocked={() => setBlocked(true)} /> : null}
             {media?.mode === "youtube" ? <YouTubePlayer state={state!} skew={skewMs} /> : null}
