@@ -65,7 +65,7 @@ function parseSendPayload(payload: unknown): ChatSendPayload | null {
 }
 
 async function authenticateSocket(socket: Socket): Promise<string | null> {
-  const secret = process.env.AUTH_SECRET;
+  const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET;
   if (!secret) return null;
 
   const cookie = socket.handshake.headers.cookie;
@@ -74,7 +74,9 @@ async function authenticateSocket(socket: Socket): Promise<string | null> {
   const token = await getToken({
     req: { headers: { cookie } } as { headers: { cookie: string } },
     secret,
-    secureCookie: process.env.NODE_ENV === "production",
+    // NextAuth prefixes the cookie with __Secure- only on HTTPS — read whichever one the
+    // browser sent rather than guessing from NODE_ENV (production over HTTP has no prefix).
+    secureCookie: /(?:^|;\s*)__Secure-authjs\.session-token/.test(cookie),
   });
 
   return typeof token?.id === "string" ? token.id : null;
