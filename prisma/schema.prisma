@@ -45,6 +45,8 @@ model User {
   aiTasteProfile        AiTasteProfile?
   aiRoadmaps            AiRoadmap[]
   aiCollectionIdeas     AiCollectionSuggestion[]
+  screenTime            ScreenTimeSettings?
+  screenTimeDays        ScreenTimeDay[]
   preferences           UserPreferences?
   watchlistItems        WatchlistItem[]
   collectionFavorites   CollectionFavorite[]
@@ -1098,4 +1100,40 @@ model AiCollectionSuggestion {
 
   @@unique([userId, weekKey, traitId])
   @@index([userId, weekKey])
+}
+
+// ─── Wellbeing ───────────────────────────────────────────────────────────────
+
+/// Self-imposed daily limit ("Mindful mode"). Turning it on or lowering it applies at
+/// once; raising or removing it only applies from the next day, so the lock can't be
+/// bypassed in the moment.
+model ScreenTimeSettings {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  /// Minutes per day; null = off.
+  dailyLimitMinutes   Int?
+  /// A change waiting for tomorrow: the new limit (null = off) from `pendingFromDay`.
+  pendingLimitMinutes Int?
+  pendingFromDay      String?
+  /// IANA time zone the day boundary is computed in, e.g. "Asia/Kolkata".
+  timezone            String   @default("UTC")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Minutes spent in the app on one local day (counted from visible-tab heartbeats).
+model ScreenTimeDay {
+  id         String    @id @default(cuid())
+  userId     String
+  /// Local date in the user's time zone, YYYY-MM-DD.
+  day        String
+  minutes    Int       @default(0)
+  lastBeatAt DateTime?
+  lockedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, day])
 }

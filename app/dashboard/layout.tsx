@@ -1,4 +1,5 @@
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { ScreenTimeGate } from "@/components/screen-time/screen-time-gate";
 import { requireCompletedOnboarding } from "@/lib/auth-guards";
 import { isPlatformAdmin } from "@/lib/platform-roles";
 import { getUserById } from "@/lib/services/user.service";
@@ -19,5 +20,9 @@ export default async function DashboardLayout({
     isAdmin: user ? isPlatformAdmin(user.role) : false,
   };
 
-  return <DashboardShell user={dashboardUser}>{children}</DashboardShell>;
+  return (
+    <ScreenTimeGate userId={userId}>
+      <DashboardShell user={dashboardUser}>{children}</DashboardShell>
+    </ScreenTimeGate>
+  );
 }
