@@ -1,8 +1,8 @@
 import "server-only";
 
-import type { z } from "zod";
+import { z } from "zod";
 import { claudeResearch, claudeStructured, isClaudeConfigured } from "@/lib/ai/providers/claude";
-import { geminiResearch, geminiStructured, isGeminiConfigured } from "@/lib/ai/providers/gemini";
+import { geminiResearch, geminiStream, geminiStructured, isGeminiConfigured } from "@/lib/ai/providers/gemini";
 
 /**
  * Pluggable LLM layer for the admin AI features. Pick with AI_PROVIDER in
@@ -61,6 +61,37 @@ function requireProvider(): AiProviderName {
 /** JSON output validated against a Zod schema. */
 export function generateStructured<S extends z.ZodType>(request: StructuredRequest<S>): Promise<z.infer<S>> {
   return requireProvider() === "claude" ? claudeStructured(request) : geminiStructured(request);
+}
+
+export interface ChatTurn {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface TextStreamRequest {
+  system: string;
+  /** Conversation so far, ending with the user's message. */
+  messages: ChatTurn[];
+  /** Gemini only. Default "fast" — chat is high-volume. */
+  tier?: "smart" | "fast";
+}
+
+/**
+ * Plain-text answer, streamed as it's generated (Gemini). Claude answers in one piece
+ * through the existing structured call, so callers handle both the same way.
+ */
+export async function* streamText(request: TextStreamRequest): AsyncGenerator<string> {
+  if (requireProvider() === "gemini") {
+    yield* geminiStream(request);
+    return;
+  }
+  const transcript = request.messages.map((turn) => `${turn.role === "user" ? "User" : "Assistant"}: ${turn.content}`).join("\n\n");
+  const out = await claudeStructured({
+    system: request.system,
+    prompt: `${transcript}\n\nWrite the assistant's next reply.`,
+    schema: z.object({ answer: z.string() }),
+  });
+  yield out.answer;
 }
 
 const RESEARCH_SYSTEM =

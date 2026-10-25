@@ -7,6 +7,7 @@ import { CacheTags, cached, invalidateTags } from "@/lib/cache/server-cache";
 import { CatalogAiError } from "@/lib/ai/errors";
 import { GEMINI_EMBEDDING_MODEL, geminiEmbed, isGeminiConfigured } from "@/lib/ai/providers/gemini";
 import { LISTEN_MOODS, WATCH_THEMES, WATCH_VIBES } from "@/lib/ai-profile/vocabulary";
+import { HELP_ARTICLES, helpArticleText } from "@/lib/assistant/knowledge";
 
 /**
  * Semantic layer of the recommender. Every catalog item is turned into a short
@@ -18,8 +19,11 @@ import { LISTEN_MOODS, WATCH_THEMES, WATCH_VIBES } from "@/lib/ai-profile/vocabu
  * memory — no vector database needed.
  */
 
-/** "trait" = AI-mode vocabulary phrases (vibes, themes, listening moods) — used to describe a user's taste. */
-export type EmbeddingKind = "content" | "track" | "artist" | "collection" | "community" | "trait";
+/**
+ * "trait" = AI-mode vocabulary phrases (vibes, themes, listening moods) — used to describe a user's taste.
+ * "help" = the assistant's help articles (lib/assistant/knowledge.ts), retrieved by meaning.
+ */
+export type EmbeddingKind = "content" | "track" | "artist" | "collection" | "community" | "trait" | "help";
 
 const DIMENSIONS = 768;
 /**
@@ -155,6 +159,7 @@ async function loadSourceItems(): Promise<SourceItem[]> {
       itemId: `listen:${option.id}`,
       text: `Music for ${option.phrase}.`,
     })),
+    ...HELP_ARTICLES.map((article) => ({ kind: "help" as const, itemId: article.id, text: doc(helpArticleText(article)) })),
   ];
 }
 

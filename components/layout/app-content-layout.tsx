@@ -1,6 +1,7 @@
 import { ContentTopbar } from "@/components/content/content-topbar";
 import { ScreenTimeGate } from "@/components/screen-time/screen-time-gate";
 import { MatchInvitePopup } from "@/components/ai-mode/match-invite-popup";
+import { AssistantRoot } from "@/components/assistant/assistant-root";
 import { auth } from "@/lib/auth";
 import { getOptionalTopbarUser } from "@/lib/data/user";
 
@@ -24,6 +25,7 @@ export async function AppContentLayout({
         {session?.user?.id ? <MatchInvitePopup /> : null}
         <ContentTopbar user={user} />
         <main className={mainClassName}>{children}</main>
+        {user ? <AssistantRoot userKey={user.handle} userName={user.name} /> : null}
       </div>
     </ScreenTimeGate>
   );

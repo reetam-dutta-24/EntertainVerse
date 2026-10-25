@@ -3,7 +3,7 @@ import "server-only";
 import { ApiError, GoogleGenAI, ThinkingLevel, type GenerateContentConfig } from "@google/genai";
 import { z } from "zod";
 import { CatalogAiError } from "@/lib/ai/errors";
-import type { StructuredRequest, WebResearch } from "@/lib/ai/provider";
+import type { StructuredRequest, TextStreamRequest, WebResearch } from "@/lib/ai/provider";
 
 /**
  * Google Gemini via the official @google/genai SDK, on two tiers:
@@ -122,6 +122,25 @@ export async function geminiStructured<S extends z.ZodType>(request: StructuredR
     return parsed.data;
   } catch (error) {
     if (error instanceof SyntaxError) throw new CatalogAiError("Gemini returned invalid JSON — try again.");
+    throw toError(error);
+  }
+}
+
+/** Streamed plain-text reply for chat. Starts on the fast tier (low latency, bigger free quota). */
+export async function* geminiStream(request: TextStreamRequest): AsyncGenerator<string> {
+  try {
+    const stream = await withRetry(() =>
+      gemini().models.generateContentStream({
+        model: model(request.tier ?? "fast"),
+        contents: request.messages.map((turn) => ({ role: turn.role === "assistant" ? "model" : "user", parts: [{ text: turn.content }] })),
+        config: { systemInstruction: request.system },
+      }),
+    );
+    for await (const chunk of stream) {
+      const text = chunk.text;
+      if (text) yield text;
+    }
+  } catch (error) {
     throw toError(error);
   }
 }

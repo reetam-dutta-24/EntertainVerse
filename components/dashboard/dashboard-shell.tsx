@@ -6,15 +6,30 @@ import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import type { DashboardUser } from "@/components/dashboard/user-profile-menu";
 import { MatchInvitePopup } from "@/components/ai-mode/match-invite-popup";
+import { AssistantProvider, useAssistant } from "@/components/assistant/assistant-context";
+import { AssistantLauncher, AssistantPanel } from "@/components/assistant/assistant-panel";
+import { cn } from "@/lib/utils";
 
 export interface DashboardShellProps {
   user: DashboardUser;
   children: React.ReactNode;
 }
 
-/** Responsive dashboard chrome — drawer sidebar on mobile, fixed rail on desktop. */
+/**
+ * Responsive dashboard chrome — drawer sidebar on mobile, fixed rail on desktop, and the
+ * AniVerse Assistant on the right (docked from xl, overlay on laptops, a sheet on phones).
+ */
 export function DashboardShell({ user, children }: DashboardShellProps) {
+  return (
+    <AssistantProvider userKey={user.handle} userName={user.name}>
+      <ShellLayout user={user}>{children}</ShellLayout>
+    </AssistantProvider>
+  );
+}
+
+function ShellLayout({ user, children }: DashboardShellProps) {
   const [navOpen, setNavOpen] = useState(false);
+  const { open: assistantOpen } = useAssistant();
 
   return (
     <div className="min-h-dvh bg-background">
@@ -34,7 +49,8 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
         />
       ) : null}
 
-      <div className="lg:pl-[168px]">
+      {/* The page makes room for the docked assistant on wide screens. */}
+      <div className={cn("transition-[padding] duration-300 lg:pl-[168px]", assistantOpen && "xl:pr-[400px]")}>
         <DashboardTopbar
           user={user}
           onMenuClick={() => setNavOpen(true)}
@@ -45,6 +61,8 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
       </div>
 
       <DashboardBottomNav />
+      <AssistantLauncher />
+      <AssistantPanel />
     </div>
   );
 }
