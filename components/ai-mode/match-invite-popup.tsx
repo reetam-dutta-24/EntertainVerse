@@ -99,7 +99,7 @@ export function MatchInvitePopup() {
               <X className="size-4" aria-hidden />
             </button>
             <div className="flex items-center gap-3">
-              <Avatar name={invite.creatorName} color={invite.creatorAvatarColor} url={invite.creatorAvatarUrl} size="size-12" />
+              <Avatar name={invite.creatorName} color={invite.creatorAvatarColor} url={invite.creatorAvatarUrl} size="size-12" handle={invite.creatorHandle} />
               <span className="inline-flex items-center gap-1 rounded-full bg-gradient-brand px-2.5 py-1 text-micro font-bold text-white">
                 <Sparkles className="size-3" aria-hidden /> {invite.matchScore}% MATCH
               </span>

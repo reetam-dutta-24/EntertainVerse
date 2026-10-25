@@ -9,6 +9,7 @@ import { getCommunityDashboardPath, getCommunityDetailPath } from "@/lib/communi
 import { getProfilePath } from "@/lib/profile-routes";
 import { MATCH_SCOPES, type MatchProfileView, type MatchScope, type RoomInvite, type RoomView } from "@/lib/match/types";
 import { cn } from "@/lib/utils";
+import { ProfileLink } from "@/components/profile/profile-link";
 
 const COUNTRY_CODES = ["IN", "US", "GB", "CA", "AU", "JP", "KR", "SG", "AE", "DE", "FR", "ES", "IT", "BR", "MX", "ID", "PH", "MY", "TH", "VN", "NL", "SE", "PK", "BD", "NP", "LK", "NZ", "ZA", "NG", "EG"];
 
@@ -20,13 +21,16 @@ function regionFromLocale() {
   }
 }
 
-export function Avatar({ name, color, url, size = "size-10" }: { name: string; color: string; url?: string; size?: string }) {
+/** Pass `handle` to make it open that user's profile. */
+export function Avatar({ name, color, url, size = "size-10", handle }: { name: string; color: string; url?: string; size?: string; handle?: string }) {
   const initials = name.split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
   return (
-    <span className={cn("flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-surface text-sm font-bold text-white", size)} style={{ backgroundColor: color }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      {url ? <img src={url} alt="" className="size-full object-cover" /> : initials}
-    </span>
+    <ProfileLink handle={handle} name={name}>
+      <span className={cn("flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-surface text-sm font-bold text-white", size)} style={{ backgroundColor: color }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {url ? <img src={url} alt="" className="size-full object-cover" /> : initials}
+      </span>
+    </ProfileLink>
   );
 }
 
@@ -301,7 +305,7 @@ export function MatchExperience({ initialProfile, initialRooms, initialInvites, 
             {invites.map((invite) => (
               <li key={invite.roomId} className={cn("flex flex-col gap-3 rounded-2xl border border-brand-magenta/30 bg-surface/70 p-4", busy === invite.roomId && "animate-pulse")}>
                 <div className="flex items-start gap-3">
-                  <Avatar name={invite.creatorName} color={invite.creatorAvatarColor} url={invite.creatorAvatarUrl} />
+                  <Avatar name={invite.creatorName} color={invite.creatorAvatarColor} url={invite.creatorAvatarUrl} handle={invite.creatorHandle} />
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-white">{invite.headline}</p>
                     <p className="mt-0.5 text-caption text-brand-pink">{invite.vibe}</p>
@@ -393,7 +397,7 @@ export function MatchExperience({ initialProfile, initialRooms, initialInvites, 
                 <ul className="flex flex-col gap-1.5">
                   {room.members.map((member) => (
                     <li key={member.userId} className="flex items-center gap-2.5">
-                      <Avatar name={member.name} color={member.avatarColor} url={member.avatarUrl} size="size-8" />
+                      <Avatar name={member.name} color={member.avatarColor} url={member.avatarUrl} size="size-8" handle={member.handle} />
                       <div className="min-w-0 flex-1">
                         <Link href={getProfilePath(member.handle)} className="truncate text-sm text-white hover:text-brand-pink">
                           {member.isMe ? "You" : member.name}

@@ -110,6 +110,7 @@ export function CommunityFriendInvitePanel({
                 avatarColor={friend.avatarColor}
                 avatarUrl={friend.avatarUrl}
                 size="sm"
+                profileHandle={friend.handle ?? friend.id}
               />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-white">{friend.name}</p>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { CollectionCard, CommunityCard } from "@/components/cards";
 import {
   ProfileAnalyticsSection,
@@ -16,6 +16,7 @@ import {
   MusicCarouselSection,
 } from "@/components/dashboard";
 import { PROFILE_SECTION_IDS } from "@/lib/profile-section-ids";
+import { getProfilePath, normalizeProfileSlug } from "@/lib/profile-routes";
 import { getOptionalUser } from "@/lib/data/user";
 import { getUserDetail } from "@/lib/data/user-detail";
 
@@ -45,6 +46,8 @@ export default async function ProfileDetailPage({ params }: ProfilePageProps) {
   const profile = await getUserDetail(userid, viewer?.id);
 
   if (!profile) notFound();
+  // Opened by user id (avatar links that only know the id) → canonical handle URL.
+  if (normalizeProfileSlug(userid) !== normalizeProfileSlug(profile.handle)) redirect(getProfilePath(profile.handle));
 
   const isOwner = viewer?.handle === profile.handle;
   const firstName = profile.name.split(" ")[0];

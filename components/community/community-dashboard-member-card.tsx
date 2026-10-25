@@ -114,6 +114,7 @@ export function CommunityDashboardMemberCard({
             avatarColor={member.avatarColor ?? DEFAULT_AVATAR_COLOR}
             avatarUrl={member.avatarUrl}
             size="sm"
+            profileHandle={member.handle ?? member.id}
           />
           {member.online ? (
             <span

@@ -7,6 +7,7 @@ import type { PartyReaction } from "@/hooks/use-party";
 import type { PartyChatMessage, PartyMember } from "@/lib/party/types";
 import type { SearchResult } from "@/lib/search/types";
 import { cn } from "@/lib/utils";
+import { ProfileLink } from "@/components/profile/profile-link";
 
 export const REACTIONS = ["😂", "🔥", "😭", "😱", "❤️", "👏"] as const;
 
@@ -23,10 +24,12 @@ export function MemberStrip({ members, hostId }: { members: PartyMember[]; hostI
     <ul className="flex flex-wrap gap-2" aria-label="In the party">
       {members.map((member) => (
         <li key={member.userId} className="flex items-center gap-1.5 rounded-full bg-white/[0.06] py-1 pl-1 pr-2.5 text-caption text-white/85">
-          <span className="flex size-6 items-center justify-center overflow-hidden rounded-full text-micro font-bold text-white" style={{ backgroundColor: member.avatarColor }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            {member.avatarUrl ? <img src={member.avatarUrl} alt="" className="size-full object-cover" /> : member.name.slice(0, 1).toUpperCase()}
-          </span>
+          <ProfileLink handle={member.userId} name={member.name} newTab>
+            <span className="flex size-6 items-center justify-center overflow-hidden rounded-full text-micro font-bold text-white" style={{ backgroundColor: member.avatarColor }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              {member.avatarUrl ? <img src={member.avatarUrl} alt="" className="size-full object-cover" /> : member.name.slice(0, 1).toUpperCase()}
+            </span>
+          </ProfileLink>
           {member.name.split(" ")[0]}
           {member.userId === hostId ? <Crown className="size-3 text-amber-300" aria-label="Host" /> : null}
         </li>

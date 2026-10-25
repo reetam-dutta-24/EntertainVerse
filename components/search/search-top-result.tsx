@@ -5,6 +5,7 @@ import { ArtistCard } from "@/components/cards/artist-card";
 import { MusicCard } from "@/components/cards/music-card";
 import { PosterCard } from "@/components/cards/poster-card";
 import { GradientButton } from "@/components/ui/gradient-button";
+import { ProfileLink } from "@/components/profile/profile-link";
 import { getProfilePath } from "@/lib/profile-routes";
 import { sectionTintSeed } from "@/lib/card-theme";
 import type { SearchPageData } from "@/lib/search/types";
@@ -73,21 +74,26 @@ export function SearchTopResult({ data }: SearchTopResultProps) {
           🔍 Top Results For {label}
         </h2>
         <div className="flex w-full max-w-[420px] flex-col items-center gap-4 rounded-3xl border border-white/10 bg-glass-purple p-6 text-center shadow-card-inner">
-          <span
-            className="flex size-20 items-center justify-center overflow-hidden rounded-full text-2xl font-bold text-black"
-            style={{ backgroundColor: profile.avatarColor }}
+          <ProfileLink
+            handle={profile.handle ?? profile.id}
+            name={profile.name}
           >
-            {profile.portraitUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profile.portraitUrl}
-                alt={profile.name}
-                className="size-full object-cover"
-              />
-            ) : (
-              profile.name.charAt(0)
-            )}
-          </span>
+            <span
+              className="flex size-20 items-center justify-center overflow-hidden rounded-full text-2xl font-bold text-black"
+              style={{ backgroundColor: profile.avatarColor }}
+            >
+              {profile.portraitUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profile.portraitUrl}
+                  alt={profile.name}
+                  className="size-full object-cover"
+                />
+              ) : (
+                profile.name.charAt(0)
+              )}
+            </span>
+          </ProfileLink>
           <div>
             <p className="text-xl font-bold text-white">{profile.name}</p>
             <p className="text-sm text-white/60">@{profile.handle}</p>

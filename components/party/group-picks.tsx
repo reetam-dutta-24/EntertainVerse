@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ChevronDown, LoaderCircle, Plus, Sparkles, X } from "lucide-react";
 import type { GroupPicks } from "@/lib/services/group-picks.service";
 import { cn } from "@/lib/utils";
+import { ProfileLink } from "@/components/profile/profile-link";
 
 export interface GroupPicksPanelProps {
   communitySlug: string;
@@ -96,9 +97,11 @@ export function GroupPicksPanel({ communitySlug, mode, memberIds, isHost, onPlay
                       <span className="font-semibold text-brand-pink">{pick.groupScore}% group</span>
                       <span className="flex -space-x-1.5" aria-hidden>
                         {pick.members.map((member) => (
-                          <span key={member.userId} title={`${member.name}: ${member.fit}%`} className="flex size-5 items-center justify-center rounded-full border border-surface text-[9px] font-bold text-white" style={{ backgroundColor: member.avatarColor }}>
-                            {member.name.slice(0, 1).toUpperCase()}
-                          </span>
+                          <ProfileLink key={member.userId} handle={member.userId} name={member.name} nested newTab>
+                            <span title={`${member.name}: ${member.fit}%`} className="flex size-5 items-center justify-center rounded-full border border-surface text-[9px] font-bold text-white" style={{ backgroundColor: member.avatarColor }}>
+                              {member.name.slice(0, 1).toUpperCase()}
+                            </span>
+                          </ProfileLink>
                         ))}
                       </span>
                       {pick.subtitle ? <span className="truncate">{pick.subtitle}</span> : null}
@@ -125,9 +128,11 @@ export function GroupPicksPanel({ communitySlug, mode, memberIds, isHost, onPlay
                   <ul className="mt-2 flex flex-col gap-1 border-t border-white/10 pt-2">
                     {pick.members.map((member) => (
                       <li key={member.userId} className="flex items-center gap-2 text-caption">
-                        <span className="flex size-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white" style={{ backgroundColor: member.avatarColor }}>
-                          {member.name.slice(0, 1).toUpperCase()}
-                        </span>
+                        <ProfileLink handle={member.userId} name={member.name} newTab>
+                          <span className="flex size-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white" style={{ backgroundColor: member.avatarColor }}>
+                            {member.name.slice(0, 1).toUpperCase()}
+                          </span>
+                        </ProfileLink>
                         <span className="w-20 shrink-0 truncate text-white/85">{member.name.split(" ")[0]}</span>
                         <span className="w-9 shrink-0 font-semibold text-white">{member.fit}%</span>
                         <span className="truncate text-white/55">{member.reason}</span>

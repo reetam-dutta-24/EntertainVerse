@@ -11,6 +11,7 @@ import {
   EditCommunityPostButton,
 } from "@/components/forms/community-post-form";
 import { BRAND_COLORS } from "@/lib/brand-colors";
+import { ProfileLink } from "@/components/profile/profile-link";
 
 const ROLE_LABELS: Record<MemberRole, string> = {
   owner: "Admin",
@@ -79,27 +80,36 @@ export function CommunityDashboardFeedPost({
       )}
     >
       <div className="flex items-center gap-2.5">
-        <span
-          className="flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-black"
-          style={{
-            backgroundColor: post.author.avatarColor ?? BRAND_COLORS.gold,
-          }}
+        <ProfileLink
+          handle={post.author.handle ?? post.author.id}
+          name={post.author.name}
         >
-          {post.author.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={post.author.avatarUrl}
-              alt={post.author.name}
-              className="size-full rounded-full object-cover"
-            />
-          ) : (
-            initial
-          )}
-        </span>
+          <span
+            className="flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-black"
+            style={{
+              backgroundColor: post.author.avatarColor ?? BRAND_COLORS.gold,
+            }}
+          >
+            {post.author.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={post.author.avatarUrl}
+                alt={post.author.name}
+                className="size-full rounded-full object-cover"
+              />
+            ) : (
+              initial
+            )}
+          </span>
+        </ProfileLink>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            <p className="text-xs font-semibold text-white/90">{post.author.name}</p>
-            <span className="text-caption font-medium text-brand-pink/80">{role}</span>
+            <p className="text-xs font-semibold text-white/90">
+              {post.author.name}
+            </p>
+            <span className="text-caption font-medium text-brand-pink/80">
+              {role}
+            </span>
             <span className="inline-flex items-center gap-1 text-caption italic text-white/50">
               <span
                 aria-hidden
@@ -117,11 +127,7 @@ export function CommunityDashboardFeedPost({
       {post.imageUrl ? (
         <div className="relative h-[180px] w-full overflow-hidden rounded-xl sm:h-[200px]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={post.imageUrl}
-            alt=""
-            className="size-full object-cover"
-          />
+          <img src={post.imageUrl} alt="" className="size-full object-cover" />
           <div className="absolute inset-0 rounded-[inherit] shadow-[inset_0_0_40px_rgba(0,0,0,0.4)]" />
         </div>
       ) : null}
@@ -142,7 +148,12 @@ export function CommunityDashboardFeedPost({
           )}
           aria-pressed={liked}
         >
-          <Heart className={cn("size-3.5", liked && "fill-current text-brand-magenta")} />
+          <Heart
+            className={cn(
+              "size-3.5",
+              liked && "fill-current text-brand-magenta",
+            )}
+          />
           {likeCount.toLocaleString()} Likes
         </button>
         <span className="flex items-center gap-1">
@@ -159,10 +170,16 @@ export function CommunityDashboardFeedPost({
         </button>
         <div className="ms-auto flex items-center gap-2">
           {post.canEdit ? (
-            <EditCommunityPostButton communitySlug={communitySlug} post={post} />
+            <EditCommunityPostButton
+              communitySlug={communitySlug}
+              post={post}
+            />
           ) : null}
           {post.canDelete ? (
-            <DeleteCommunityPostButton communitySlug={communitySlug} post={post} />
+            <DeleteCommunityPostButton
+              communitySlug={communitySlug}
+              post={post}
+            />
           ) : null}
         </div>
       </div>

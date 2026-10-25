@@ -305,6 +305,8 @@ export function DashboardMessagesPanel() {
                       avatarColor={entry.peer.avatarColor}
                       avatarUrl={entry.peer.avatarUrl}
                       size="sm"
+                      profileHandle={entry.peer.handle}
+                      nestedLink
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
@@ -342,6 +344,7 @@ export function DashboardMessagesPanel() {
               avatarColor={activeConversation.peer.avatarColor}
               avatarUrl={activeConversation.peer.avatarUrl}
               size="sm"
+              profileHandle={activeConversation.peer.handle}
             />
           ) : null}
           <div className="min-w-0">
@@ -372,6 +375,7 @@ export function DashboardMessagesPanel() {
                   avatarUrl={message.sender.avatarUrl}
                   size="sm"
                   className="mt-1"
+                  profileHandle={message.sender.handle}
                 />
               ) : null}
               <div

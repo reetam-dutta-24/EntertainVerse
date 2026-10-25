@@ -77,7 +77,8 @@ async function findUserRecord(profileSlug: string) {
 
   return prisma.user.findFirst({
     where: {
-      OR: [{ handle }, { handle: normalizeHandle(profileSlug) }],
+      // Handle first; a user id also works for places that only know the id (e.g. party members).
+      OR: [{ handle }, { handle: normalizeHandle(profileSlug) }, { id: profileSlug.trim() }],
     },
     include: {
       preferences: true,

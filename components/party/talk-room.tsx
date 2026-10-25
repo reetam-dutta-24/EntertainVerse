@@ -7,6 +7,7 @@ import { LoaderCircle, Mic, MicOff, PhoneOff } from "lucide-react";
 import { getSocketUrl } from "@/lib/env/socket";
 import { VOICE_ROOM_LIMIT, type VoicePeer } from "@/lib/party/types";
 import { cn } from "@/lib/utils";
+import { ProfileLink } from "@/components/profile/profile-link";
 
 /** Free public STUN servers — enough for most home and mobile networks (no TURN relay). */
 const ICE_SERVERS: RTCIceServer[] = [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }];
@@ -221,9 +222,11 @@ export function TalkRoom({ channelId, channelTitle, onClose }: TalkRoomProps) {
             </li>
             {people.map((peer) => (
               <li key={peer.socketId} className="flex flex-col items-center gap-2 rounded-2xl bg-black/30 p-3">
-                <span className={cn("flex size-16 items-center justify-center rounded-full text-lg font-bold text-white transition-shadow", peer.speaking && "ring-4 ring-emerald-400/80", !peer.connected && "opacity-60")} style={{ backgroundColor: peer.avatarColor }}>
-                  {(peer.name || "?").slice(0, 1).toUpperCase()}
-                </span>
+                <ProfileLink handle={peer.userId} name={peer.name || "this speaker"} newTab>
+                  <span className={cn("flex size-16 items-center justify-center rounded-full text-lg font-bold text-white transition-shadow", peer.speaking && "ring-4 ring-emerald-400/80", !peer.connected && "opacity-60")} style={{ backgroundColor: peer.avatarColor }}>
+                    {(peer.name || "?").slice(0, 1).toUpperCase()}
+                  </span>
+                </ProfileLink>
                 <span className="flex max-w-full items-center gap-1 truncate text-caption text-white/80">
                   {peer.muted ? <MicOff className="size-3.5 shrink-0 text-red-300" aria-label="Muted" /> : null}
                   <span className="truncate">{peer.name || "Joining…"}</span>
