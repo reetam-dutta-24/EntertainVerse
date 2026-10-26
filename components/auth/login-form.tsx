@@ -58,7 +58,8 @@ export function LoginForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    // method="post": a submit before hydration must not put the password in the URL.
+    <form method="post" onSubmit={handleSubmit} className="flex flex-col gap-4">
       <AuthInput
         icon={User}
         name="identifier"
