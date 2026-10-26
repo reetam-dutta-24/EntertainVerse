@@ -119,12 +119,17 @@ export function DashboardMessagesPanel() {
     if (id) setActiveId(id);
   });
 
+  // Latest values for the socket handlers below, which live for the panel's whole lifetime.
+  const activeIdRef = useRef(activeId);
+  const conversationsRef = useRef(conversations);
   useEffect(() => {
-    if (!activeId) return;
-    // loadMessages only sets state after awaiting the network.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadMessages(activeId);
+    activeIdRef.current = activeId;
+    conversationsRef.current = conversations;
+  });
 
+  // One socket while the panel is open. The server delivers every DM for this user to it
+  // (not only the open conversation's), so the inbox and previews stay live.
+  useEffect(() => {
     const socket = io(getSocketUrl(), {
       path: "/api/socket/io",
       withCredentials: true,
@@ -132,37 +137,57 @@ export function DashboardMessagesPanel() {
     });
     socketRef.current = socket;
 
+    // isOwn is per-viewer, so it isn't broadcast: in a 1:1 chat a message is mine
+    // exactly when the other participant didn't send it.
+    const withOwnFlag = (message: DmMessage): DmMessage => {
+      const conversation = conversationsRef.current.find((entry) => entry.id === message.conversationId);
+      return { ...message, isOwn: conversation ? message.senderId !== conversation.peer.id : false };
+    };
+
     socket.on("connect", () => {
-      socket.emit("dm:join", { conversationId: activeId });
+      // (Re)join the open conversation after connecting or reconnecting.
+      if (activeIdRef.current) socket.emit("dm:join", { conversationId: activeIdRef.current });
     });
 
-    socket.on("dm:message", (message: DmMessage) => {
-      if (message.conversationId !== activeId) {
-        void loadConversations();
-        return;
+    socket.on("dm:message", (raw: DmMessage) => {
+      const message = withOwnFlag(raw);
+      if (message.conversationId === activeIdRef.current) {
+        setMessages((current) => (current.some((entry) => entry.id === message.id) ? current : [...current, message]));
       }
-      setMessages((current) => [...current, message]);
       void loadConversations();
     });
 
     socket.on("dm:edited", (message: DmMessage) => {
       setMessages((current) =>
         current.map((entry) =>
-          entry.id === message.id ? { ...entry, ...message } : entry,
+          entry.id === message.id ? { ...entry, ...message, isOwn: entry.isOwn } : entry,
         ),
       );
     });
 
     socket.on("dm:deleted", (payload: { id: string }) => {
       setMessages((current) => current.filter((entry) => entry.id !== payload.id));
+      void loadConversations();
     });
 
     return () => {
-      socket.emit("dm:leave", { conversationId: activeId });
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [activeId, loadMessages, loadConversations]);
+  }, [loadConversations]);
+
+  // Load the open conversation and join its room (for typing indicators and reads).
+  useEffect(() => {
+    if (!activeId) return;
+    // loadMessages only sets state after awaiting the network.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadMessages(activeId);
+    const socket = socketRef.current;
+    if (socket?.connected) socket.emit("dm:join", { conversationId: activeId });
+    return () => {
+      socketRef.current?.emit("dm:leave", { conversationId: activeId });
+    };
+  }, [activeId, loadMessages]);
 
   async function handleSend(event: React.FormEvent) {
     event.preventDefault();

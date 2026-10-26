@@ -6,8 +6,7 @@ import {
   sendDirectMessage,
 } from "@/lib/services/dm.service";
 import { dmSendSchema } from "@/lib/validators/dm";
-import { getSocketServer } from "@/lib/socket/io-instance";
-import { getDmRoomId } from "@/lib/services/dm.service";
+import { broadcastDmEvent } from "@/lib/socket/dm-broadcast";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
@@ -42,8 +41,7 @@ export async function POST(request: Request) {
       parsed.data.content,
     );
 
-    const io = getSocketServer();
-    io?.to(getDmRoomId(conversation.id)).emit("dm:message", message);
+    await broadcastDmEvent(conversation.id, "dm:message", message);
 
     return NextResponse.json(
       { conversationId: conversation.id, message },

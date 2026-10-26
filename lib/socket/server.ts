@@ -13,6 +13,7 @@ import {
 } from "@/lib/services/community-chat.service";
 import { communityChatSendSchema } from "@/lib/validators/community-chat";
 import { setSocketServer } from "@/lib/socket/io-instance";
+import { userRoom } from "@/lib/realtime/rooms";
 import { registerPartyHandlers } from "@/lib/socket/parties";
 
 interface ChatJoinPayload {
@@ -106,6 +107,8 @@ export function attachSocketServer(httpServer: HttpServer) {
   io.on("connection", (socket) => {
     const userId = socket.data.userId as string;
     const joinedRooms = new Set<string>();
+    // Personal room: DMs and other events addressed to this user, on every open tab.
+    void socket.join(userRoom(userId));
     // Watch / listen parties and talk rooms.
     registerPartyHandlers(io, socket, userId);
 

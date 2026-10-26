@@ -7,8 +7,7 @@ import {
   sendDirectMessage,
 } from "@/lib/services/dm.service";
 import { dmSendSchema } from "@/lib/validators/dm";
-import { getSocketServer } from "@/lib/socket/io-instance";
-import { getDmRoomId } from "@/lib/services/dm.service";
+import { broadcastDmEvent } from "@/lib/socket/dm-broadcast";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -58,8 +57,7 @@ export async function POST(request: Request, context: RouteContext) {
     );
 
     if (message.conversationId === id) {
-      const io = getSocketServer();
-      io?.to(getDmRoomId(id)).emit("dm:message", message);
+      await broadcastDmEvent(id, "dm:message", message);
     }
 
     return NextResponse.json({ message }, { status: 201 });

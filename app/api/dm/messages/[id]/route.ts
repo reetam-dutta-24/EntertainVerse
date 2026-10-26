@@ -7,8 +7,7 @@ import {
   editDirectMessage,
 } from "@/lib/services/dm.service";
 import { dmEditSchema } from "@/lib/validators/dm";
-import { getSocketServer } from "@/lib/socket/io-instance";
-import { getDmRoomId } from "@/lib/services/dm.service";
+import { broadcastDmEvent } from "@/lib/socket/dm-broadcast";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -36,8 +35,7 @@ export async function PATCH(request: Request, context: RouteContext) {
       parsed.data.content,
     );
 
-    const io = getSocketServer();
-    io?.to(getDmRoomId(message.conversationId)).emit("dm:edited", message);
+    await broadcastDmEvent(message.conversationId, "dm:edited", message);
 
     return NextResponse.json({ message });
   } catch (error) {
@@ -61,8 +59,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
   try {
     const result = await deleteDirectMessage(auth.userId, id);
 
-    const io = getSocketServer();
-    io?.to(getDmRoomId(result.conversationId)).emit("dm:deleted", result);
+    await broadcastDmEvent(result.conversationId, "dm:deleted", result);
 
     return NextResponse.json({ ok: true });
   } catch (error) {
