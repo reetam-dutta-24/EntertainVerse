@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getChatRoomId, type CommunityChatChannelId } from "@/lib/community-chat";
 import { canDirectMessage, getDmRoomId } from "@/lib/services/dm.service";
 import { userRoom } from "@/lib/realtime/rooms";
+import { SERVER_SHUTDOWN } from "@/lib/server-lifecycle";
 
 /**
  * Presence and typing indicators.
@@ -79,7 +80,9 @@ export function registerPresenceHandlers(io: SocketServer, socket: Socket, userI
     socket.to(room).emit("chat:typing", { communitySlug, channel, userId, name: await displayName(socket, userId), typing: Boolean(typing) });
   });
 
-  socket.on("disconnect", async () => {
+  socket.on("disconnect", async (reason) => {
+    // This server is stopping and the user is reconnecting to another — not going offline.
+    if (reason === SERVER_SHUTDOWN) return;
     const left = (online.get(userId) ?? 1) - 1;
     if (left > 0) {
       online.set(userId, left);

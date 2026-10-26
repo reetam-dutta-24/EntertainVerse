@@ -1,6 +1,7 @@
 import type { Server as SocketServer, Socket } from "socket.io";
 import { prisma } from "@/lib/prisma";
 import { assertCommunityChatMember } from "@/lib/services/community-chat.service";
+import { SERVER_SHUTDOWN } from "@/lib/server-lifecycle";
 import { getSharedStore } from "@/lib/socket/shared-store";
 import { episodeMinutes, fullRuntime, isFilmType } from "@/lib/roadmap/runtime";
 import {
@@ -542,8 +543,11 @@ export function registerPartyHandlers(io: SocketServer, socket: Socket, userId: 
     await leaveVoice(io, socket, channelId);
   });
 
-  socket.on("disconnect", async () => {
+  socket.on("disconnect", async (reason) => {
     lastChatAt.delete(socket.id);
+    // This server is stopping: the browser reconnects to another one and rejoins, keeping
+    // its place (and host role). Its old socket is then cleared there as a ghost.
+    if (reason === SERVER_SHUTDOWN) return;
     await Promise.all([
       ...[...joinedParties].map((key) => leaveParty(io, socket, key)),
       ...[...joinedVoice].map((channelId) => leaveVoice(io, socket, channelId)),
