@@ -16,6 +16,7 @@ import { setSocketServer } from "@/lib/socket/io-instance";
 import { userRoom } from "@/lib/realtime/rooms";
 import { registerPartyHandlers } from "@/lib/socket/parties";
 import { registerPresenceHandlers } from "@/lib/socket/presence";
+import { attachRedisAdapter } from "@/lib/socket/redis-adapter";
 
 interface ChatJoinPayload {
   communitySlug: string;
@@ -84,7 +85,7 @@ async function authenticateSocket(socket: Socket): Promise<string | null> {
   return typeof token?.id === "string" ? token.id : null;
 }
 
-export function attachSocketServer(httpServer: HttpServer) {
+export async function attachSocketServer(httpServer: HttpServer) {
   const io = new SocketServer(httpServer, {
     path: "/api/socket/io",
     cors: {
@@ -102,6 +103,10 @@ export function attachSocketServer(httpServer: HttpServer) {
     socket.data.userId = userId;
     next();
   });
+
+  // Multi-server mode when REDIS_URL is set; otherwise single-server as before.
+  const multiServer = await attachRedisAdapter(io);
+  console.log(`> Socket.IO: ${multiServer ? "Redis adapter (multi-server)" : "single-server"}`);
 
   setSocketServer(io);
 
