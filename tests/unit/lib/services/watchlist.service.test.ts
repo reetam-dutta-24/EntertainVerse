@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { PrismaMock } from "../../../helpers/prisma-mock";
 
 vi.mock("@/lib/prisma", async () => ({ prisma: (await import("../../../helpers/prisma-mock")).createPrismaMock() }));
+vi.mock("@/lib/services/taste-engine.service", () => ({ scoreContentForUser: vi.fn() }));
 
 const prisma = (await import("@/lib/prisma")).prisma as unknown as PrismaMock;
 const watchlist = await import("@/lib/services/watchlist.service");
+const { scoreContentForUser } = vi.mocked(await import("@/lib/services/taste-engine.service"));
 
 const content = (slug: string) => ({
   id: `id-${slug}`,
@@ -30,6 +32,7 @@ const item = (id: string, slug: string, fields: Record<string, unknown> = {}) =>
 });
 
 beforeEach(() => {
+  scoreContentForUser.mockResolvedValue(new Map());
   prisma.content.findUnique.mockImplementation(async ({ where }: { where: { slug: string } }) =>
     where.slug === "missing" ? null : { id: `id-${where.slug}` },
   );
@@ -90,9 +93,25 @@ describe("getWatchlistStatsForUser", () => {
     for (const [args] of prisma.watchlistItem.count.mock.calls) expect(args.where.userId).toBe("u1");
   });
 
-  // mapContentToItem never sets matchScore, so every card falls back to 78 + (list position % 19)
-  // and "Avg AI Match" on /dashboard/watchlist is derived from list order, not the recommender.
-  it.todo("averages the recommender's real match scores");
+  it("averages the recommender's real match scores", async () => {
+    prisma.watchlistItem.count.mockResolvedValue(3);
+    prisma.watchlistItem.findMany.mockResolvedValue([item("w1", "frieren"), item("w2", "mushishi"), item("w3", "monster")]);
+    scoreContentForUser.mockResolvedValue(new Map([["frieren", 91], ["mushishi", 72], ["monster", 80]]));
+
+    expect((await watchlist.getWatchlistStatsForUser("u1")).avgAiMatch).toBe(81);
+    expect(scoreContentForUser).toHaveBeenCalledWith("u1", ["frieren", "mushishi", "monster"]);
+  });
+
+  it("shows no score rather than a made-up one when the recommender fails", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    prisma.watchlistItem.count.mockResolvedValue(1);
+    prisma.watchlistItem.findMany.mockResolvedValue([item("w1", "frieren")]);
+    scoreContentForUser.mockRejectedValue(new Error("embeddings offline"));
+
+    const [listed] = await watchlist.listWatchlistForUser("u1");
+    expect(listed.matchScore).toBeUndefined();
+    expect((await watchlist.getWatchlistStatsForUser("u1")).avgAiMatch).toBe(0);
+  });
 });
 
 describe("addWatchlistItem", () => {
@@ -200,7 +219,8 @@ describe("toggleContentWatchlist", () => {
   it("adds an unsaved title", async () => {
     prisma.watchlistItem.findFirst.mockResolvedValue(null);
     expect(await watchlist.toggleContentWatchlist("u1", "frieren")).toEqual({ onWatchlist: true, wasWatching: false });
-    expect(prisma.watchlistItem.create).toHaveBeenCalledWith({ data: expect.objectContaining({ userId: "u1", contentId: "id-frieren" }) });
+    // Saved for later, not "watching" — matches the add form's default.
+    expect(prisma.watchlistItem.create).toHaveBeenCalledWith({ data: expect.objectContaining({ userId: "u1", contentId: "id-frieren", status: "PENDING" }) });
   });
 
   it("rejects an unknown title", async () => {

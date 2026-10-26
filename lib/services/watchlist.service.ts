@@ -52,7 +52,23 @@ export async function listWatchlistForUser(
     orderBy: [{ priority: "desc" }, { addedAt: "desc" }],
   });
 
-  return rows.map((row, index) => mapWatchlistItemToContent(row, index));
+  const scores = await scoreWatchlist(
+    userId,
+    rows.map((row) => row.content.slug),
+  );
+  return rows.map((row) => mapWatchlistItemToContent(row, scores.get(row.content.slug)));
+}
+
+/** Real recommender scores; the list still renders (without scores) if ranking fails. */
+async function scoreWatchlist(userId: string, slugs: string[]) {
+  if (!slugs.length) return new Map<string, number>();
+  try {
+    const { scoreContentForUser } = await import("@/lib/services/taste-engine.service");
+    return await scoreContentForUser(userId, slugs);
+  } catch (error) {
+    console.error("[watchlist] match scores unavailable", error);
+    return new Map<string, number>();
+  }
 }
 
 export async function getWatchlistStatsForUser(userId: string) {
@@ -173,7 +189,8 @@ export async function toggleContentWatchlist(userId: string, contentSlug: string
       userId,
       contentId,
       priority: "NORMAL",
-      status: "WATCHING",
+      // Saved, not started — the same default as the add-to-watchlist form.
+      status: "PENDING",
     },
   });
   return { onWatchlist: true, wasWatching: false };

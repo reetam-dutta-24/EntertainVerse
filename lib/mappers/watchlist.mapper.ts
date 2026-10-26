@@ -8,12 +8,13 @@ type WatchlistWithContent = WatchlistItem & {
 
 export function mapWatchlistItemToContent(
   row: WatchlistWithContent,
-  index = 0,
+  /** From the recommender; left unset when it isn't available. */
+  matchScore?: number,
 ): ContentItem {
   const item = mapContentToItem(row.content);
   return {
     ...item,
-    matchScore: item.matchScore ?? 78 + (index % 19),
+    matchScore: matchScore ?? item.matchScore,
     description:
       item.description ??
       `${item.title} — saved to your EntertainVerse watchlist.`,

@@ -613,6 +613,8 @@ interface RankOptions {
   maxRating?: number;
   /** Leave out these slugs (already shown elsewhere on the page). */
   exclude?: Set<string>;
+  /** Score only these slugs (e.g. the user's watchlist). */
+  only?: Set<string>;
   /** Evaluation only: switch hybrid layers off to measure what each adds. */
   layers?: { semantic?: boolean; collaborative?: boolean };
 }
@@ -634,6 +636,7 @@ export async function rankContent(
     .filter((row) => {
       if (options.excludeKnown && v.known.has(row.slug)) return false;
       if (options.exclude?.has(row.slug)) return false;
+      if (options.only && !options.only.has(row.slug)) return false;
       const genres = contentGenres(row);
       if (options.genre && !genres.includes(options.genre)) return false;
       if (options.anyGenre && !genres.some((genre) => options.anyGenre!.includes(genre))) return false;
@@ -720,6 +723,14 @@ export async function rankArtists(
       matchScore: toMatch(score),
       reason: explainArtist(row, v, ctx),
     }));
+}
+
+/** The recommender's match score (50–99) for specific titles, keyed by slug. */
+export async function scoreContentForUser(userId: string, slugs: string[]): Promise<Map<string, number>> {
+  if (!slugs.length) return new Map();
+  const signals = await loadTasteSignals(userId);
+  const ranked = await rankContent(signals, { only: new Set(slugs), limit: slugs.length });
+  return new Map(ranked.map((item) => [item.id, item.matchScore ?? 0]));
 }
 
 /** Where the user sits in embedding space, for content and for music (null without embeddings). */
