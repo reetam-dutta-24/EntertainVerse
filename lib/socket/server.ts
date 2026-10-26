@@ -17,6 +17,7 @@ import { userRoom } from "@/lib/realtime/rooms";
 import { registerPartyHandlers } from "@/lib/socket/parties";
 import { registerPresenceHandlers } from "@/lib/socket/presence";
 import { attachRedisAdapter } from "@/lib/socket/redis-adapter";
+import { getSharedStore } from "@/lib/socket/shared-store";
 
 interface ChatJoinPayload {
   communitySlug: string;
@@ -106,6 +107,8 @@ export async function attachSocketServer(httpServer: HttpServer) {
 
   // Multi-server mode when REDIS_URL is set; otherwise single-server as before.
   const multiServer = await attachRedisAdapter(io);
+  // Party / talk-room state: connect now so a bad REDIS_URL fails at boot, not mid-party.
+  await getSharedStore();
   console.log(`> Socket.IO: ${multiServer ? "Redis adapter (multi-server)" : "single-server"}`);
 
   setSocketServer(io);
