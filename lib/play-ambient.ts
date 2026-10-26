@@ -6,6 +6,8 @@ export interface PlayAccentTheme {
   glass: string;
   primary: string;
   primaryMuted: string;
+  /** Accent mixed halfway to white — stays readable (≥4.5:1) on the dark play panels. */
+  textAccent: string;
   gradient: string;
   gradientSoft: string;
   glow: string;
@@ -49,6 +51,7 @@ export function getPlayAccentTheme(accent?: AccentColor | string): PlayAccentThe
     glass: tint.glass,
     primary: `rgb(${r},${g},${b})`,
     primaryMuted: `rgba(${r},${g},${b},0.75)`,
+    textAccent: `rgb(${Math.round((r + 255) / 2)},${Math.round((g + 255) / 2)},${Math.round((b + 255) / 2)})`,
     gradient: `linear-gradient(135deg, rgb(${r},${g},${b}) 0%, rgb(${r2},${g2},${b2}) 100%)`,
     gradientSoft: `rgba(${r},${g},${b},0.22)`,
     glow: `0 4px 18px rgba(${r},${g},${b},0.28)`,

@@ -70,7 +70,7 @@ export function ScreenTimeLock({ limitMinutes, unlocksAt }: { limitMinutes: numb
         >
           <LogOut className="size-4" aria-hidden /> Sign out
         </button>
-        <p className="text-caption text-white/40">Changing the limit takes effect tomorrow — that&apos;s the point.</p>
+        <p className="text-caption text-white/60">Changing the limit takes effect tomorrow — that&apos;s the point.</p>
       </div>
     </div>
   );

@@ -33,7 +33,7 @@ export function Field({
       <span id={labelId} className="text-xs font-semibold uppercase tracking-wide text-white/55">
         {label}
       </span>
-      {hint ? <span className="text-xs text-white/40">{hint}</span> : null}
+      {hint ? <span className="text-xs text-white/60">{hint}</span> : null}
     </>
   );
   // A single input / select / textarea: a real <label>, so screen readers announce it
@@ -70,7 +70,7 @@ export function Section({
       <div>
         <h2 className="text-sm font-semibold text-white">{title}</h2>
         {description ? (
-          <p className="mt-1 text-xs text-white/45">{description}</p>
+          <p className="mt-1 text-xs text-white/60">{description}</p>
         ) : null}
       </div>
       {children}

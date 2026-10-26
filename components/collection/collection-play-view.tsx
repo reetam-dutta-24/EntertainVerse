@@ -222,7 +222,7 @@ function SynopsisPanel({
   if (!synopsis?.trim()) {
     return (
       <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-6 text-center">
-        <p className="text-xs text-white/40">No synopsis available.</p>
+        <p className="text-xs text-white/60">No synopsis available.</p>
       </div>
     );
   }
@@ -235,7 +235,7 @@ function SynopsisPanel({
         backgroundColor: theme.panelBg,
       }}
     >
-      <p className="text-micro font-semibold uppercase tracking-widest text-white/40">
+      <p className="text-micro font-semibold uppercase tracking-widest text-white/60">
         About this title
       </p>
       <div className="flex min-h-[7rem] flex-col justify-center gap-2">
@@ -246,7 +246,7 @@ function SynopsisPanel({
               "text-sm leading-relaxed",
               index === 0 ? "font-medium" : "text-white/60",
             )}
-            style={index === 0 ? { color: theme.primaryMuted } : undefined}
+            style={index === 0 ? { color: theme.textAccent } : undefined}
           >
             {line}
           </p>
@@ -511,7 +511,7 @@ function MusicPlayQueue({
           }
         />
 
-        <div className="mb-2 hidden grid-cols-[40px_60px_minmax(0,1fr)_72px_80px] gap-3 border-b border-white/[0.08] px-2 pb-2 text-micro font-medium uppercase tracking-wide text-white/40 sm:grid">
+        <div className="mb-2 hidden grid-cols-[40px_60px_minmax(0,1fr)_72px_80px] gap-3 border-b border-white/[0.08] px-2 pb-2 text-micro font-medium uppercase tracking-wide text-white/60 sm:grid">
           <span>#</span>
           <span>Cover</span>
           <span>Title</span>
@@ -583,7 +583,7 @@ function MusicPlayQueue({
                       </span>
                     </span>
 
-                    <span className="text-right text-xs text-white/45">
+                    <span className="text-right text-xs text-white/60">
                       {track.durationLabel}
                     </span>
                   </button>
@@ -841,7 +841,7 @@ function ContentPlayQueue({
           theme={theme}
         />
 
-        <div className="mb-2 hidden grid-cols-[40px_60px_minmax(0,1fr)_120px] gap-3 border-b border-white/[0.08] px-2 pb-2 text-micro font-medium uppercase tracking-wide text-white/40 sm:grid">
+        <div className="mb-2 hidden grid-cols-[40px_60px_minmax(0,1fr)_120px] gap-3 border-b border-white/[0.08] px-2 pb-2 text-micro font-medium uppercase tracking-wide text-white/60 sm:grid">
           <span>#</span>
           <span>Cover</span>
           <span>Title</span>
@@ -1005,7 +1005,7 @@ function ContentPlayQueue({
               </button>
             </div>
 
-            <p className="mt-3 text-center text-caption text-white/40">
+            <p className="mt-3 text-center text-caption text-white/60">
               {activeIndex + 1} of {items.length} in queue
             </p>
 

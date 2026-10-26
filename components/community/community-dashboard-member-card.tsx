@@ -131,7 +131,7 @@ export function CommunityDashboardMemberCard({
               {ROLE_LABELS[member.role]}
             </span>
             {member.handle ? (
-              <span className="text-caption text-white/40">@{member.handle}</span>
+              <span className="text-caption text-white/60">@{member.handle}</span>
             ) : null}
             {member.online ? (
               <span className="text-caption italic text-emerald-400/60">Online</span>

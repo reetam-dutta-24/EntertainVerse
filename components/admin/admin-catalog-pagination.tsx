@@ -43,7 +43,7 @@ export function AdminCatalogPagination({
   const linkClass =
     "inline-flex items-center gap-1 rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:border-brand-magenta/40 hover:bg-white/10";
   const disabledClass =
-    "inline-flex cursor-not-allowed items-center gap-1 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/35";
+    "inline-flex cursor-not-allowed items-center gap-1 rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-white/50";
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm">
@@ -57,7 +57,7 @@ export function AdminCatalogPagination({
             Previous
           </Link>
         ) : (
-          <span className={disabledClass}>
+          <span className={disabledClass} aria-disabled="true">
             <ChevronLeft className="size-3.5" aria-hidden />
             Previous
           </span>
@@ -71,7 +71,7 @@ export function AdminCatalogPagination({
             <ChevronRight className="size-3.5" aria-hidden />
           </Link>
         ) : (
-          <span className={disabledClass}>
+          <span className={disabledClass} aria-disabled="true">
             Next
             <ChevronRight className="size-3.5" aria-hidden />
           </span>

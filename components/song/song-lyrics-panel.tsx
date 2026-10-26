@@ -42,7 +42,7 @@ export function SongLyricsPanel({
           className,
         )}
       >
-        <p className="text-xs text-white/40">No lyrics available for this track.</p>
+        <p className="text-xs text-white/60">No lyrics available for this track.</p>
       </div>
     );
   }
@@ -60,7 +60,7 @@ export function SongLyricsPanel({
         boxShadow: variant === "overlay" ? theme.glow : undefined,
       }}
     >
-      <p className="text-micro font-semibold uppercase tracking-widest text-white/40">
+      <p className="text-micro font-semibold uppercase tracking-widest text-white/60">
         Lyrics
       </p>
       <div
@@ -81,7 +81,7 @@ export function SongLyricsPanel({
                   ? "text-white/35"
                   : "text-white/55",
             )}
-            style={line.active ? { color: theme.primary } : undefined}
+            style={line.active ? { color: theme.textAccent } : undefined}
           >
             {line.text}
           </p>

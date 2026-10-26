@@ -20,6 +20,8 @@
   --color-brand-purple: #ae00ff;
   --color-brand-fuchsia: #d500dd;
   --color-brand-magenta: #ff00cc;
+  /* Deeper magenta for small white text on solid pills (white on #ff00cc is only 3.4:1). */
+  --color-brand-magenta-deep: #c8009f;
   --color-brand-pink: #fab7ff;
   --color-glow-violet: #8a38f5;
 

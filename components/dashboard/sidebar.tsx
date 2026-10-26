@@ -161,7 +161,7 @@ export function DashboardSidebar({
       <nav aria-label="Main" className="relative -mx-1 mt-6 flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-1 pb-2">
         {navGroups.map((group) => (
           <div key={group.label} className="flex flex-col gap-0.5">
-            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/35">
+            <p className="px-3 pb-1 text-micro font-semibold uppercase tracking-[0.14em] text-white/60">
               {group.label}
             </p>
             {group.items.map((item) => (

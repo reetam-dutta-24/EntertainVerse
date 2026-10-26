@@ -150,7 +150,7 @@ export function ListenParty({ communitySlug, viewerUserId }: { communitySlug: st
           <PartyChat messages={chat} onSend={sendChat} viewerUserId={viewerUserId} />
         </aside>
       </div>
-      <p className="text-caption text-white/40">
+      <p className="text-caption text-white/60">
         Songs play from licensed full audio where an admin added it, otherwise the official 30-second preview.
       </p>
     </div>

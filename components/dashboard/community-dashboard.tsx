@@ -42,7 +42,7 @@ function FilterChip({
       className={cn(
         "h-7 cursor-pointer rounded-full px-4 text-xs font-semibold text-white transition-colors",
         active
-          ? "bg-brand-magenta shadow-glow-pink-soft"
+          ? "bg-brand-magenta-deep shadow-glow-pink-soft"
           : "border border-brand-magenta/70 bg-transparent hover:bg-brand-magenta/15",
       )}
     >

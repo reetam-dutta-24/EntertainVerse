@@ -231,7 +231,7 @@ export function EditReviewButton({
           type="button"
           aria-label="Edit review"
           onClick={() => setOpen(true)}
-          className="text-white/60 transition-colors hover:text-white"
+          className="flex size-6 cursor-pointer items-center justify-center rounded-md text-white/60 transition-colors hover:text-white"
         >
           <Pencil className="size-3.5" />
         </button>
@@ -299,7 +299,7 @@ export function DeleteReviewButton({
         type="button"
         aria-label="Delete review"
         onClick={() => setOpen(true)}
-        className="text-white/60 transition-colors hover:text-red-300"
+        className="flex size-6 cursor-pointer items-center justify-center rounded-md text-white/60 transition-colors hover:text-red-300"
       >
         <Trash2 className="size-3.5" />
       </button>

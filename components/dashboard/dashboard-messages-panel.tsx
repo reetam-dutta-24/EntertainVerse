@@ -395,7 +395,7 @@ export function DashboardMessagesPanel() {
                         @{entry.peer.handle}
                       </p>
                       {entry.lastMessage ? (
-                        <p className="mt-0.5 truncate text-caption text-white/45">
+                        <p className="mt-0.5 truncate text-caption text-white/60">
                           {entry.lastMessage.content}
                         </p>
                       ) : null}

@@ -132,7 +132,7 @@ export function SmartCollectionIdeas({ initialIdeas }: { initialIdeas: SmartColl
           );
         })}
       </ul>
-      <p className="text-caption text-white/40">
+      <p className="text-caption text-white/60">
         Learned from your activity —{" "}
         <Link href="/dashboard/settings/ai" className="text-brand-pink hover:underline">
           see or switch off what the AI uses

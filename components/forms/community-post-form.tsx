@@ -190,7 +190,7 @@ export function EditCommunityPostButton({
         type="button"
         aria-label="Edit post"
         onClick={() => setOpen(true)}
-        className="text-white/60 transition-colors hover:text-white"
+        className="flex size-6 cursor-pointer items-center justify-center rounded-md text-white/60 transition-colors hover:text-white"
       >
         <Pencil className="size-3" />
       </button>
@@ -265,7 +265,7 @@ export function DeleteCommunityPostButton({
         type="button"
         aria-label="Delete post"
         onClick={() => setOpen(true)}
-        className="text-white/60 transition-colors hover:text-red-300"
+        className="flex size-6 cursor-pointer items-center justify-center rounded-md text-white/60 transition-colors hover:text-red-300"
       >
         <Trash2 className="size-3" />
       </button>

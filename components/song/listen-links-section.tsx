@@ -52,7 +52,7 @@ export function ListenLinksSection({ heading, query, links, inset = true }: List
           </li>
         ))}
       </ul>
-      <p className="text-caption text-white/40">
+      <p className="text-caption text-white/60">
         In-app playback uses official 30-second previews. Open a service for full tracks.
       </p>
     </section>

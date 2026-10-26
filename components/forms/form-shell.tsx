@@ -96,7 +96,7 @@ function Field({
       <span className="text-xs font-semibold uppercase tracking-wide text-white/55">
         {label}
       </span>
-      {hint ? <span className="text-xs text-white/40">{hint}</span> : null}
+      {hint ? <span className="text-xs text-white/60">{hint}</span> : null}
       {children}
     </label>
   );

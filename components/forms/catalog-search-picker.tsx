@@ -248,7 +248,7 @@ function CatalogSearchInput({
         ) : (
           <ul role="none" className="flex flex-col gap-0.5">
             {canBrowse && !loading ? (
-              <li aria-hidden="true" className="px-3 py-2 text-micro font-medium uppercase tracking-wide text-white/40">
+              <li aria-hidden="true" className="px-3 py-2 text-micro font-medium uppercase tracking-wide text-white/60">
                 Catalog artists
               </li>
             ) : null}
@@ -439,7 +439,7 @@ export function CatalogSearchPicker({
       )}
 
       {showHint && !value ? (
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-white/60">
           {adminSearch
             ? "Click to browse the catalog, or type to search by title or slug."
             : hint}
@@ -641,7 +641,7 @@ export function CatalogMultiSearchPicker({
       ) : null}
 
       {!atLimit ? (
-        <p className="text-xs text-white/40">
+        <p className="text-xs text-white/60">
           {values.length > 0
             ? `${values.length} selected — search again to add more.`
             : hint}
