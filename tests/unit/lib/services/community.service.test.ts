@@ -201,8 +201,12 @@ describe("joining", () => {
     await expect(c.joinCommunityByCode("third", code)).rejects.toThrow(new Forbidden("This community has reached its member limit."));
   });
 
-  // assertCommunityHasCapacity runs before the "already a member" check.
-  it.todo("re-joining a full community you're already in is a no-op, not an error");
+  it("re-joining a full community you're already in is a no-op, not an error", async () => {
+    const { code } = await privateRoom(2);
+    await c.joinCommunityByCode("second", code);
+    await expect(c.joinCommunityByCode("second", code)).resolves.toMatchObject({ joined: false });
+    expect(community("secret-room").memberCount).toBe(2);
+  });
 });
 
 describe("leaveCommunity", () => {
@@ -216,8 +220,18 @@ describe("leaveCommunity", () => {
     await expect(c.leaveCommunity("stranger", "club")).rejects.toThrow(new NotFound("You are not a member."));
   });
 
-  // Nothing stops the only admin leaving, which leaves a community no one can manage.
-  it.todo("the last admin can't leave without handing over the community");
+  it("the last admin can't leave without handing over the community", async () => {
+    await expect(c.leaveCommunity("admin", "club")).rejects.toThrow(
+      new Forbidden("You're the only admin. Delete the community instead of leaving it."),
+    );
+    expect(roleOf("admin", "club")).toBe("ADMIN");
+  });
+
+  it("lets an admin leave when another admin stays", async () => {
+    seedMember("co-admin", "club", "ADMIN");
+    await c.leaveCommunity("admin", "club");
+    expect(roleOf("admin", "club")).toBeUndefined();
+  });
 });
 
 describe("managing the community", () => {
@@ -238,9 +252,21 @@ describe("managing the community", () => {
     await expect(c.joinCommunityByCode("newbie", joinCode!)).rejects.toThrow("Invalid room code.");
   });
 
-  // Moderators pass updateCommunity's ADMIN/MODERATOR check for every field, while
-  // regenerating the code is admin-only and the code status says only admins canManage.
-  it.todo("only admins can change visibility, the room code or the member limit");
+  it.each([
+    ["visibility", { visibility: "PRIVATE" }],
+    ["the member limit", { memberLimit: 10 }],
+    ["the room code", { joinCode: "ROOM-MODMOD" }],
+  ])("only admins can change %s", async (_, input) => {
+    await expect(c.updateCommunity("mod", "club", input as never)).rejects.toThrow(
+      new Forbidden("Only admins can change visibility, the room code or the member limit."),
+    );
+    expect(community("club")).toMatchObject({ visibility: "PUBLIC", memberLimit: null, joinCodeHash: null });
+  });
+
+  it("lets a moderator save details when the access fields come back unchanged", async () => {
+    await c.updateCommunity("mod", "club", { name: "Club (mod edit)", visibility: "PUBLIC" } as never);
+    expect(community("club").name).toBe("Club (mod edit)");
+  });
 
   it("lets only admins delete the community", async () => {
     await expect(c.deleteCommunity("mod", "club")).rejects.toBeInstanceOf(NotFound);

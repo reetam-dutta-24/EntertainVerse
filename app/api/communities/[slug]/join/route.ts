@@ -48,6 +48,9 @@ export async function DELETE(_request: Request, context: RouteContext) {
     if (error instanceof CommunityNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 });
     }
+    if (error instanceof CommunityForbiddenError) {
+      return NextResponse.json({ error: error.message }, { status: 403 });
+    }
     console.error("[community join DELETE]", error);
     return NextResponse.json({ error: "Could not leave community." }, { status: 500 });
   }

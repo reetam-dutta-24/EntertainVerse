@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { requireUserApi } from "@/lib/api-auth";
 import { mapCommunityToCard } from "@/lib/mappers/community.mapper";
 import {
+  CommunityForbiddenError,
   CommunityNotFoundError,
   deleteCommunity,
   getCommunityDetailBySlug,
@@ -48,6 +49,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   } catch (error) {
     if (error instanceof CommunityNotFoundError) {
       return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+    if (error instanceof CommunityForbiddenError) {
+      return NextResponse.json({ error: error.message }, { status: 403 });
     }
     console.error("[communities PATCH]", error);
     return NextResponse.json(

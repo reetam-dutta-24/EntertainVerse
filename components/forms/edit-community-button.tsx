@@ -41,6 +41,8 @@ export function EditCommunityButton({
   trigger?: React.ReactNode;
 }) {
   const router = useAppRouter();
+  // Only admins decide who can get in (visibility, limit, room code).
+  const isAdmin = community.canDelete ?? false;
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(community.name);
   const [description, setDescription] = useState(community.description ?? "");
@@ -93,12 +95,12 @@ export function EditCommunityButton({
         name,
         description,
         category,
-        visibility,
         activityLevel,
         accent,
         imageUrl: imageUrl || "",
         wallpaperUrl: wallpaperUrl || "",
-        ...(visibility === "PRIVATE"
+        ...(isAdmin ? { visibility } : {}),
+        ...(isAdmin && visibility === "PRIVATE"
           ? { memberLimit: Number(memberLimit) || 50 }
           : {}),
       }),
@@ -162,8 +164,8 @@ export function EditCommunityButton({
                 ))}
               </SelectInput>
             </FormField>
-            <FormField label="Visibility">
-              <SelectInput value={visibility} onChange={(e) => setVisibility(e.target.value as "PUBLIC" | "PRIVATE")}>
+            <FormField label="Visibility" hint={isAdmin ? undefined : "Only admins can change this."}>
+              <SelectInput value={visibility} disabled={!isAdmin} onChange={(e) => setVisibility(e.target.value as "PUBLIC" | "PRIVATE")}>
                 <option value="PUBLIC">Public</option>
                 <option value="PRIVATE">Private</option>
               </SelectInput>
@@ -207,6 +209,7 @@ export function EditCommunityButton({
                   type="number"
                   min={2}
                   max={500}
+                  disabled={!isAdmin}
                   value={memberLimit}
                   onChange={(e) => setMemberLimit(e.target.value)}
                 />
@@ -214,7 +217,7 @@ export function EditCommunityButton({
               <CommunityJoinCodePanel
                 communitySlug={community.slug}
                 visibility="private"
-                canManage={community.canDelete ?? false}
+                canManage={isAdmin}
               />
             </>
           ) : null}

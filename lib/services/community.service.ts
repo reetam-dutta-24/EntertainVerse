@@ -117,12 +117,13 @@ async function addCommunityMember(
     slug: string;
   },
 ) {
-  await assertCommunityHasCapacity(community);
-
+  // Members re-joining are a no-op, even when the room is full.
   const existing = await prisma.communityMember.findUnique({
     where: { userId_communityId: { userId, communityId: community.id } },
   });
   if (existing) return { membership: existing, slug: community.slug, joined: false };
+
+  await assertCommunityHasCapacity(community);
 
   const membership = await prisma.communityMember.create({
     data: { userId, communityId: community.id, role: "MEMBER" },
@@ -301,6 +302,21 @@ export async function updateCommunity(
     include: { community: true },
   });
   if (!membership) throw new CommunityNotFoundError("Community not found.");
+
+  // Moderators edit the details; who can get in (visibility, room code, limit) is admin-only.
+  // Compared against current values because the edit form always resends them.
+  if (membership.role !== "ADMIN") {
+    const current = membership.community;
+    const changesAccess =
+      (input.visibility !== undefined && input.visibility !== current.visibility) ||
+      (input.memberLimit !== undefined && input.memberLimit !== current.memberLimit) ||
+      Boolean(input.joinCode?.trim());
+    if (changesAccess) {
+      throw new CommunityForbiddenError(
+        "Only admins can change visibility, the room code or the member limit.",
+      );
+    }
+  }
 
   const becomingPrivate = input.visibility === "PRIVATE";
   const becomingPublic = input.visibility === "PUBLIC";
@@ -484,6 +500,18 @@ export async function leaveCommunity(userId: string, slug: string) {
     where: { userId_communityId: { userId, communityId: community.id } },
   });
   if (!membership) throw new CommunityNotFoundError("You are not a member.");
+
+  // Admins can't be appointed, so the last one leaving would strand the community.
+  if (membership.role === "ADMIN") {
+    const admins = await prisma.communityMember.count({
+      where: { communityId: community.id, role: "ADMIN" },
+    });
+    if (admins <= 1) {
+      throw new CommunityForbiddenError(
+        "You're the only admin. Delete the community instead of leaving it.",
+      );
+    }
+  }
 
   await prisma.communityMember.delete({
     where: { userId_communityId: { userId, communityId: community.id } },
