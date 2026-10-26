@@ -22,6 +22,10 @@ test("the load balancer spreads visitors across both servers", async ({ request 
 test("a DM sent through server A arrives live for a user connected to server B", async () => {
   const aisha = await signInApi(A, AISHA.email);
   const vikram = await signInApi(B, VIKRAM.email);
+  // Only friends can message: Aisha's follow sends a request, Vikram's follow back accepts it.
+  await aisha.api.post(`/api/users/${VIKRAM.handle}/follow`);
+  const accepted = await vikram.api.post(`/api/users/${AISHA.handle}/follow`);
+  expect((await accepted.json()).friendStatus).toBe("friends");
   const vikramTab = await connect(B, vikram.cookie);
 
   const text = `cross-server hello ${Date.now()}`;

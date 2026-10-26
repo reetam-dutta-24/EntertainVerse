@@ -13,9 +13,11 @@ export default defineConfig({
   outputDir: "test-results",
   fullyParallel: true,
   forbidOnly: CI,
-  retries: CI ? 2 : 0,
+  // The stack (six containers) shares this machine with the browsers: freshly booted servers
+  // under load occasionally miss a 30s deadline, so give each test one more go there.
+  retries: CI ? 2 : E2E_STACK ? 1 : 0,
   // The app server runs on the same machine; more workers just starve it of CPU.
-  workers: CI ? 2 : 4,
+  workers: CI || E2E_STACK ? 2 : 4,
   timeout: 30_000,
   expect: { timeout: 10_000 },
   reporter: CI ? [["github"], ["html", { open: "never" }]] : [["list"], ["html", { open: "never" }]],
