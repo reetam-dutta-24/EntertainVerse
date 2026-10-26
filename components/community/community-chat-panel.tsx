@@ -7,6 +7,7 @@ import { getCommunityChatTheme } from "@/lib/community-chat-theme";
 import { useCommunityChat } from "@/hooks/use-community-chat";
 import { ChatMessageRow } from "@/components/community/chat-message-row";
 import { ChatInput } from "@/components/community/chat-input";
+import { typingLabel } from "@/hooks/use-typing";
 import type { AccentColor } from "@/lib/catalog-enums";
 
 interface CommunityChatPanelProps {
@@ -68,7 +69,7 @@ export function CommunityChatPanel({
   const enabled = Boolean(viewerUserId && isMember);
   const theme = useMemo(() => getCommunityChatTheme(accent), [accent]);
 
-  const { messages, loading, connected, error, sendMessage, updateMessage, deleteMessage } =
+  const { messages, loading, connected, error, sendMessage, updateMessage, deleteMessage, typers, notifyTyping } =
     useCommunityChat({
     communitySlug,
     channel,
@@ -136,10 +137,14 @@ export function CommunityChatPanel({
         {error ? (
           <p className="mb-2 text-xs font-medium text-red-300">{error}</p>
         ) : null}
+        <p className="mb-1.5 h-4 text-xs font-medium italic" style={{ color: theme.mutedText }} aria-live="polite">
+          {typingLabel(typers)}
+        </p>
         <ChatInput
           placeholder={placeholder}
           disabled={!connected}
           onSend={sendMessage}
+          onTyping={notifyTyping}
           theme={theme}
         />
       </div>

@@ -15,6 +15,7 @@ import { communityChatSendSchema } from "@/lib/validators/community-chat";
 import { setSocketServer } from "@/lib/socket/io-instance";
 import { userRoom } from "@/lib/realtime/rooms";
 import { registerPartyHandlers } from "@/lib/socket/parties";
+import { registerPresenceHandlers } from "@/lib/socket/presence";
 
 interface ChatJoinPayload {
   communitySlug: string;
@@ -111,6 +112,8 @@ export function attachSocketServer(httpServer: HttpServer) {
     void socket.join(userRoom(userId));
     // Watch / listen parties and talk rooms.
     registerPartyHandlers(io, socket, userId);
+    // Online status and typing indicators.
+    registerPresenceHandlers(io, socket, userId);
 
     socket.on("chat:join", async (payload: unknown) => {
       const parsed = parseJoinPayload(payload);

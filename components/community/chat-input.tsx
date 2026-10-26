@@ -24,6 +24,8 @@ export interface ChatInputProps {
   placeholder?: string;
   disabled?: boolean;
   onSend?: (payload: ChatSendPayload) => void;
+  /** Called on each keystroke — drives "is typing…" for others. */
+  onTyping?: () => void;
   theme?: CommunityChatTheme;
   className?: string;
 }
@@ -66,6 +68,7 @@ export function ChatInput({
   placeholder = "Send a message...",
   disabled = false,
   onSend,
+  onTyping,
   theme,
   className,
 }: ChatInputProps) {
@@ -290,7 +293,10 @@ export function ChatInput({
         <input
           type="text"
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => {
+            setValue(e.target.value);
+            if (e.target.value) onTyping?.();
+          }}
           placeholder={placeholder}
           disabled={disabled || uploading}
           className="h-full flex-1 bg-transparent text-sm font-medium placeholder:text-white/55 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink"

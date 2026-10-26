@@ -7,6 +7,7 @@ import type { CommunityChatChannelId } from "@/lib/community-chat";
 import { getSocketUrl } from "@/lib/env/socket";
 import type { ChatAttachment } from "@/lib/chat-emojis";
 import type { ChatMessage } from "@/types";
+import { useTypers, useTypingSender } from "@/hooks/use-typing";
 
 interface UseCommunityChatOptions {
   communitySlug: string;
@@ -39,6 +40,10 @@ export function useCommunityChat({
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string>();
   const socketRef = useRef<Socket | null>(null);
+  const { typers, applyTyping, clearTypers } = useTypers();
+  const { onInput: notifyTyping, stop: stopTyping } = useTypingSender((value) =>
+    socketRef.current?.emit("chat:typing", { communitySlug, channel, typing: value }),
+  );
 
   // Reset the loading/error state whenever the chat target changes.
   useOnValueChange(`${communitySlug}|${channel}|${viewerUserId}|${enabled}`, () => {
@@ -116,7 +121,14 @@ export function useCommunityChat({
       );
     });
 
+    socket.on("chat:typing", (payload: { userId: string; name?: string; typing: boolean }) => {
+      if (payload.userId === viewerUserId) return;
+      applyTyping({ userId: payload.userId, name: payload.name }, payload.typing);
+    });
+
     socket.on("chat:message", (message: ChatMessage) => {
+      // Their message landed — they're done typing.
+      applyTyping({ userId: message.author.id }, false);
       setMessages((current) => {
         if (current.some((item) => item.id === message.id)) return current;
         return [...current, withViewerFlags(message, viewerUserId)];
@@ -148,8 +160,9 @@ export function useCommunityChat({
       socket.emit("chat:leave", { communitySlug, channel });
       socket.disconnect();
       socketRef.current = null;
+      clearTypers();
     };
-  }, [communitySlug, channel, enabled, viewerUserId]);
+  }, [communitySlug, channel, enabled, viewerUserId, applyTyping, clearTypers]);
 
   const sendMessage = useCallback(
     (payload: { content: string; attachment?: ChatAttachment }) => {
@@ -164,8 +177,9 @@ export function useCommunityChat({
         content: trimmed,
         attachment: payload.attachment,
       });
+      stopTyping();
     },
-    [communitySlug, channel],
+    [communitySlug, channel, stopTyping],
   );
 
   const updateMessage = useCallback(
@@ -244,5 +258,9 @@ export function useCommunityChat({
     sendMessage,
     updateMessage,
     deleteMessage,
+    /** Others typing in this channel right now. */
+    typers,
+    /** Call on each keystroke in the composer. */
+    notifyTyping,
   };
 }

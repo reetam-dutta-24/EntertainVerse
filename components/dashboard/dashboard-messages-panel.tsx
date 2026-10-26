@@ -9,6 +9,7 @@ import { Pencil, Trash2, MessagesSquare } from "lucide-react";
 import { DmUserAvatar } from "@/components/messages/dm-user-avatar";
 import { refreshMessagesUnread } from "@/lib/messages-store";
 import { EmptyState } from "@/components/ui/empty-state";
+import { useTypers, useTypingSender } from "@/hooks/use-typing";
 
 interface DmPeer {
   id: string;
@@ -43,6 +44,18 @@ interface DmMessage {
   sender?: DmPeer;
 }
 
+/** Avatar with a green dot while that person is online. */
+function WithPresence({ online, children }: { online: boolean; children: React.ReactNode }) {
+  return (
+    <span className="relative inline-flex shrink-0">
+      {children}
+      {online ? (
+        <span className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-[#120a24] bg-emerald-400" aria-label="Online" />
+      ) : null}
+    </span>
+  );
+}
+
 function UnreadBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
@@ -66,6 +79,15 @@ export function DashboardMessagesPanel() {
   const [editingId, setEditingId] = useState<string>();
   const [editDraft, setEditDraft] = useState("");
   const socketRef = useRef<Socket | null>(null);
+  // Latest values for the socket handlers, which live for the panel's whole lifetime.
+  const activeIdRef = useRef(activeId);
+  const conversationsRef = useRef(conversations);
+  const [onlineIds, setOnlineIds] = useState<Set<string>>(() => new Set());
+  const { typers, applyTyping, clearTypers } = useTypers();
+  const { onInput: notifyTyping, stop: stopTyping } = useTypingSender((typing) => {
+    const conversationId = activeIdRef.current;
+    if (conversationId) socketRef.current?.emit("dm:typing", { conversationId, typing });
+  });
 
   const activeConversation = useMemo(
     () => conversations.find((entry) => entry.id === activeId),
@@ -119,9 +141,7 @@ export function DashboardMessagesPanel() {
     if (id) setActiveId(id);
   });
 
-  // Latest values for the socket handlers below, which live for the panel's whole lifetime.
-  const activeIdRef = useRef(activeId);
-  const conversationsRef = useRef(conversations);
+  // Keep the socket handlers' view of the open conversation and list current.
   useEffect(() => {
     activeIdRef.current = activeId;
     conversationsRef.current = conversations;
@@ -149,8 +169,25 @@ export function DashboardMessagesPanel() {
       if (activeIdRef.current) socket.emit("dm:join", { conversationId: activeIdRef.current });
     });
 
+    const watchPeers = () =>
+      socket.emit("presence:watch", { userIds: conversationsRef.current.map((entry) => entry.peer.id) });
+    socket.on("connect", watchPeers);
+    socket.on("presence:state", ({ online }: { online: string[] }) => setOnlineIds(new Set(online)));
+    socket.on("presence:update", ({ userId, online }: { userId: string; online: boolean }) =>
+      setOnlineIds((current) => {
+        const next = new Set(current);
+        if (online) next.add(userId);
+        else next.delete(userId);
+        return next;
+      }),
+    );
+    socket.on("dm:typing", ({ conversationId, userId, typing }: { conversationId: string; userId: string; typing: boolean }) => {
+      if (conversationId === activeIdRef.current) applyTyping({ userId }, typing);
+    });
+
     socket.on("dm:message", (raw: DmMessage) => {
       const message = withOwnFlag(raw);
+      applyTyping({ userId: message.senderId }, false);
       if (message.conversationId === activeIdRef.current) {
         setMessages((current) => (current.some((entry) => entry.id === message.id) ? current : [...current, message]));
       }
@@ -174,7 +211,14 @@ export function DashboardMessagesPanel() {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [loadConversations]);
+  }, [loadConversations, applyTyping]);
+
+  // Watch the online status of everyone in the list (re-sent when the list changes).
+  const peerIds = conversations.map((entry) => entry.peer.id).join(",");
+  useEffect(() => {
+    const socket = socketRef.current;
+    if (socket?.connected && peerIds) socket.emit("presence:watch", { userIds: peerIds.split(",") });
+  }, [peerIds]);
 
   // Load the open conversation and join its room (for typing indicators and reads).
   useEffect(() => {
@@ -185,9 +229,11 @@ export function DashboardMessagesPanel() {
     const socket = socketRef.current;
     if (socket?.connected) socket.emit("dm:join", { conversationId: activeId });
     return () => {
+      stopTyping();
+      clearTypers();
       socketRef.current?.emit("dm:leave", { conversationId: activeId });
     };
-  }, [activeId, loadMessages]);
+  }, [activeId, loadMessages, stopTyping, clearTypers]);
 
   async function handleSend(event: React.FormEvent) {
     event.preventDefault();
@@ -263,6 +309,7 @@ export function DashboardMessagesPanel() {
         }
       }
     } finally {
+      stopTyping();
       setSending(false);
     }
   }
@@ -325,14 +372,16 @@ export function DashboardMessagesPanel() {
                       isActive ? "bg-white/15" : "hover:bg-white/8"
                     } ${unread > 0 && !isActive ? "border border-brand-magenta/30" : ""}`}
                   >
-                    <DmUserAvatar
-                      name={entry.peer.name}
-                      avatarColor={entry.peer.avatarColor}
-                      avatarUrl={entry.peer.avatarUrl}
-                      size="sm"
-                      profileHandle={entry.peer.handle}
-                      nestedLink
-                    />
+                    <WithPresence online={onlineIds.has(entry.peer.id)}>
+                      <DmUserAvatar
+                        name={entry.peer.name}
+                        avatarColor={entry.peer.avatarColor}
+                        avatarUrl={entry.peer.avatarUrl}
+                        size="sm"
+                        profileHandle={entry.peer.handle}
+                        nestedLink
+                      />
+                    </WithPresence>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <p
@@ -364,13 +413,15 @@ export function DashboardMessagesPanel() {
       <section className="flex min-h-[60vh] flex-col rounded-2xl border border-white/10 bg-white/5">
         <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
           {activeConversation ? (
-            <DmUserAvatar
-              name={activeConversation.peer.name}
-              avatarColor={activeConversation.peer.avatarColor}
-              avatarUrl={activeConversation.peer.avatarUrl}
-              size="sm"
-              profileHandle={activeConversation.peer.handle}
-            />
+            <WithPresence online={onlineIds.has(activeConversation.peer.id)}>
+              <DmUserAvatar
+                name={activeConversation.peer.name}
+                avatarColor={activeConversation.peer.avatarColor}
+                avatarUrl={activeConversation.peer.avatarUrl}
+                size="sm"
+                profileHandle={activeConversation.peer.handle}
+              />
+            </WithPresence>
           ) : null}
           <div className="min-w-0">
             <h2 className="truncate text-sm font-semibold text-white">
@@ -378,8 +429,14 @@ export function DashboardMessagesPanel() {
                 (targetHandle ? `@${targetHandle}` : "Select a conversation")}
             </h2>
             {activeConversation ? (
-              <p className="truncate text-caption text-white/55">
-                @{activeConversation.peer.handle}
+              <p className="truncate text-caption text-white/55" aria-live="polite">
+                {typers.length > 0 ? (
+                  <span className="font-medium text-brand-pink">typing…</span>
+                ) : onlineIds.has(activeConversation.peer.id) ? (
+                  <span className="text-emerald-300">Online</span>
+                ) : (
+                  <>@{activeConversation.peer.handle}</>
+                )}
               </p>
             ) : null}
           </div>
@@ -486,7 +543,10 @@ export function DashboardMessagesPanel() {
           <div className="flex gap-2">
             <input
               value={draft}
-              onChange={(event) => setDraft(event.target.value)}
+              onChange={(event) => {
+                setDraft(event.target.value);
+                if (event.target.value) notifyTyping();
+              }}
               placeholder={
                 activeConversation || targetHandle
                   ? "Write a message…"

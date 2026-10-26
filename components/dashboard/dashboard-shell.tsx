@@ -6,6 +6,7 @@ import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
 import type { DashboardUser } from "@/components/dashboard/user-profile-menu";
 import { MatchInvitePopup } from "@/components/ai-mode/match-invite-popup";
+import { PresenceConnection } from "@/components/realtime/presence-connection";
 import { AssistantProvider, useAssistant } from "@/components/assistant/assistant-context";
 import { AssistantLauncher, AssistantPanel } from "@/components/assistant/assistant-panel";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ function ShellLayout({ user, children }: DashboardShellProps) {
   return (
     <div className="min-h-dvh bg-background">
       <MatchInvitePopup />
+      <PresenceConnection />
       <DashboardSidebar
         user={user}
         mobileOpen={navOpen}

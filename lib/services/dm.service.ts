@@ -16,8 +16,8 @@ async function areCircleMates(userAId: string, userBId: string) {
   return shared > 0;
 }
 
-/** DMs are for friends — and for people in your AI Match circles. */
-async function canDirectMessage(userAId: string, userBId: string) {
+/** DMs are for friends — and for people in your AI Match circles. (Also decides who may see your online status.) */
+export async function canDirectMessage(userAId: string, userBId: string) {
   return (await areUsersFriends(userAId, userBId)) || (await areCircleMates(userAId, userBId));
 }
 
