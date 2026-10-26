@@ -136,7 +136,7 @@ function TagListEditor({
     <Field label={label}>
       <div className="flex gap-2">
         <input
-          className={`${inputClass} flex-1`}
+          className={`${inputClass} min-w-0 flex-1`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
@@ -150,7 +150,7 @@ function TagListEditor({
         <button
           type="button"
           onClick={add}
-          className="cursor-pointer rounded-xl border border-white/20 px-4 text-sm font-medium text-white hover:bg-white/10"
+          className="shrink-0 cursor-pointer rounded-xl border border-white/20 px-4 text-sm font-medium text-white hover:bg-white/10"
         >
           Add
         </button>
@@ -339,7 +339,7 @@ export function ContentForm({ mode, contentId, initial, ai = { enabled: false, t
           notice={
             ai.tmdbEnabled ? null : (
               <>
-                Only anime sources are on. Add <code className="font-mono">TMDB_API_KEY</code> for movies, shows and K-dramas.
+                Only anime sources are on. Add <code className="break-all font-mono">TMDB_API_KEY</code> for movies, shows and K-dramas.
               </>
             )
           }

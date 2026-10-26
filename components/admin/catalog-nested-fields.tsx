@@ -119,7 +119,7 @@ export function TagListEditor({
     <Field label={label} hint={hint}>
       <div className="flex gap-2">
         <input
-          className={`${inputClass} flex-1`}
+          className={`${inputClass} min-w-0 flex-1`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
@@ -133,7 +133,7 @@ export function TagListEditor({
         <button
           type="button"
           onClick={add}
-          className="cursor-pointer rounded-xl border border-white/20 px-4 text-sm font-medium text-white hover:bg-white/10"
+          className="shrink-0 cursor-pointer rounded-xl border border-white/20 px-4 text-sm font-medium text-white hover:bg-white/10"
         >
           Add
         </button>

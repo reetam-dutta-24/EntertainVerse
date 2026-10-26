@@ -96,8 +96,8 @@ export function CatalogImportPanel<R>({
 
       {!aiEnabled ? (
         <p className="rounded-xl border border-amber-300/30 bg-amber-300/[0.08] px-4 py-3 text-xs text-amber-100">
-          AI import needs a model key. Add <code className="font-mono">GEMINI_API_KEY</code> (free, from Google AI
-          Studio) or <code className="font-mono">ANTHROPIC_API_KEY</code> to <code className="font-mono">.env.local</code>{" "}
+          AI import needs a model key. Add <code className="break-all font-mono">GEMINI_API_KEY</code> (free, from Google AI
+          Studio) or <code className="break-all font-mono">ANTHROPIC_API_KEY</code> to <code className="break-all font-mono">.env.local</code>{" "}
           and restart the server.
         </p>
       ) : (
