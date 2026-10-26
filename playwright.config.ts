@@ -1,11 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
-import { E2E_APP_ENV, E2E_BASE_URL } from "./tests/e2e/support/env";
+import { E2E_APP_ENV, E2E_BASE_URL, E2E_STACK } from "./tests/e2e/support/env";
 
 const CI = Boolean(process.env.CI);
 
 /**
  * E2E tests run against a production build (`next build` + the custom Socket.IO server),
  * the same thing that's deployed. Reset the database first: `npm run test:e2e` does both.
+ * `npm run test:e2e:stack` runs them against two servers behind a load balancer instead.
  */
 export default defineConfig({
   testDir: "tests/e2e",
@@ -26,10 +27,19 @@ export default defineConfig({
   projects: [
     // Signs the demo user in once; tests that need a session reuse it.
     { name: "setup", testMatch: /.*\.setup\.ts/ },
-    { name: "desktop", use: { ...devices["Desktop Chrome"] }, dependencies: ["setup"], testIgnore: /.*\.mobile\.spec\.ts/ },
+    { name: "desktop", use: { ...devices["Desktop Chrome"] }, dependencies: ["setup"], testIgnore: [/.*\.mobile\.spec\.ts/, /.*\.stack\.spec\.ts/] },
     { name: "mobile", use: { ...devices["Pixel 7"] }, dependencies: ["setup"], testMatch: /.*\.mobile\.spec\.ts/ },
+    ...(E2E_STACK
+      ? [
+          // Users on different servers: realtime, uploads and caches must still agree.
+          { name: "multi-server", testMatch: /multi-server\.stack\.spec\.ts/ },
+          // Stops a server, so it runs last, after everything else is done with it.
+          { name: "failover", testMatch: /failover\.stack\.spec\.ts/, dependencies: ["desktop", "mobile", "multi-server"] },
+        ]
+      : []),
   ],
-  webServer: {
+  // The stack is already running (docker compose); otherwise build and start one server.
+  webServer: E2E_STACK ? undefined : {
     command: "npm run build && npx tsx server.ts",
     url: `${E2E_BASE_URL}/login`,
     env: { ...E2E_APP_ENV, NODE_ENV: "production" },

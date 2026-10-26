@@ -22,7 +22,6 @@ import {
 import { getCommunityMemberPreview } from "@/lib/data/community";
 import { getOptionalUser } from "@/lib/data/user";
 import {
-  getAllContentIds,
   getContentDetail,
 } from "@/lib/data/content-detail";
 import { isContentFavorited } from "@/lib/services/favorite.service";
@@ -31,11 +30,6 @@ import { ContentWatchOptions } from "@/components/content/content-watch-options"
 
 interface ContentPageProps {
   params: Promise<{ contentid: string }>;
-}
-
-export async function generateStaticParams() {
-  const ids = await getAllContentIds();
-  return ids.map((contentid) => ({ contentid }));
 }
 
 export async function generateMetadata({

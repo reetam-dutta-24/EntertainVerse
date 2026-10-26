@@ -11,17 +11,12 @@ import { ListenLinksSection } from "@/components/song/listen-links-section";
 import { SongRelatedCatalogSection } from "@/components/song/song-related-catalog-section";
 import { getCommunityMemberPreview } from "@/lib/data/community";
 import { getOptionalUser } from "@/lib/data/user";
-import { getAllSongIds, getSongDetail } from "@/lib/data/song-detail";
+import { getSongDetail } from "@/lib/data/song-detail";
 import { isTrackFavorited } from "@/lib/services/favorite.service";
 import { isContentOnWatchlist } from "@/lib/services/watchlist.service";
 
 interface SongPageProps {
   params: Promise<{ songid: string }>;
-}
-
-export async function generateStaticParams() {
-  const ids = await getAllSongIds();
-  return ids.map((songid) => ({ songid }));
 }
 
 export async function generateMetadata({

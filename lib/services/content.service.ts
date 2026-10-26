@@ -269,14 +269,6 @@ export async function listCatalogContent(options: {
   };
 }
 
-export async function listAllContentSlugs() {
-  const rows = await prisma.content.findMany({
-    select: { slug: true },
-    orderBy: { title: "asc" },
-  });
-  return rows.map((row) => row.slug);
-}
-
 export async function getContentRecordById(id: string) {
   return prisma.content.findUnique({
     where: { id },

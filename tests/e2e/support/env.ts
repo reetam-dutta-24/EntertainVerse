@@ -4,11 +4,22 @@
  * the dev database are never touched.
  */
 
-export const E2E_PORT = Number(process.env.E2E_PORT ?? 3100);
-export const E2E_BASE_URL = `http://localhost:${E2E_PORT}`;
+/**
+ * `npm run test:e2e:stack`: the app runs as two servers (Docker) behind a load balancer,
+ * like production — see docker-compose.e2e.yml. Otherwise one server, started by Playwright.
+ */
+export const E2E_STACK = process.env.E2E_STACK === "1";
 
-/** Local default matches `npm run e2e:db`; CI passes its Postgres service URL. */
-export const E2E_DATABASE_URL = process.env.E2E_DATABASE_URL ?? "postgresql://test:test@localhost:55433/entertainverse_e2e";
+export const E2E_PORT = Number(process.env.E2E_PORT ?? 3100);
+export const E2E_BASE_URL = E2E_STACK ? "http://localhost:8080" : `http://localhost:${E2E_PORT}`;
+
+/** Each app server of the stack directly, skipping the load balancer. */
+export const E2E_SERVERS = { a: "http://localhost:3201", b: "http://localhost:3202" } as const;
+
+/** Local default matches `npm run e2e:db` (or the stack's Postgres); CI passes its service URL. */
+export const E2E_DATABASE_URL =
+  process.env.E2E_DATABASE_URL ??
+  `postgresql://test:test@localhost:${E2E_STACK ? 55434 : 55433}/entertainverse_e2e`;
 
 /** Environment for the app under test (overrides .env / .env.local, which Next also loads). */
 export const E2E_APP_ENV: Record<string, string> = {

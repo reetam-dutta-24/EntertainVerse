@@ -597,14 +597,6 @@ export async function getCollectionDetailBySlug(
   return { ...detail, viewerCanEditItems: canEditCollectionItems(row, viewerUserId) };
 }
 
-export async function listAllCollectionSlugs() {
-  const rows = await prisma.collection.findMany({
-    select: { slug: true },
-    orderBy: { updatedAt: "desc" },
-  });
-  return rows.map((row) => row.slug);
-}
-
 export class CollectionNotFoundError extends Error {
   constructor(message: string) {
     super(message);

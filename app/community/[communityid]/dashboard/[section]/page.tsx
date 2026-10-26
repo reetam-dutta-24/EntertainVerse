@@ -6,23 +6,12 @@ import {
   isCommunityDashboardSection,
 } from "@/lib/community-routes";
 import {
-  getAllCommunityIds,
   getCommunityDetail,
 } from "@/lib/data/community-detail";
 import { getOptionalUser } from "@/lib/data/user";
 
 interface CommunityDashboardSectionPageProps {
   params: Promise<{ communityid: string; section: string }>;
-}
-
-export async function generateStaticParams() {
-  const ids = await getAllCommunityIds();
-  return ids.flatMap((communityid) =>
-    COMMUNITY_DASHBOARD_SECTIONS.map((section) => ({
-      communityid,
-      section,
-    })),
-  );
 }
 
 export async function generateMetadata({

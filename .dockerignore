@@ -1,0 +1,27 @@
+# Installed and built inside the image.
+node_modules
+.next
+
+# Secrets never go into an image: configuration comes from the environment at run time.
+.env*
+
+# User uploads live in S3 (or a volume), not in the image.
+public/uploads/*
+!public/uploads/.gitkeep
+
+.git
+.github
+.claude
+.vscode
+coverage
+playwright-report
+test-results
+# Tests and the tooling that runs them aren't part of the app.
+tests
+playwright.config.ts
+vitest.config.*
+scripts/e2e-*
+*.tmp.*
+*.log
+Dockerfile
+docker-compose*.yml

@@ -137,14 +137,6 @@ export async function getArtistRecordBySlug(slug: string) {
   });
 }
 
-export async function listAllArtistSlugs() {
-  const rows = await prisma.artist.findMany({
-    select: { slug: true },
-    orderBy: { title: "asc" },
-  });
-  return rows.map((r) => r.slug);
-}
-
 export async function createCatalogArtist(input: ArtistFormInput) {
   const row = await prisma.artist.create({
     data: toArtistData(input),

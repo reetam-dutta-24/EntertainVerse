@@ -10,7 +10,6 @@ import {
   MusicCarouselSection,
 } from "@/components/dashboard";
 import {
-  getAllCommunityIds,
   getCommunityDetail,
 } from "@/lib/data/community-detail";
 import { getUserReviewsForTarget } from "@/lib/services/review.service";
@@ -19,11 +18,6 @@ import { getOptionalUser } from "@/lib/data/user";
 
 interface CommunityPageProps {
   params: Promise<{ communityid: string }>;
-}
-
-export async function generateStaticParams() {
-  const ids = await getAllCommunityIds();
-  return ids.map((communityid) => ({ communityid }));
 }
 
 export async function generateMetadata({

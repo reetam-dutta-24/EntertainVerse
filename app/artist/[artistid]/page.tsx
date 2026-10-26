@@ -9,17 +9,12 @@ import {
 } from "@/components/content";
 import { MusicCarouselSection, MusicGridSection } from "@/components/dashboard";
 import { ListenLinksSection } from "@/components/song/listen-links-section";
-import { getAllArtistIds, getArtistDetail } from "@/lib/data/artist-detail";
+import { getArtistDetail } from "@/lib/data/artist-detail";
 import { getCommunityMemberPreview } from "@/lib/data/community";
 import { getOptionalUser } from "@/lib/data/user";
 
 interface ArtistPageProps {
   params: Promise<{ artistid: string }>;
-}
-
-export async function generateStaticParams() {
-  const ids = await getAllArtistIds();
-  return ids.map((artistid) => ({ artistid }));
 }
 
 export async function generateMetadata({

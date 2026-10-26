@@ -8,7 +8,6 @@ import type { TrackRecordFull } from "@/lib/services/music.service";
 import {
   getTrackEngagementStats,
   getTrackRecordBySlug,
-  listAllTrackSlugs,
 } from "@/lib/services/music.service";
 import {
   findSimilarTracks,
@@ -439,12 +438,3 @@ export async function getSongDetail(
   return buildDetailFromTrack(track, tracks);
 }
 
-export async function getAllSongIds(): Promise<string[]> {
-  const dbSlugs = await listAllTrackSlugs().catch(() => [] as string[]);
-  const tracks = await allMusicTracks();
-  const slugs = new Set<string>(dbSlugs);
-  for (const track of tracks) {
-    slugs.add(normalizeSongSlug(track.id));
-  }
-  return [...slugs];
-}

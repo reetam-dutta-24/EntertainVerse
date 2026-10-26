@@ -789,14 +789,6 @@ export async function getCommunityDetailBySlug(
   });
 }
 
-export async function listAllCommunitySlugs() {
-  const rows = await prisma.community.findMany({
-    select: { slug: true },
-    orderBy: { updatedAt: "desc" },
-  });
-  return rows.map((row) => row.slug);
-}
-
 export { mapCommunityPost };
 
 export async function listUserJoinedCommunities(userId: string) {

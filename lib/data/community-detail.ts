@@ -1,6 +1,5 @@
 import {
   getCommunityDetailBySlug,
-  listAllCommunitySlugs,
 } from "@/lib/services/community.service";
 import type { CommunityDetail } from "@/types";
 import { normalizeCommunitySlug } from "@/lib/community-routes";
@@ -8,10 +7,6 @@ import { normalizeCommunitySlug } from "@/lib/community-routes";
 /**
  * Community detail — backed by PostgreSQL.
  */
-
-export async function getAllCommunityIds(): Promise<string[]> {
-  return listAllCommunitySlugs();
-}
 
 export async function getCommunityDetail(
   communityId: string,

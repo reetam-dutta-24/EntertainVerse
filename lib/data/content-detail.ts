@@ -4,7 +4,6 @@ import {
   getContentEngagementStats,
   getContentItemBySlug,
   getContentRecordBySlug,
-  listAllContentSlugs,
 } from "@/lib/services/content.service";
 import { mapContentRecordToDetail } from "@/lib/mappers/content-detail.mapper";
 import {
@@ -760,6 +759,3 @@ export async function getContentDetail(
 }
 
 /** List of known content IDs for static generation / sitemap. */
-export async function getAllContentIds(): Promise<string[]> {
-  return listAllContentSlugs();
-}

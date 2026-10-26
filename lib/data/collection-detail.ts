@@ -1,6 +1,5 @@
 import {
   getCollectionDetailBySlug,
-  listAllCollectionSlugs,
 } from "@/lib/services/collection.service";
 import type { CollectionDetail } from "@/types";
 import { normalizeCollectionSlug } from "@/lib/collection-routes";
@@ -8,10 +7,6 @@ import { normalizeCollectionSlug } from "@/lib/collection-routes";
 /**
  * Collection detail — backed by PostgreSQL.
  */
-
-export async function getAllCollectionIds(): Promise<string[]> {
-  return listAllCollectionSlugs();
-}
 
 export async function getCollectionDetail(
   collectionId: string,

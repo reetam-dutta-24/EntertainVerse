@@ -13,7 +13,6 @@ import { normalizeArtistSlug } from "@/lib/artist-routes";
 import { mapArtistRecordToDetail } from "@/lib/mappers/artist-detail.mapper";
 import {
   getArtistRecordBySlug,
-  listAllArtistSlugs,
 } from "@/lib/services/artist.service";
 import { isArtistFollowed, getArtistFollowerPreview } from "@/lib/services/artist-follow.service";
 import { isArtistFavorited } from "@/lib/services/favorite.service";
@@ -354,13 +353,6 @@ const twiceDetail: ArtistDetail = {
 const curatedById: Record<string, ArtistDetail> = {
   twice: twiceDetail,
 };
-
-export async function getAllArtistIds(): Promise<string[]> {
-  const dbSlugs = await listAllArtistSlugs().catch(() => [] as string[]);
-  const ids = new Set<string>(dbSlugs);
-  for (const key of Object.keys(curatedById)) ids.add(key);
-  return [...ids];
-}
 
 export async function getArtistDetail(
   artistid: string,

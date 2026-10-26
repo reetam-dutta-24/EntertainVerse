@@ -18,7 +18,6 @@ import { getCollectionPlayPath } from "@/lib/collection-routes";
 import { getCommunityMemberPreview } from "@/lib/data/community";
 import { getOptionalUser } from "@/lib/data/user";
 import {
-  getAllCollectionIds,
   getCollectionDetail,
 } from "@/lib/data/collection-detail";
 import { isCollectionFavorited } from "@/lib/services/favorite.service";
@@ -26,11 +25,6 @@ import { isCollectionFollowed } from "@/lib/services/collection-follow.service";
 
 interface CollectionPageProps {
   params: Promise<{ collectionid: string }>;
-}
-
-export async function generateStaticParams() {
-  const ids = await getAllCollectionIds();
-  return ids.map((collectionid) => ({ collectionid }));
 }
 
 export async function generateMetadata({

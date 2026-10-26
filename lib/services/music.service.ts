@@ -177,14 +177,6 @@ export async function getTrackRecordBySlug(slug: string) {
   });
 }
 
-export async function listAllTrackSlugs() {
-  const rows = await prisma.musicTrack.findMany({
-    select: { slug: true },
-    orderBy: { title: "asc" },
-  });
-  return rows.map((r) => r.slug);
-}
-
 export async function createCatalogTrack(input: MusicFormInput) {
   const row = await prisma.musicTrack.create({
     data: await toTrackData(input),
