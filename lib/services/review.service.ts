@@ -231,16 +231,22 @@ export async function createReview(
 
   const targetMeta = await resolveTargetMeta(target, targetId);
 
-  const row = await prisma.review.create({
-    data: {
-      author: { connect: { id: userId } },
-      rating: roundRating(input.rating) ?? 0,
-      headline: input.headline?.trim() || null,
-      body: input.body.trim(),
-      ...targetData(target, targetId),
-    },
-    include: reviewInclude,
-  });
+  const row = await prisma.review
+    .create({
+      data: {
+        author: { connect: { id: userId } },
+        rating: roundRating(input.rating) ?? 0,
+        headline: input.headline?.trim() || null,
+        body: input.body.trim(),
+        ...targetData(target, targetId),
+      },
+      include: reviewInclude,
+    })
+    .catch((error: unknown) => {
+      // A simultaneous second submit passes the check above; the unique index stops it.
+      if ((error as { code?: string } | null)?.code === "P2002") throw new ReviewConflictError();
+      throw error;
+    });
 
   await notifyReviewPublished({
     userId,

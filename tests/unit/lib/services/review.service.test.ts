@@ -70,9 +70,13 @@ describe.each(TARGETS)("reviews of a %s", (target, model, foreignKey, relation, 
   });
 });
 
-// No @@unique on Review(authorId, target), so two simultaneous submits both pass the
-// findFirst check — needs a database to show; see integration tests.
-it.todo("the database rejects a second review by the same user (unique constraint)");
+// Two simultaneous submits both pass the findFirst check; the unique index on
+// (authorId, target) rejects the second, and that surfaces as the same conflict.
+it("treats a unique-constraint race as 'already reviewed'", async () => {
+  prisma.review.findFirst.mockResolvedValue(null);
+  prisma.review.create.mockRejectedValue(Object.assign(new Error("Unique constraint failed"), { code: "P2002" }));
+  await expect(reviews.createReview("u1", "content", "frieren", { rating: 8, body: "Again" })).rejects.toBeInstanceOf(reviews.ReviewConflictError);
+});
 
 describe("createReview details", () => {
   it("stores a blank headline as null and an out-of-band rating as rounded", async () => {

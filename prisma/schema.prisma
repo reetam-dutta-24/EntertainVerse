@@ -812,6 +812,12 @@ model Review {
   community Community?  @relation(fields: [communityId], references: [id], onDelete: Cascade)
   likes     ReviewLike[]
 
+  // One review per author per target. Each review has exactly one target set; Postgres
+  // treats NULLs as distinct, so rows for other target types never collide.
+  @@unique([authorId, contentId])
+  @@unique([authorId, trackId])
+  @@unique([authorId, artistId])
+  @@unique([authorId, communityId])
   @@index([authorId])
   @@index([communityId])
 }
