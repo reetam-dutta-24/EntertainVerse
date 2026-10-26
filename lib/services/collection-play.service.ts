@@ -11,6 +11,7 @@ import type {
   CollectionPlayQueue,
   CollectionPlayTrack,
 } from "@/types";
+import { canEditCollectionItems, canViewCollection } from "@/lib/collection-access";
 
 function asStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
@@ -37,6 +38,7 @@ function mapTrackGenreLabels(genres: unknown, language?: string | null) {
 }
 
 const collectionPlayInclude = {
+  collaborators: { select: { userId: true, role: true } },
   user: {
     select: {
       id: true,
@@ -73,10 +75,7 @@ export async function getCollectionPlayQueue(
     include: collectionPlayInclude,
   });
 
-  if (!row) return null;
-  if (row.visibility === "PRIVATE" && row.userId !== viewerUserId) {
-    return null;
-  }
+  if (!row || !canViewCollection(row, viewerUserId)) return null;
 
   const collectionKind = row.kind === "music" ? "music" : "content";
 
@@ -119,7 +118,7 @@ export async function getCollectionPlayQueue(
       collectionKind,
       itemCount: tracks.length,
       ownerName: row.user.name,
-      canManage: Boolean(viewerUserId && row.userId === viewerUserId),
+      canManage: canEditCollectionItems(row, viewerUserId),
       tracks,
     };
   }
@@ -157,7 +156,7 @@ export async function getCollectionPlayQueue(
     collectionKind,
     itemCount: items.length,
     ownerName: row.user.name,
-    canManage: Boolean(viewerUserId && row.userId === viewerUserId),
+    canManage: canEditCollectionItems(row, viewerUserId),
     items,
   };
 }

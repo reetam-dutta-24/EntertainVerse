@@ -8,17 +8,25 @@ const prisma = (await import("@/lib/prisma")).prisma as unknown as PrismaMock;
 const collections = await import("@/lib/services/collection.service");
 
 const OWNER = "owner";
+const EDITOR = "editor-user";
 const STRANGER = "stranger";
 
 // One collection, owned by OWNER, holding Frieren at position 0.
 let items: { id: string; collectionId: string; contentId: string | null; trackId: string | null; position: number }[];
-const collection = { id: "col-1", slug: "cozy-picks", userId: OWNER, visibility: "PUBLIC" };
+const collection = { id: "col-1", slug: "cozy-picks", userId: OWNER, visibility: "PUBLIC", collaborators: [{ userId: EDITOR, role: "editor" }] };
 type Where = Record<string, unknown>;
-const matches = (row: Where, where: Where) => Object.entries(where).every(([key, value]) => row[key] === value);
+// Enough of Prisma's where semantics for these lookups: equality, OR, and a relation `some`.
+const matches = (row: Where, where: Where): boolean =>
+  Object.entries(where).every(([key, value]) => {
+    if (key === "OR") return (value as Where[]).some((branch) => matches(row, branch));
+    if (value && typeof value === "object" && "some" in value)
+      return ((row[key] as Where[]) ?? []).some((child) => matches(child, (value as { some: Where }).some));
+    return row[key] === value;
+  });
 
 beforeEach(() => {
   items = [{ id: "item-1", collectionId: "col-1", contentId: "id-frieren", trackId: null, position: 0 }];
-  // Owner-scoped lookups: `where: { slug, userId }` only finds the owner's collection.
+  // Scoped lookups only find the collection when the where clause lets this user in.
   prisma.collection.findFirst.mockImplementation(async ({ where }: { where: Where }) =>
     matches(collection, where) ? { ...collection, items: items.map(({ position }) => ({ position })) } : null,
   );
@@ -51,9 +59,20 @@ describe("only the owner can change a collection", () => {
     expect(prisma.collectionItem.delete).not.toHaveBeenCalled();
   });
 
-  // collection-collaborator.service adds people with role "editor", but every write here
-  // looks the collection up by { slug, userId: owner } — collaborators get no access.
-  it.todo("collaborators with the editor role can add and remove items");
+  it("collaborators with the editor role can add and remove items", async () => {
+    await collections.addCollectionItem(EDITOR, "cozy-picks", { contentSlug: "mushishi" });
+    expect(items.map((item) => item.contentId)).toEqual(["id-frieren", "id-mushishi"]);
+
+    await collections.removeCollectionItem(EDITOR, "cozy-picks", "item-1");
+    expect(items.map((item) => item.contentId)).toEqual(["id-mushishi"]);
+  });
+
+  it.each([
+    ["rename", () => collections.updateCollection(EDITOR, "cozy-picks", { name: "Mine now" })],
+    ["delete", () => collections.deleteCollection(EDITOR, "cozy-picks")],
+  ])("an editor still can't %s the collection", async (_, attempt) => {
+    await expect(attempt()).rejects.toThrow(collections.CollectionNotFoundError);
+  });
 
   it("deletes the owner's collection", async () => {
     await collections.deleteCollection(OWNER, "cozy-picks");

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { COLLECTION_EDITOR_ROLE } from "@/lib/collection-access";
 
 export class CollaboratorNotFoundError extends Error {
   constructor(message = "Not found.") {
@@ -60,7 +61,7 @@ export async function addCollectionCollaborator(
     data: {
       collectionId: collection.id,
       userId: user.id,
-      role: "editor",
+      role: COLLECTION_EDITOR_ROLE,
     },
   });
 

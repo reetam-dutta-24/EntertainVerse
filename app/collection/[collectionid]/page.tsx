@@ -87,7 +87,8 @@ export default async function CollectionDetailPage({
     </Link>
   );
 
-  const addItemAction = (
+  // Owner and editor collaborators; everyone else just browses.
+  const addItemAction = collection.viewerCanEditItems ? (
     <AddCollectionItemButton
       collectionSlug={collection.id}
       collectionKind={collection.collectionKind ?? "content"}
@@ -97,7 +98,7 @@ export default async function CollectionDetailPage({
           : collection.allItems.map((item) => item.id)
       }
     />
-  );
+  ) : null;
 
   return (
     <div className="flex w-full flex-col gap-10 sm:gap-12 lg:gap-14">

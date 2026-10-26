@@ -144,6 +144,8 @@ export interface CollectionDetail {
   collectionKind?: "content" | "music";
   genreLabelIds?: string[];
   ownerId?: string;
+  /** Owner or editor collaborator — may add and remove items. */
+  viewerCanEditItems?: boolean;
   visibility: CommunityVisibility;
   createdAt: string;
   updatedAt?: string;

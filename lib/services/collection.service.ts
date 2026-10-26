@@ -15,6 +15,11 @@ import type {
   CollectionItemFormInput,
   CollectionUpdateInput,
 } from "@/lib/validators/collection";
+import {
+  canEditCollectionItems,
+  canViewCollection,
+  editableCollectionWhere,
+} from "@/lib/collection-access";
 
 /**
  * The recommender is server-only (it needs the Next server runtime). Load it lazily so
@@ -32,6 +37,7 @@ const collectionInclude = {
       avatarUrl: true,
     },
   },
+  collaborators: { select: { userId: true, role: true } },
   items: {
     orderBy: { position: "asc" },
     include: {
@@ -270,7 +276,7 @@ export async function addCollectionItem(
   input: CollectionItemFormInput,
 ) {
   const collection = await prisma.collection.findFirst({
-    where: { slug, userId },
+    where: { slug, ...editableCollectionWhere(userId) },
     include: { items: { select: { position: true } } },
   });
   if (!collection) throw new CollectionNotFoundError("Collection not found.");
@@ -336,7 +342,7 @@ export async function removeCollectionItem(
   itemId: string,
 ) {
   const collection = await prisma.collection.findFirst({
-    where: { slug, userId },
+    where: { slug, ...editableCollectionWhere(userId) },
   });
   if (!collection) throw new CollectionNotFoundError("Collection not found.");
 
@@ -450,10 +456,7 @@ export async function getCollectionDetailBySlug(
   viewerUserId?: string,
 ): Promise<CollectionDetail | null> {
   const row = await getCollectionRecordBySlug(slug);
-  if (!row) return null;
-  if (row.visibility === "PRIVATE" && row.userId !== viewerUserId) {
-    return null;
-  }
+  if (!row || !canViewCollection(row, viewerUserId)) return null;
 
   const allItems = row.items
     .map((item, index) => mapCollectionItemToContent(item, index))
@@ -539,7 +542,7 @@ export async function getCollectionDetailBySlug(
 
   const featuredTrack = allTracks[0];
 
-  return mapCollectionToDetail(row, {
+  const detail = mapCollectionToDetail(row, {
     similarCollections: similarRows.map(mapCollectionToCard),
     similarContent: isMusic ? [] : similarContentRows,
     similarTracks: isMusic ? similarTrackRows : [],
@@ -591,6 +594,7 @@ export async function getCollectionDetailBySlug(
               }
             : undefined,
   });
+  return { ...detail, viewerCanEditItems: canEditCollectionItems(row, viewerUserId) };
 }
 
 export async function listAllCollectionSlugs() {
