@@ -1,9 +1,10 @@
 /**
  * Server-side data cache — shared across requests in the long-running Node server.
  *
- * EntertainVerse runs as one Node process (`server.ts`: Next + Socket.IO), so an in-memory
- * cache is the fastest option and can hold values Next's serialized caches can't
- * (Maps/Sets of taste signals, Float32Array embeddings).
+ * Each app server (`server.ts`: Next + Socket.IO) keeps its own in-memory cache — the fastest
+ * option, and it can hold values Next's serialized caches can't (Maps/Sets of taste signals,
+ * Float32Array embeddings). With several servers, invalidations are shared through Redis
+ * (see `lib/cache/cross-server.ts`), so a write on one server clears the others too.
  *
  * - TTL + stale-while-revalidate: a stale entry is served instantly while one
  *   background refresh runs.
@@ -15,6 +16,8 @@
  * Cached values are shared by every request — callers must treat them as read-only.
  * Deliberately not `server-only`: the Socket.IO server imports services that use it.
  */
+
+import { listenForInvalidations, publishInvalidation } from "@/lib/cache/cross-server";
 
 const MAX_ENTRIES = 2_000;
 
@@ -126,8 +129,13 @@ export async function cached<T>(key: string, options: CacheOptions, loader: () =
   return load(key, options, loader);
 }
 
-/** Drop every entry carrying any of these tags. */
+/** Drop every entry carrying any of these tags — on this server and every other one. */
 export function invalidateTags(...tags: string[]) {
+  invalidateLocally(tags);
+  publishInvalidation(tags);
+}
+
+function invalidateLocally(tags: string[]) {
   for (const tag of tags) {
     store.tagVersions.set(tag, (store.tagVersions.get(tag) ?? 0) + 1);
     const keys = store.tagIndex.get(tag);
@@ -135,6 +143,11 @@ export function invalidateTags(...tags: string[]) {
     store.stats.invalidations += 1;
     for (const key of [...keys]) remove(key);
   }
+}
+
+/** Start applying other servers' invalidations here (call once at boot). False without Redis. */
+export function startCacheSync() {
+  return listenForInvalidations(invalidateLocally);
 }
 
 export function invalidateUser(userId: string) {

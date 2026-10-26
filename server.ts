@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { parse } from "node:url";
 import next from "next";
 import { attachSocketServer } from "./lib/socket/server";
+import { startCacheSync } from "./lib/cache/server-cache";
 
 const hostname = process.env.HOSTNAME ?? "localhost";
 const port = Number(process.env.PORT ?? 3000);
@@ -24,6 +25,8 @@ app.prepare().then(async () => {
   });
 
   await attachSocketServer(httpServer);
+  // With several servers, a write on one must clear the cache on all of them.
+  if (await startCacheSync()) console.log("> Cache: invalidations shared through Redis");
 
   httpServer.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port} (Next.js + Socket.IO)`);

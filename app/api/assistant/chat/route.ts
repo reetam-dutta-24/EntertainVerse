@@ -7,6 +7,7 @@ import { answerStream } from "@/lib/assistant/answer";
 import { retrieve } from "@/lib/assistant/retrieval";
 import type { AssistantStreamEvent } from "@/lib/assistant/types";
 import { getUserById } from "@/lib/services/user.service";
+import { createRateLimit } from "@/lib/rate-limit";
 
 const bodySchema = z.object({
   messages: z
@@ -17,25 +18,8 @@ const bodySchema = z.object({
   pathname: z.string().max(200).default("/dashboard"),
 });
 
-/** Per-user sliding window — protects the shared AI quota. */
-const WINDOW_MS = 10 * 60_000;
-const MAX_PER_WINDOW = 30;
-const recent = new Map<string, number[]>();
-
-function rateLimited(userId: string) {
-  const now = Date.now();
-  // Forget users whose window has fully passed, so the map can't grow with every user ever seen.
-  if (recent.size > 500) {
-    for (const [id, stamps] of recent) {
-      if (now - stamps[stamps.length - 1] >= WINDOW_MS) recent.delete(id);
-    }
-  }
-  const times = (recent.get(userId) ?? []).filter((at) => now - at < WINDOW_MS);
-  if (times.length >= MAX_PER_WINDOW) return true;
-  times.push(now);
-  recent.set(userId, times);
-  return false;
-}
+/** 30 questions per 10 minutes per user, counted across all servers — protects the shared AI quota. */
+const assistantLimit = createRateLimit("assistant", 30, 10 * 60_000);
 
 /** POST /api/assistant/chat — retrieval-augmented answer, streamed as NDJSON events. */
 export async function POST(request: Request) {
@@ -45,7 +29,7 @@ export async function POST(request: Request) {
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "Invalid message." }, { status: 400 });
-  if (rateLimited(auth.userId)) {
+  if (await assistantLimit.hit(auth.userId)) {
     return NextResponse.json({ error: "You're asking quickly — give it a few minutes and try again." }, { status: 429 });
   }
 
