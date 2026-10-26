@@ -38,19 +38,20 @@ export function DashboardBottomNav() {
               : pathname.startsWith(item.href);
 
           return (
-            <li key={item.href} className="flex-1">
+            // min-w-0 lets long labels truncate instead of pushing the last tab off a 320px screen.
+            <li key={item.href} className="min-w-0 flex-1">
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-caption font-medium transition-colors",
+                  "flex min-w-0 flex-col items-center gap-0.5 rounded-lg px-1 py-2 text-caption font-medium transition-colors",
                   active
                     ? "text-brand-pink"
                     : "text-white/70 hover:text-white",
                 )}
               >
                 <item.icon className="size-4 shrink-0" />
-                <span className="truncate">{item.label}</span>
+                <span className="max-w-full truncate">{item.label}</span>
               </Link>
             </li>
           );

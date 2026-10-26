@@ -48,7 +48,7 @@ export function AuthInput({
           type="button"
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Hide password" : "Show password"}
-          className="cursor-pointer text-muted/80 transition-colors hover:text-white"
+          className="-m-1 cursor-pointer p-1 text-muted/80 transition-colors hover:text-white"
         >
           {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </button>

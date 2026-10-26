@@ -149,7 +149,8 @@ export function GlobalSearch({
           type="button"
           aria-label="Search"
           onClick={() => submitSearch(query)}
-          className="shrink-0 text-white/80 transition-colors hover:text-white"
+          // -m-1 p-1: 24px hit area around the 16px icon without moving it.
+          className="-m-1 shrink-0 cursor-pointer p-1 text-white/80 transition-colors hover:text-white"
         >
           <Search className="size-4" />
         </button>
