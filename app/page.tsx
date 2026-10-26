@@ -15,7 +15,7 @@ export default async function LandingPage() {
   await redirectAuthenticatedAway();
 
   return (
-    <main className="flex w-full flex-col">
+    <main className="flex w-full flex-col overflow-x-clip">
       <Navbar />
       <Hero />
       <FeaturesSection />

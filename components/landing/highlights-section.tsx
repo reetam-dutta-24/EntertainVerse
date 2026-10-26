@@ -24,7 +24,7 @@ interface HighlightTextProps {
 
 function HighlightText({ title, subtitle, bullets, cta, href }: HighlightTextProps) {
   return (
-    <div className="flex max-w-[560px] flex-col justify-center gap-8 px-6 py-8 lg:px-10">
+    <div className="flex w-full min-w-0 max-w-[560px] flex-col justify-center gap-8 px-6 py-8 lg:px-10">
       <div className="flex flex-col gap-2">
         <h3 className="max-w-[480px] text-heading font-bold text-white">
           {title}
