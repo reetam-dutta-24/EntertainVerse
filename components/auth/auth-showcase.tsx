@@ -3,16 +3,16 @@ import Image from "next/image";
 const collage = [
   "/images/poster-jjk.png",
   "/images/album-swim.png",
-  "/images/hero-1.png",
-  "/images/hero-3.png",
-  "/images/hero-4.png",
-  "/images/hero-2.png",
+  "/images/hero-1.webp",
+  "/images/hero-3.webp",
+  "/images/hero-4.webp",
+  "/images/hero-2.webp",
   "/images/album-swim.png",
   "/images/poster-jjk.png",
-  "/images/hero-2.png",
-  "/images/hero-4.png",
-  "/images/hero-1.png",
-  "/images/hero-3.png",
+  "/images/hero-2.webp",
+  "/images/hero-4.webp",
+  "/images/hero-1.webp",
+  "/images/hero-3.webp",
 ];
 
 /** Left auth panel: dimmed content collage with welcome copy on top. */

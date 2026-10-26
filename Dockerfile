@@ -2,7 +2,7 @@
 # everything that differs between them (database, Redis, S3, secrets, SERVER_NAME) is set
 # through environment variables when the container starts.
 
-FROM node:20-bookworm-slim AS base
+FROM node:22-bookworm-slim AS base
 # Prisma's query engine needs OpenSSL.
 RUN apt-get update \
   && apt-get install -y --no-install-recommends openssl ca-certificates \

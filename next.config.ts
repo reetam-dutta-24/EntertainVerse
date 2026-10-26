@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Images are served as they are: catalog art and uploads at full quality (see HdImage), and
+  // the landing/auth artwork pre-compressed to WebP. Resizing on request costs CPU the app
+  // servers need, and after a cold start the optimizer once left a request hanging for good.
+  images: { unoptimized: true },
   experimental: {
     serverActions: {
       bodySizeLimit: "11mb",

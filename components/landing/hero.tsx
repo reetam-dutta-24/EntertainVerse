@@ -18,7 +18,7 @@ export function Hero() {
       <div className="absolute inset-0 flex" aria-hidden>
         <div className="relative h-full w-[43%]">
           <Image
-            src="/images/hero-1.png"
+            src="/images/hero-1.webp"
             alt=""
             fill
             priority
@@ -29,7 +29,7 @@ export function Hero() {
         </div>
         <div className="relative hidden h-full w-[36%] sm:block">
           <Image
-            src="/images/hero-2.png"
+            src="/images/hero-2.webp"
             alt=""
             fill
             priority
@@ -41,7 +41,7 @@ export function Hero() {
         <div className="relative hidden h-full w-[34%] flex-col md:flex">
           <div className="relative h-[68%] w-full">
             <Image
-              src="/images/hero-4.png"
+              src="/images/hero-4.webp"
               alt=""
               fill
               priority
@@ -52,7 +52,7 @@ export function Hero() {
           </div>
           <div className="relative h-[32%] w-full">
             <Image
-              src="/images/hero-3.png"
+              src="/images/hero-3.webp"
               alt=""
               fill
               priority
