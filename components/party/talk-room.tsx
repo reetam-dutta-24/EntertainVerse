@@ -5,12 +5,11 @@ import { createPortal } from "react-dom";
 import { io, type Socket } from "socket.io-client";
 import { LoaderCircle, Mic, MicOff, PhoneOff } from "lucide-react";
 import { getSocketUrl } from "@/lib/env/socket";
+import { DEFAULT_ICE_SERVERS, fetchIceServers } from "@/lib/realtime/ice-servers";
 import { VOICE_ROOM_LIMIT, type VoicePeer } from "@/lib/party/types";
 import { cn } from "@/lib/utils";
 import { ProfileLink } from "@/components/profile/profile-link";
 
-/** Free public STUN servers — enough for most home and mobile networks (no TURN relay). */
-const ICE_SERVERS: RTCIceServer[] = [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }];
 
 type Signal = { type: "offer" | "answer"; sdp: string } | { type: "candidate"; candidate: RTCIceCandidateInit };
 
@@ -64,6 +63,8 @@ export function TalkRoom({ channelId, channelTitle, onClose }: TalkRoomProps) {
 
   useEffect(() => {
     let cancelled = false;
+    // STUN by default; the server adds a TURN relay when one is configured.
+    let iceServers = DEFAULT_ICE_SERVERS;
     const updatePeer = (socketId: string, patch: Partial<PeerView>) =>
       setPeers((current) => (current[socketId] ? { ...current, [socketId]: { ...current[socketId]!, ...patch } } : current));
 
@@ -82,7 +83,7 @@ export function TalkRoom({ channelId, channelTitle, onClose }: TalkRoomProps) {
     };
 
     const createConnection = (peer: VoicePeer) => {
-      const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+      const pc = new RTCPeerConnection({ iceServers });
       connections.current.set(peer.socketId, pc);
       localStream.current?.getTracks().forEach((track) => pc.addTrack(track, localStream.current!));
       pc.onicecandidate = (event) => {
@@ -128,6 +129,8 @@ export function TalkRoom({ channelId, channelTitle, onClose }: TalkRoomProps) {
       }
 
       setStatus("connecting");
+      iceServers = await fetchIceServers();
+      if (cancelled) return;
       const socket = io(getSocketUrl(), { path: "/api/socket/io", withCredentials: true, transports: ["websocket", "polling"] });
       socketRef.current = socket;
       socket.on("connect", () => socket.emit("voice:join", { channelId }));
