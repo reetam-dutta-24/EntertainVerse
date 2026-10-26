@@ -2,13 +2,14 @@ import path from "path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextResponse } from "next/server";
 
-vi.mock("fs/promises", () => ({ mkdir: vi.fn(), writeFile: vi.fn() }));
+vi.mock("fs/promises", () => ({ mkdir: vi.fn(), writeFile: vi.fn(), readFile: vi.fn() }));
 vi.mock("@/lib/api-auth", () => ({ requireUserApi: vi.fn() }));
 
-const { mkdir, writeFile } = await import("fs/promises");
+const { mkdir, readFile, writeFile } = await import("fs/promises");
 const { requireUserApi } = await import("@/lib/api-auth");
-const { saveUploadedChatFile, saveUploadedImage, UploadValidationError } = await import("@/lib/services/upload.service");
+const { readUpload, saveUploadedChatFile, saveUploadedImage, UploadValidationError } = await import("@/lib/services/upload.service");
 const { POST } = await import("@/app/api/upload/route");
+const { GET } = await import("@/app/uploads/[...path]/route");
 
 const MB = 1024 * 1024;
 const file = (name: string, type: string, size = 1024) => new File([new Uint8Array(size).fill(1)], name, { type });
@@ -68,10 +69,11 @@ describe("saveUploadedImage", () => {
     expect(writeFile).not.toHaveBeenCalled();
   });
 
-  it("reports a disk error without leaking the path", async () => {
+  it("reports a storage error without leaking the path", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
     vi.mocked(writeFile).mockRejectedValue(new Error("EACCES: permission denied, open 'C:\\srv\\public\\uploads\\...'"));
     const attempt = saveUploadedImage(file("x.png", "image/png"), "user-1");
-    await expect(attempt).rejects.toThrow("Could not save the file. Check that the app can write to public/uploads.");
+    await expect(attempt).rejects.toThrow("Could not save the file. Try again in a moment.");
     await expect(attempt.catch((error: Error) => error.message)).resolves.not.toContain("EACCES");
   });
 });
@@ -156,5 +158,55 @@ describe("POST /api/upload", () => {
     expect(await response.json()).toEqual({ error: "Unsupported file type. Use images or common document/media formats." });
     expect((await upload({ purpose: "chat" })).status).toBe(400);
     expect((await upload({ file: "not-a-file" })).status).toBe(400);
+  });
+});
+
+describe("serving uploads", () => {
+  const enoent = () => Object.assign(new Error("ENOENT: no such file"), { code: "ENOENT" });
+
+  it("reads a stored file with the type from its extension", async () => {
+    vi.mocked(readFile).mockResolvedValue(Buffer.from("png-bytes") as never);
+    const found = await readUpload(["user-1", "images", "a1.png"]);
+    expect(readFile).toHaveBeenCalledWith(path.join(process.cwd(), "public", "uploads", "user-1", "images", "a1.png"));
+    expect(found).toMatchObject({ contentType: "image/png", size: 9 });
+  });
+
+  it("uses the standard type where two share an extension", async () => {
+    vi.mocked(readFile).mockResolvedValue(Buffer.from("x") as never);
+    expect((await readUpload(["u", "files", "song.mp3"]))?.contentType).toBe("audio/mpeg");
+    expect((await readUpload(["u", "files", "all.zip"]))?.contentType).toBe("application/zip");
+  });
+
+  it.each([[[]], [["..", "..", ".env"]], [["user-1", "..", "secret.png"]], [[".hidden"]], [["user-1", "a b.png"]], [["user-1", "a\b.png"]]])(
+    "never reads outside the uploads folder: %j",
+    async (segments) => {
+      expect(await readUpload(segments)).toBeNull();
+      expect(readFile).not.toHaveBeenCalled();
+    },
+  );
+
+  it("is null for a missing file, and passes other errors on", async () => {
+    vi.mocked(readFile).mockRejectedValue(enoent());
+    expect(await readUpload(["user-1", "images", "gone.png"])).toBeNull();
+    vi.mocked(readFile).mockRejectedValue(new Error("EIO"));
+    await expect(readUpload(["user-1", "images", "x.png"])).rejects.toThrow("EIO");
+  });
+
+  const get = (segments: string[]) => GET(new Request("http://localhost/uploads/x"), { params: Promise.resolve({ path: segments }) });
+
+  it("GET serves the file with safe headers", async () => {
+    vi.mocked(readFile).mockResolvedValue(Buffer.from("%PDF-1.7") as never);
+    const response = await get(["user-1", "files", "notes.pdf"]);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("application/pdf");
+    expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(response.headers.get("content-length")).toBe("8");
+    expect(await response.text()).toBe("%PDF-1.7");
+  });
+
+  it("GET is 404 for missing or unsafe paths", async () => {
+    vi.mocked(readFile).mockRejectedValue(enoent());
+    expect((await get(["user-1", "images", "gone.png"])).status).toBe(404);
+    expect((await get(["..", "package.json"])).status).toBe(404);
   });
 });

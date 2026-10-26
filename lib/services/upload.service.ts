@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
 import path from "path";
+import { getFileStorage } from "@/lib/file-storage";
 import {
   attachmentKindFromMime,
   type ChatAttachmentKind,
@@ -108,32 +108,25 @@ async function persistUpload(
   userId: string,
   subfolder: "images" | "files",
 ): Promise<string> {
-  const ext = resolveExtension(file);
-  const filename = `${randomUUID()}${ext}`;
-  const relativeDir = path.join("uploads", userId, subfolder);
-  const absoluteDir = path.join(process.cwd(), "public", relativeDir);
+  const key = `uploads/${userId}/${subfolder}/${randomUUID()}${resolveExtension(file)}`;
 
-  try {
-    await mkdir(absoluteDir, { recursive: true });
-
-    const bytes = Buffer.from(await file.arrayBuffer());
-    if (bytes.length === 0) {
-      throw new UploadValidationError(
-        "The uploaded file could not be read. Try a smaller file.",
-      );
-    }
-
-    await writeFile(path.join(absoluteDir, filename), bytes);
-  } catch (error) {
-    if (error instanceof UploadValidationError) {
-      throw error;
-    }
+  const bytes = Buffer.from(await file.arrayBuffer());
+  if (bytes.length === 0) {
     throw new UploadValidationError(
-      "Could not save the file. Check that the app can write to public/uploads.",
+      "The uploaded file could not be read. Try a smaller file.",
     );
   }
 
-  return `/${relativeDir.replace(/\\/g, "/")}/${filename}`;
+  try {
+    await getFileStorage().put(key, bytes, file.type);
+  } catch (error) {
+    console.error("[upload] couldn't store file:", (error as Error).message);
+    throw new UploadValidationError(
+      "Could not save the file. Try again in a moment.",
+    );
+  }
+
+  return `/${key}`;
 }
 
 export async function saveUploadedImage(
@@ -166,4 +159,24 @@ export async function saveUploadedChatFile(
     name: file.name,
     kind,
   };
+}
+
+// Reversed; where two types share an extension (.mp3, .zip) the first, standard one wins.
+const MIME_BY_EXT: Record<string, string> = {};
+for (const [mime, ext] of Object.entries(EXT_BY_MIME)) MIME_BY_EXT[ext] ??= mime;
+// Each part of an upload path is one we generated: ids, folder names, uuid file names.
+const SAFE_SEGMENT = /^[A-Za-z0-9_-][A-Za-z0-9._-]*$/;
+
+/**
+ * A stored upload by its URL path parts (`/uploads/a/b/c.png` → ["a", "b", "c.png"]), or
+ * null. The type comes from our own extension list, never from the stored file.
+ */
+export async function readUpload(segments: string[]) {
+  if (!segments.length || !segments.every((segment) => SAFE_SEGMENT.test(segment))) {
+    return null;
+  }
+  const file = await getFileStorage().get(`uploads/${segments.join("/")}`);
+  if (!file) return null;
+  const ext = path.extname(segments.at(-1)!).toLowerCase();
+  return { ...file, contentType: MIME_BY_EXT[ext] ?? "application/octet-stream" };
 }
