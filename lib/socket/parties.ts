@@ -263,8 +263,10 @@ export function registerPartyHandlers(io: SocketServer, socket: Socket, userId: 
           sockets: {},
           liveViewers: [],
         };
-        for (const ghost of ghosts) if (ghost in party.sockets) dropSocket(io, party, ghost);
+        // New socket first: someone reconnecting (their server went away) still has a tab
+        // here when their old socket is cleared, so they keep their place and host role.
         party.sockets[socket.id] = userId;
+        for (const ghost of ghosts) if (ghost in party.sockets) dropSocket(io, party, ghost);
         if (!party.members.some((member) => member.userId === userId)) party.members.push(profile);
         if (!party.hostId) party.hostId = userId;
         return party;
