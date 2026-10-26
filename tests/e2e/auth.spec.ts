@@ -43,6 +43,7 @@ test.describe("signed out", () => {
     await expect(page.getByText("An account with this email already exists.")).toBeVisible();
     await expect(page).toHaveURL(/\/signup/);
   });
+
 });
 
 test.describe("signed in", () => {
@@ -56,23 +57,18 @@ test.describe("signed in", () => {
   test("signs out from the account menu", async ({ page }) => {
     // Each test gets its own copy of the saved session, so this doesn't sign out other tests.
     await page.goto("/dashboard");
-    // Let link prefetches finish first — see the fixme below.
-    await page.waitForLoadState("networkidle");
     // The sidebar and the top bar each have one; use whichever this layout shows.
     await page.getByRole("button", { name: "Account menu" }).filter({ visible: true }).first().click();
-    // Opening the menu shows its links, which Next prefetches — let those finish too.
-    await page.waitForLoadState("networkidle");
     await page.getByRole("button", { name: "Sign Out" }).click();
     await expect(page).not.toHaveURL(/\/dashboard/);
     await page.goto("/dashboard");
     await expect(page).toHaveURL(/\/login/);
   });
 
-  // Bug: a dashboard request already in flight (a link prefetch — opening the account menu
-  // itself prefetches its links) can answer after the sign-out response; the middleware
-  // re-issues the JWT cookie on every dashboard request, so that late response signs the
-  // user straight back in. Reproduces in roughly a third of runs under load.
-  test.fixme("stays signed out when signing out while the dashboard is still loading", async ({ page }) => {
+  // Regression: a dashboard request still in flight (a link prefetch — opening the account
+  // menu prefetches its links) used to answer after sign-out with a fresh session cookie,
+  // signing the user straight back in. The middleware now never re-issues the cookie.
+  test("stays signed out when signing out while the dashboard is still loading", async ({ page }) => {
     await page.goto("/dashboard", { waitUntil: "commit" });
     await page.getByRole("button", { name: "Account menu" }).filter({ visible: true }).first().click();
     await page.getByRole("button", { name: "Sign Out" }).click();
