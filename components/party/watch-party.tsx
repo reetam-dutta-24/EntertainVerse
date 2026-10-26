@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { Clapperboard, ExternalLink, Pause, Play, RotateCcw, RotateCw, Tv, X } from "lucide-react";
+import { Camera, Clapperboard, ExternalLink, LoaderCircle, MonitorUp, Pause, Play, RotateCcw, RotateCw, Square, Tv, X } from "lucide-react";
 import { GroupPicksPanel } from "@/components/party/group-picks";
 import { MediaPicker, MemberStrip, PartyChat, ReactionBar, ReactionLayer, formatClock } from "@/components/party/party-shared";
 import { usePlaybackMinutes } from "@/hooks/use-playback-minutes";
 import { useParty } from "@/hooks/use-party";
+import { useLiveBroadcast } from "@/hooks/use-live-broadcast";
 import { expectedPosition, type PartyMediaMode, type PartyState } from "@/lib/party/types";
 import { cn } from "@/lib/utils";
 
@@ -114,6 +115,32 @@ function YouTubePlayer({ state, skew }: { state: PartyState; skew: React.Mutable
   return <div ref={mount} className="size-full" />;
 }
 
+/** The host's live screen / camera. Your own preview is muted; viewers may need a tap for sound. */
+function LiveVideo({ stream, muted }: { stream: MediaStream | null; muted: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [needsTap, setNeedsTap] = useState(false);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    video.srcObject = stream;
+    if (stream) void video.play().then(() => setNeedsTap(false), () => setNeedsTap(true));
+  }, [stream]);
+  return (
+    <>
+      <video ref={ref} autoPlay playsInline muted={muted} className="size-full bg-black object-contain" />
+      {needsTap ? (
+        <button
+          type="button"
+          onClick={() => void ref.current?.play().then(() => setNeedsTap(false))}
+          className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/70 text-sm font-semibold text-white"
+        >
+          Tap to watch live
+        </button>
+      ) : null}
+    </>
+  );
+}
+
 function ClockPlayer({ state, skew }: { state: PartyState; skew: React.MutableRefObject<number> }) {
   const [now, setNow] = useState(0);
   useEffect(() => {
@@ -152,7 +179,8 @@ export interface WatchPartyProps {
 
 /** Synced watch party for one community watch channel. */
 export function WatchParty({ channelId, channelTitle, viewerUserId, onClose }: WatchPartyProps) {
-  const { state, chat, reactions, connected, error, skewMs, control, sendChat, react } = useParty(`watch:${channelId}`);
+  const { state, chat, reactions, connected, error, skewMs, control, sendChat, react, socketRef } = useParty(`watch:${channelId}`);
+  const live = useLiveBroadcast({ socketRef, partyKey: `watch:${channelId}`, state, viewerUserId });
   const [blocked, setBlocked] = useState(false);
   const [scrub, setScrub] = useState<number | null>(null);
   const [, forceTick] = useState(0);
@@ -198,10 +226,24 @@ export function WatchParty({ channelId, channelTitle, viewerUserId, onClose }: W
         {/* Children must not shrink, or the 16:9 player collapses once this column scrolls. */}
         <div className="flex min-w-0 shrink-0 flex-col gap-3 lg:min-h-0 lg:flex-[2] lg:overflow-y-auto lg:pr-1 [&>*]:shrink-0">
           <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
-            {media?.mode === "video" ? <VideoPlayer state={state!} skew={skewMs} onBlocked={() => setBlocked(true)} /> : null}
-            {media?.mode === "youtube" ? <YouTubePlayer state={state!} skew={skewMs} /> : null}
-            {media?.mode === "clock" ? <ClockPlayer state={state!} skew={skewMs} /> : null}
-            {!media ? (
+            {live.live ? (
+              <>
+                <LiveVideo stream={live.broadcasting ? live.localStream : live.remoteStream} muted={live.broadcasting} />
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-red-600 px-2.5 py-1 text-micro font-bold uppercase tracking-wide text-white shadow-lg">
+                  <span className="size-1.5 animate-pulse rounded-full bg-white" aria-hidden /> Live · {host?.name ?? "Host"}
+                  {live.broadcasting ? ` · ${live.viewerCount} watching` : ""}
+                </span>
+                {!live.broadcasting && !live.remoteStream ? (
+                  <div className="absolute inset-0 flex items-center justify-center gap-2 text-sm text-white/70">
+                    <LoaderCircle className="size-4 animate-spin" aria-hidden /> Connecting to {host?.name ?? "the host"}&apos;s stream…
+                  </div>
+                ) : null}
+              </>
+            ) : null}
+            {!live.live && media?.mode === "video" ? <VideoPlayer state={state!} skew={skewMs} onBlocked={() => setBlocked(true)} /> : null}
+            {!live.live && media?.mode === "youtube" ? <YouTubePlayer state={state!} skew={skewMs} /> : null}
+            {!live.live && media?.mode === "clock" ? <ClockPlayer state={state!} skew={skewMs} /> : null}
+            {!media && !live.live ? (
               <div className="flex size-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-white/60">
                 <Tv className="size-8 text-white/30" aria-hidden />
                 {isHost ? "Pick a title below to start the party." : `Waiting for ${host?.name ?? "the host"} to pick a title…`}
@@ -215,7 +257,30 @@ export function WatchParty({ channelId, channelTitle, viewerUserId, onClose }: W
             <ReactionLayer reactions={reactions} />
           </div>
 
-          {media ? (
+          {isHost ? (
+            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              {live.broadcasting ? (
+                <button type="button" onClick={live.stop} className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full bg-red-600 px-5 text-sm font-semibold text-white hover:bg-red-500">
+                  <Square className="size-3.5 fill-current" aria-hidden /> Stop live
+                </button>
+              ) : (
+                <>
+                  <button type="button" onClick={() => void live.start("screen")} className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full bg-white/[0.08] px-4 text-sm font-semibold text-white hover:bg-white/15">
+                    <MonitorUp className="size-4" aria-hidden /> Share screen
+                  </button>
+                  <button type="button" onClick={() => void live.start("camera")} className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full bg-white/[0.08] px-4 text-sm font-semibold text-white hover:bg-white/15">
+                    <Camera className="size-4" aria-hidden /> Go live with camera
+                  </button>
+                </>
+              )}
+              <p className="text-caption text-white/50">
+                {live.broadcasting ? "Everyone in the room is watching your stream." : "Host a live session — your screen or camera goes straight to the room (up to 8 viewers)."}
+              </p>
+              {live.error ? <p className="w-full text-caption text-amber-100">{live.error}</p> : null}
+            </div>
+          ) : null}
+
+          {media && !live.live ? (
             <div className="flex flex-col gap-2 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
               <div className="flex items-center gap-2">
                 <span className="w-14 text-right text-caption tabular-nums text-white/60">{formatClock(shown)}</span>

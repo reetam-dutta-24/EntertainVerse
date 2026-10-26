@@ -3,8 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { assertCommunityChatMember } from "@/lib/services/community-chat.service";
 import { episodeMinutes, fullRuntime, isFilmType } from "@/lib/roadmap/runtime";
 import {
+  LIVE_VIEWER_LIMIT,
   VOICE_ROOM_LIMIT,
   type PartyChatMessage,
+  type PartyLiveKind,
   type PartyControl,
   type PartyMedia,
   type PartyMediaMode,
@@ -21,10 +23,21 @@ import {
  *   listen:<slug>         the community's synced listen party (shared queue)
  *   voice:<channelId>     talk room — WebRTC audio, signalled through here
  *
+ * Watch-party hosts can also go live: their screen or camera goes browser-to-browser to
+ * each viewer (one connection per viewer), with the offers/answers relayed here.
+ *
  * Only members of the community can join. Hosts control playback; anyone can add songs.
  */
 
-const parties = new Map<string, Omit<PartyState, "serverNow"> & { sockets: Map<string, string> }>();
+type LiveParty = Omit<PartyState, "serverNow"> & {
+  sockets: Map<string, string>;
+  /** The broadcasting socket while the host is live. */
+  liveSocketId?: string;
+  /** Sockets currently receiving the broadcast. */
+  liveViewers: Set<string>;
+};
+
+const parties = new Map<string, LiveParty>();
 const voiceRooms = new Map<string, Map<string, VoicePeer>>();
 const lastChatAt = new Map<string, number>();
 
@@ -83,8 +96,10 @@ async function resolveMedia(item: { kind: "content" | "track"; slug: string }, p
 function snapshot(key: string): PartyState | null {
   const party = parties.get(key);
   if (!party) return null;
-  const { sockets: _sockets, ...state } = party;
+  const { sockets: _sockets, liveSocketId: _liveSocketId, liveViewers: _liveViewers, ...state } = party;
   void _sockets;
+  void _liveSocketId;
+  void _liveViewers;
   return { ...state, serverNow: Date.now() };
 }
 
@@ -127,12 +142,25 @@ function settle(party: Omit<PartyState, "serverNow">) {
   party.updatedAt = Date.now();
 }
 
+/** End the host's broadcast for everyone. */
+function endLive(io: SocketServer, party: LiveParty) {
+  if (!party.live) return;
+  party.live = null;
+  party.liveSocketId = undefined;
+  party.liveViewers.clear();
+  io.to(roomOf(party.key)).emit("live:ended", { key: party.key });
+}
+
 function leaveParty(io: SocketServer, socket: Socket, key: string) {
   const party = parties.get(key);
   if (!party) return;
   const userId = party.sockets.get(socket.id);
   party.sockets.delete(socket.id);
   void socket.leave(roomOf(key));
+  if (party.liveSocketId === socket.id) endLive(io, party);
+  else if (party.liveViewers.delete(socket.id) && party.liveSocketId) {
+    io.to(party.liveSocketId).emit("live:viewer-left", { viewerSocketId: socket.id });
+  }
   if (userId && ![...party.sockets.values()].includes(userId)) {
     party.members = party.members.filter((member) => member.userId !== userId);
     if (party.hostId === userId) party.hostId = party.members[0]?.userId ?? null;
@@ -183,7 +211,9 @@ export function registerPartyHandlers(io: SocketServer, socket: Socket, userId: 
           playing: false,
           positionSec: 0,
           updatedAt: Date.now(),
+          live: null,
           sockets: new Map(),
+          liveViewers: new Set(),
         };
         parties.set(key, party);
       }
@@ -317,6 +347,53 @@ export function registerPartyHandlers(io: SocketServer, socket: Socket, userId: 
     const party = key ? parties.get(key) : undefined;
     if (!party || typeof emoji !== "string" || emoji.length > 8 || party.sockets.get(socket.id) !== userId) return;
     io.to(roomOf(party.key)).emit("party:reaction", { emoji, userId, at: Date.now() });
+  });
+
+  // ---- live hosting (watch parties: host screen / camera → viewers) ------------------------
+
+  const memberParty = (key: unknown) => {
+    const party = typeof key === "string" ? parties.get(key) : undefined;
+    return party && party.sockets.get(socket.id) === userId ? party : undefined;
+  };
+
+  socket.on("live:start", (payload: unknown) => {
+    const { key, kind } = (payload ?? {}) as { key?: unknown; kind?: unknown };
+    const party = memberParty(key);
+    if (!party || party.kind !== "watch") return;
+    if (party.hostId !== userId) return fail("Only the host can go live.");
+    if (kind !== "screen" && kind !== "camera") return;
+    if (party.live) endLive(io, party);
+    party.live = { userId, kind: kind as PartyLiveKind, startedAt: Date.now() };
+    party.liveSocketId = socket.id;
+    broadcast(io, party.key);
+  });
+
+  socket.on("live:stop", (payload: unknown) => {
+    const party = memberParty((payload as { key?: unknown })?.key);
+    if (!party?.live || (party.liveSocketId !== socket.id && party.hostId !== userId)) return;
+    endLive(io, party);
+    broadcast(io, party.key);
+  });
+
+  // A viewer asks for the stream; the broadcaster then sends them an offer.
+  socket.on("live:request", (payload: unknown) => {
+    const party = memberParty((payload as { key?: unknown })?.key);
+    if (!party?.live || !party.liveSocketId || party.liveSocketId === socket.id) return;
+    if (!party.liveViewers.has(socket.id) && party.liveViewers.size >= LIVE_VIEWER_LIMIT) {
+      return fail(`Live streams hold ${LIVE_VIEWER_LIMIT} viewers — this one is full.`);
+    }
+    party.liveViewers.add(socket.id);
+    io.to(party.liveSocketId).emit("live:viewer", { viewerSocketId: socket.id });
+  });
+
+  // Offers / answers / ICE candidates — only between the broadcaster and that party's members.
+  socket.on("live:signal", (payload: unknown) => {
+    const { key, to, data } = (payload ?? {}) as { key?: unknown; to?: unknown; data?: unknown };
+    const party = memberParty(key);
+    if (!party?.liveSocketId || typeof to !== "string") return;
+    const fromBroadcaster = socket.id === party.liveSocketId;
+    const allowed = fromBroadcaster ? party.sockets.has(to) : to === party.liveSocketId && party.liveViewers.has(socket.id);
+    if (allowed) io.to(to).emit("live:signal", { from: socket.id, data });
   });
 
   // ---- talk rooms (WebRTC signalling) ------------------------------------------------------

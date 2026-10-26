@@ -54,5 +54,5 @@ export function useParty(key: string | null) {
   const sendChat = useCallback((text: string) => socketRef.current?.emit("party:chat", { key, text }), [key]);
   const react = useCallback((emoji: string) => socketRef.current?.emit("party:reaction", { key, emoji }), [key]);
 
-  return { state, chat, reactions, connected, error, skewMs: skewRef, control, sendChat, react };
+  return { state, chat, reactions, connected, error, skewMs: skewRef, control, sendChat, react, socketRef };
 }

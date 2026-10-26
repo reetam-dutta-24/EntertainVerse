@@ -52,6 +52,17 @@ export interface PartyState {
   updatedAt: number;
   /** Server epoch ms when this state was sent — lets clients correct clock skew. */
   serverNow: number;
+  /** The host is broadcasting their screen or camera to the room (watch parties). */
+  live: PartyLive | null;
+}
+
+export type PartyLiveKind = "screen" | "camera";
+
+export interface PartyLive {
+  userId: string;
+  kind: PartyLiveKind;
+  /** Server epoch ms — a new broadcast gets a new value, so viewers know to reconnect. */
+  startedAt: number;
 }
 
 export interface PartyChatMessage {
@@ -89,3 +100,6 @@ export function expectedPosition(state: Pick<PartyState, "playing" | "positionSe
 }
 
 export const VOICE_ROOM_LIMIT = 8;
+
+/** Live hosting is browser-to-browser: the host uploads one stream per viewer. */
+export const LIVE_VIEWER_LIMIT = 8;
