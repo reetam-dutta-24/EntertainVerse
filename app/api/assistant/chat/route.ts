@@ -24,6 +24,12 @@ const recent = new Map<string, number[]>();
 
 function rateLimited(userId: string) {
   const now = Date.now();
+  // Forget users whose window has fully passed, so the map can't grow with every user ever seen.
+  if (recent.size > 500) {
+    for (const [id, stamps] of recent) {
+      if (now - stamps[stamps.length - 1] >= WINDOW_MS) recent.delete(id);
+    }
+  }
   const times = (recent.get(userId) ?? []).filter((at) => now - at < WINDOW_MS);
   if (times.length >= MAX_PER_WINDOW) return true;
   times.push(now);

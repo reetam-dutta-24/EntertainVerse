@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import {
   LANDING_FEATURED_COLLECTION,
   LANDING_FEATURED_COMMUNITY,
-  LANDING_FEATURED_COMMUNITY_MEMBERS,
   LANDING_SPOTLIGHT_CONTENT,
   LANDING_SPOTLIGHT_MUSIC,
 } from "@/lib/data/landing";
@@ -53,7 +52,6 @@ export function HighlightsSection() {
   const content = LANDING_SPOTLIGHT_CONTENT;
   const music = LANDING_SPOTLIGHT_MUSIC;
   const community = LANDING_FEATURED_COMMUNITY;
-  const members = LANDING_FEATURED_COMMUNITY_MEMBERS;
   const collection = LANDING_FEATURED_COLLECTION;
 
   return (

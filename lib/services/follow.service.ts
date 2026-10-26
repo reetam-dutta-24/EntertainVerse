@@ -448,6 +448,8 @@ export async function toggleUserFollow(actorId: string, targetHandle: string) {
     select: { name: true, handle: true, avatarUrl: true },
   });
 
+  // Re-checked here, not only via `status` above: they may have sent theirs a moment ago,
+  // and accepting beats leaving two opposite pending requests.
   const reversePending = await prisma.friendRequest.findFirst({
     where: {
       requesterId: target.id,

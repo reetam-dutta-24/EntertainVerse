@@ -29,6 +29,11 @@ const nextConfig: NextConfig = {
         source: "/:folder(images|uploads)/:path*",
         headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
       },
+      {
+        // User uploads: never let a browser sniff an image into HTML or script.
+        source: "/uploads/:path*",
+        headers: [{ key: "X-Content-Type-Options", value: "nosniff" }],
+      },
     ];
   },
 };
