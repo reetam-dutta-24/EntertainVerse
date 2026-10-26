@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { isValidElement, useId } from "react";
 import { ImageUploadInput } from "@/components/ui/image-upload-input";
 import { CatalogMultiSearchPicker } from "@/components/forms/catalog-search-picker";
 import type { SearchResultType } from "@/lib/search/types";
@@ -16,6 +16,8 @@ import type {
 export const inputClass =
   "h-11 rounded-xl border border-white/15 bg-white/5 px-3 text-sm text-white placeholder:text-white/35 focus:border-brand-magenta focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-pink";
 
+const NATIVE_CONTROLS = new Set(["input", "select", "textarea"]);
+
 export function Field({
   label,
   hint,
@@ -25,12 +27,30 @@ export function Field({
   hint?: string;
   children: React.ReactNode;
 }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <span className="text-xs font-semibold uppercase tracking-wide text-white/55">
+  const labelId = useId();
+  const heading = (
+    <>
+      <span id={labelId} className="text-xs font-semibold uppercase tracking-wide text-white/55">
         {label}
       </span>
       {hint ? <span className="text-xs text-white/40">{hint}</span> : null}
+    </>
+  );
+  // A single input / select / textarea: a real <label>, so screen readers announce it
+  // and clicking the text focuses the control.
+  if (isValidElement(children) && typeof children.type === "string" && NATIVE_CONTROLS.has(children.type)) {
+    return (
+      <label className="flex flex-col gap-1.5">
+        {heading}
+        {children}
+      </label>
+    );
+  }
+  // Composite fields (chip pickers, tag lists): a named group — a <label> around several
+  // controls would make clicking the text toggle the first one.
+  return (
+    <div role="group" aria-labelledby={labelId} className="flex flex-col gap-1.5">
+      {heading}
       {children}
     </div>
   );

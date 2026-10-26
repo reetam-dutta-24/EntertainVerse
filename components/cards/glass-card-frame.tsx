@@ -72,7 +72,8 @@ export function GlassCardFrame({ tint, hovered, size, hoverSize, front, back, cl
         animate={{ opacity: hovered ? 0 : 1, scale: hovered ? 0.97 : 1 }}
         transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
         style={{ pointerEvents: hovered ? "none" : "auto" }}
-        aria-hidden={hovered}
+        // inert, not aria-hidden: also takes the hidden face's buttons out of the Tab order.
+        inert={hovered}
       >
         {front}
       </motion.div>
@@ -83,7 +84,7 @@ export function GlassCardFrame({ tint, hovered, size, hoverSize, front, back, cl
         animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 10 }}
         transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1], delay: hovered ? 0.06 : 0 }}
         style={{ pointerEvents: hovered ? "auto" : "none" }}
-        aria-hidden={!hovered}
+        inert={!hovered}
       >
         {back}
       </motion.div>

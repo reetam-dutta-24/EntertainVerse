@@ -73,7 +73,7 @@ export function CommunityDetailHero({
             </div>
           ) : null}
 
-          <div className={cn(CHIP_ROW, "shrink-0")}>
+          <div className={cn(CHIP_ROW, "shrink-0")} tabIndex={0} role="group" aria-label="Details">
             {community.primaryTags.map((tag) => (
               <Chip key={tag} chipKey="action" className={DETAIL_CHIP}>
                 {tag}
@@ -87,7 +87,7 @@ export function CommunityDetailHero({
 
           <CommunityHeroActions communityId={community.id} />
 
-          <div className={cn(CHIP_ROW, "shrink-0")}>
+          <div className={cn(CHIP_ROW, "shrink-0")} tabIndex={0} role="group" aria-label="Details">
             {community.matchScore != null ? (
               <MatchChip score={community.matchScore} className={DETAIL_CHIP} />
             ) : null}

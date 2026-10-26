@@ -246,14 +246,14 @@ function CatalogSearchInput({
                 : "No matches found."}
           </p>
         ) : (
-          <ul className="flex flex-col gap-0.5">
+          <ul role="none" className="flex flex-col gap-0.5">
             {canBrowse && !loading ? (
-              <li className="px-3 py-2 text-micro font-medium uppercase tracking-wide text-white/40">
+              <li aria-hidden="true" className="px-3 py-2 text-micro font-medium uppercase tracking-wide text-white/40">
                 Catalog artists
               </li>
             ) : null}
             {results.map((result, index) => (
-              <li key={`${result.type}-${result.id}`}>
+              <li key={`${result.type}-${result.id}`} role="none">
                 <button
                   type="button"
                   role="option"

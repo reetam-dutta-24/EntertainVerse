@@ -73,7 +73,7 @@ export function ArtistDetailHero({ artist }: ArtistDetailHeroProps) {
             </div>
           ) : null}
 
-          <div className={CHIP_ROW}>
+          <div className={CHIP_ROW} tabIndex={0} role="group" aria-label="Details">
             {artist.genres.map((genre) => (
               <Chip
                 key={genre.id}
@@ -103,7 +103,7 @@ export function ArtistDetailHero({ artist }: ArtistDetailHeroProps) {
             className="max-w-3xl shrink-0"
           />
 
-          <div className={CHIP_ROW}>
+          <div className={CHIP_ROW} tabIndex={0} role="group" aria-label="Details">
             {artist.matchScore != null ? (
               <MatchChip score={artist.matchScore} className={DETAIL_CHIP} />
             ) : null}

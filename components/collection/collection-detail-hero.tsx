@@ -90,7 +90,7 @@ export function CollectionDetailHero({
             </p>
           ) : null}
 
-          <div className={CHIP_ROW}>
+          <div className={CHIP_ROW} tabIndex={0} role="group" aria-label="Details">
             {collection.genres.map((genre) => (
               <Chip
                 key={genre.id}
@@ -112,7 +112,7 @@ export function CollectionDetailHero({
             {collection.description}
           </p>
 
-          <div className={CHIP_ROW}>
+          <div className={CHIP_ROW} tabIndex={0} role="group" aria-label="Details">
             {collection.matchScore != null ? (
               <MatchChip
                 score={collection.matchScore}

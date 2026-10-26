@@ -65,7 +65,8 @@ export function EnumMultiSelect({
     <Field label={label} hint={hint}>
       <div className="flex gap-2">
         <select
-          className={`${inputClass} flex-1`}
+          aria-label={label}
+          className={`${inputClass} min-w-0 flex-1`}
           value=""
           onChange={(e) => {
             const v = e.target.value;

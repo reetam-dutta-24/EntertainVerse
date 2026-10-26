@@ -22,7 +22,7 @@ export function CommunitiesSection() {
           subtitle="Example fan spaces — post, review and chat live, then start a watch party, listen party or voice talk room."
         />
       </ScrollFadeIn>
-      <div className="w-full overflow-x-auto pb-8 pt-2">
+      <div className="w-full overflow-x-auto pb-8 pt-2" tabIndex={0} role="region" aria-label="Example communities">
         <ScrollFadeStagger className="mx-auto flex w-max flex-nowrap items-start gap-7 px-2">
           {communities.map((community) => (
             <ScrollFadeItem key={community.id}>

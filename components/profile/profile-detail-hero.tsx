@@ -109,7 +109,7 @@ export function ProfileDetailHero({ profile, isOwner }: ProfileDetailHeroProps) 
             </div>
           </div>
 
-          <div className={cn(CHIP_ROW, "shrink-0")}>
+          <div className={cn(CHIP_ROW, "shrink-0")} tabIndex={0} role="group" aria-label="Details">
             <Chip variant="indigo" className={DETAIL_CHIP}>
               {profile.location}
             </Chip>

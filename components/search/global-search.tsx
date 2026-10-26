@@ -166,9 +166,9 @@ export function GlobalSearch({
           ) : results.length === 0 ? (
             <p className="px-3 py-4 text-sm text-white/55">No matches yet.</p>
           ) : (
-            <ul className="flex flex-col gap-0.5">
+            <ul role="none" className="flex flex-col gap-0.5">
               {results.map((result, index) => (
-                <li key={`${result.type}-${result.id}`}>
+                <li key={`${result.type}-${result.id}`} role="none">
                   <Link
                     href={result.href}
                     role="option"

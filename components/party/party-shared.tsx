@@ -75,7 +75,7 @@ export function ReactionBar({ onReact }: { onReact: (emoji: string) => void }) {
 
 export function PartyChat({ messages, onSend, viewerUserId }: { messages: PartyChatMessage[]; onSend: (text: string) => void; viewerUserId?: string }) {
   const [draft, setDraft] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLLIElement>(null);
   // Block body: some browsers return a value from scrollIntoView, which React would treat as a cleanup.
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
@@ -95,7 +95,7 @@ export function PartyChat({ messages, onSend, viewerUserId }: { messages: PartyC
         ) : (
           <li className="text-caption text-white/45">Party chat is live — say something.</li>
         )}
-        <div ref={endRef} />
+        <li ref={endRef} aria-hidden="true" />
       </ol>
       <form
         className="flex gap-2"

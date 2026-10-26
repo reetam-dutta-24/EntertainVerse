@@ -29,9 +29,9 @@ import { ONBOARDING_RETAKE_PATH } from "@/lib/onboarding-routes";
 import { cn } from "@/lib/utils";
 import { useConfirm, useToast } from "@/components/feedback/feedback-provider";
 
-function FieldLabel({ children }: { children: React.ReactNode }) {
+function FieldLabel({ children, htmlFor }: { children: React.ReactNode; htmlFor?: string }) {
   return (
-    <label className="text-xs font-semibold uppercase tracking-wide text-muted">
+    <label htmlFor={htmlFor} className="text-xs font-semibold uppercase tracking-wide text-muted">
       {children}
     </label>
   );
@@ -220,17 +220,18 @@ export function SettingsView({ data: initialData }: SettingsViewProps) {
       >
         <div className="flex flex-col gap-1.5">
           <FieldLabel>Email</FieldLabel>
-          <AuthInput icon={Mail} type="email" value={data.email} readOnly disabled />
+          <AuthInput icon={Mail} type="email" value={data.email} readOnly disabled aria-label="Email" />
         </div>
         <div className="flex flex-col gap-1.5">
           <FieldLabel>Username</FieldLabel>
-          <AuthInput icon={AtSign} value={data.handle} readOnly disabled />
+          <AuthInput icon={AtSign} value={data.handle} readOnly disabled aria-label="Username" />
         </div>
         <Divider />
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <FieldLabel>Current password</FieldLabel>
             <AuthInput
+              aria-label="Current password"
               icon={Lock}
               type="password"
               value={passwordForm.currentPassword}
@@ -246,6 +247,7 @@ export function SettingsView({ data: initialData }: SettingsViewProps) {
           <div className="flex flex-col gap-1.5">
             <FieldLabel>New password</FieldLabel>
             <AuthInput
+              aria-label="New password"
               icon={Lock}
               type="password"
               value={passwordForm.newPassword}
@@ -259,6 +261,7 @@ export function SettingsView({ data: initialData }: SettingsViewProps) {
         <div className="flex flex-col gap-1.5 sm:max-w-[50%]">
           <FieldLabel>Confirm password</FieldLabel>
           <AuthInput
+              aria-label="Confirm password"
             icon={Lock}
             type="password"
             value={passwordForm.confirmPassword}
@@ -372,10 +375,11 @@ export function SettingsView({ data: initialData }: SettingsViewProps) {
 
       <SettingsSection title="⚙️ Preferences" subtitle="Saved automatically">
         <div className="flex flex-col gap-1.5">
-          <FieldLabel>Language</FieldLabel>
+          <FieldLabel htmlFor="settings-language">Language</FieldLabel>
           <div className="relative">
             <Globe className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted/80" />
             <select
+              id="settings-language"
               value={preferences.language}
               onChange={(e) => {
                 const value = e.target.value;

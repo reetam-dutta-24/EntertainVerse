@@ -41,7 +41,7 @@ export function HowItWorksSection() {
           subtitle="Start with your taste. EntertainVerse does the rest."
         />
       </ScrollFadeIn>
-      <div className="w-full overflow-x-auto py-6">
+      <div className="w-full overflow-x-auto py-6" tabIndex={0} role="region" aria-label="How it works steps">
         <ScrollFadeStagger className="mx-auto flex w-max flex-nowrap items-stretch gap-6 px-2 lg:gap-8">
         {steps.map((step) => (
           <ScrollFadeItem key={step.number}>

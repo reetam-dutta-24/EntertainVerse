@@ -378,8 +378,6 @@ export function DashboardMessagesPanel() {
                         avatarColor={entry.peer.avatarColor}
                         avatarUrl={entry.peer.avatarUrl}
                         size="sm"
-                        profileHandle={entry.peer.handle}
-                        nestedLink
                       />
                     </WithPresence>
                     <div className="min-w-0 flex-1">
