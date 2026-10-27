@@ -18,6 +18,10 @@ It is a full-stack Next.js application:
 
 > **Why it exists:** people pay for several streaming apps and still lose 20 minutes scrolling. They don't know what to watch next, or in what order. EntertainVerse answers *what*, *why* and *in what order*.
 
+🌐 **Live demo:** https://showed-automotive-opinions-travelling.trycloudflare.com
+
+> The demo runs on demand to keep AWS costs down. Each time the servers are started, the free HTTPS tunnel gets a **new address**, so this link only works while that demo is up. If it doesn't load, the demo is off; ask for a fresh link. Sign in with a demo account from [Seeded accounts](#seeded-accounts), e.g. `reetam@entertainverse.local` / `User123!`.
+
 📍 **Full history, architecture deep dive, decisions, bugs and interview notes:** [project-roadmap.md](project-roadmap.md)
 
 ---
