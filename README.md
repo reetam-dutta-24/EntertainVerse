@@ -1,31 +1,43 @@
-# AniVerse
+# EntertainVerse
 
-**AniVerse** is an AI-powered entertainment hub for anime, shows, K-dramas, films and music. You discover titles matched to your taste, with a reason for every pick. AI mode turns your mood into a time-budgeted roadmap of what to watch or listen to next. AI Match opens rooms with people who share your taste, and every community has live watch parties, listen parties and voice talk rooms. You can ask for a spoiler-safe recap before you continue a show, see your Taste DNA change month by month, and get a Spotify-style Wrapped of your year.
+**EntertainVerse** is an AI-powered entertainment hub for anime, shows, K-dramas, films and music. You discover titles matched to your taste, with a reason for every pick. AI mode turns your mood into a time-budgeted roadmap of what to watch or listen to next. AI Match opens rooms with people who share your taste. Every community has live watch parties, listen parties and voice talk rooms. You can also:
 
-It's a full-stack Next.js application: PostgreSQL + Prisma, NextAuth (credentials + Google), **108 REST API routes**, Socket.IO realtime (community chat, DMs, synced parties, WebRTC voice signalling), a role-scoped admin CMS with AI-assisted import, a hybrid deep-learning recommender built on Gemini, and retrieval-augmented generation (RAG) for recaps, roadmaps and AI mode.
+- ask for a spoiler-safe recap before you continue a show
+- see your Taste DNA change month by month
+- get a Spotify-style Wrapped of your year
+- ask the in-app assistant anything about the app
 
-> **Why it exists:** people pay for several streaming apps and still lose 20 minutes scrolling — they don't know what to watch next, or in what order. AniVerse answers *what*, *why* and *in what order*.
+It is a full-stack Next.js application:
 
-📍 **Full history, status and what's left:** [project-roadmap.md](project-roadmap.md)
+- **Data and auth:** PostgreSQL + Prisma, and NextAuth (credentials + Google).
+- **API:** 112 REST route handlers.
+- **Realtime:** Socket.IO (community chat, DMs, presence, synced parties, WebRTC signalling).
+- **Admin:** a role-scoped CMS with AI-assisted import.
+- **AI:** a hybrid recommender built on Gemini embeddings, and retrieval-augmented generation (RAG) for recaps, roadmaps and the assistant.
+- **Production:** it runs on **two servers behind an AWS load balancer**, with Redis, S3, health checks and graceful shutdown. It is tested end to end against that layout.
+
+> **Why it exists:** people pay for several streaming apps and still lose 20 minutes scrolling. They don't know what to watch next, or in what order. EntertainVerse answers *what*, *why* and *in what order*.
+
+📍 **Full history, architecture deep dive, decisions, bugs and interview notes:** [project-roadmap.md](project-roadmap.md)
 
 ---
 
 ## Contents
 
 - [Highlights](#highlights)
-- [AI features](#ai-features)
 - [Tech stack](#tech-stack)
 - [Getting started](#getting-started)
 - [Architecture](#architecture)
-- [User flow](#user-flow)
+- [Running on several servers](#running-on-several-servers)
+- [Testing](#testing)
+- [Deployment (AWS)](#deployment-aws)
 - [Routes](#routes)
 - [API surface](#api-surface)
 - [Data model](#data-model)
-- [Feature wiring map](#feature-wiring-map)
 - [Project structure](#project-structure)
 - [Scripts](#scripts)
 - [Design system](#design-system)
-- [Status & what's left](#status--whats-left)
+- [Status](#status)
 
 ---
 
@@ -34,52 +46,20 @@ It's a full-stack Next.js application: PostgreSQL + Prisma, NextAuth (credential
 | | |
 |---|---|
 | 🎯 **Hybrid recommender** | Explicit taste + semantic embeddings (`gemini-embedding-001`) + collaborative filtering + watch/listen history. Every card says *why*. |
-| ✨ **AI mode** | Watch or Listen. Answer by an animated taste quiz **or** a chat; get explained picks instantly. |
-| 🗺️ **AI roadmaps** | An ordered plan that fits your weekly hours, with a written analysis of your taste. Steps tick off as you watch. |
-| 📒 **Smart collections** | Weekly collection ideas learned from your behaviour — save or dismiss. |
-| 🛠️ **AI-assisted Admin CMS** | Import titles, songs and artists from TMDB, AniList, Apple Music, Deezer and MusicBrainz; AI review before publishing. |
+| ✨ **AI mode & roadmaps** | Watch or Listen: a taste quiz or a chat gives explained picks, then an ordered plan that fits your weekly hours and ticks off as you watch. |
+| 📒 **Smart collections** | Weekly collection ideas learned from your behaviour. Save or dismiss. |
+| 💬 **Assistant** | Ask anything in the app shell. RAG over 28 help articles, the catalog and your own stats, with cited sources. |
+| 🛠️ **AI-assisted admin CMS** | Import titles, songs and artists from TMDB, AniList, Apple Music, Deezer and MusicBrainz, with an AI review before publishing. |
 | 🎬 **Legal media** | Official trailers, "where to watch" (JustWatch via TMDB), official 30-second previews and listen links. |
-| 🤝 **AI Match rooms** | Open a room and everyone whose taste matches (nearby, in your country or worldwide) gets a popup invite. One tap to join. |
-| 🍿 **Watch, listen & talk parties** | Synced watch parties and listen parties, plus voice talk rooms (WebRTC) in every community. Group AI mode picks what works for everyone. |
-| 🧠 **Catch me up** | Tell the AI where you stopped; it recaps only what you've seen, grounded in episode guides or the web (RAG). |
-| 🧬 **Taste DNA & Wrapped** | Your taste traits month by month, the "eras" they form, and a Spotify-style Wrapped with an AI-named persona and a share card. |
-| 💬 **Social & realtime** | Communities with posts and live chat, friends, DMs, collaborative collections. |
-| 📊 **Live analytics** | Watch/listen time, taste fit, rhythm and traits from real-time activity. |
-| ⏳ **Daily limit** | Set a daily screen-time limit; a 5-minute warning, then the app locks until midnight. |
+| 🤝 **AI Match rooms** | Open a room, and everyone whose taste matches (nearby, in your country or worldwide) gets a popup invite. |
+| 🍿 **Watch, listen & talk** | Synced watch and listen parties. The host can go live with their screen or camera. Voice talk rooms (WebRTC). Group picks that suit everyone. |
+| 🧠 **Catch me up** | A recap of only what you've seen, grounded in episode guides or the web (RAG). |
+| 🧬 **Taste DNA & Wrapped** | Your taste traits month by month, and a story of your year with an AI-named persona and a share card. |
+| 💬 **Social & realtime** | Communities with posts and live chat; friends; DMs with online status, typing, edits and deletes; collaborative collections. |
+| 📊 **Live analytics** | Watch/listen time, taste fit, rhythm and traits from real activity. |
+| ⏳ **Daily limit** | A 5-minute warning, then the app locks until midnight. |
 | 🔐 **You own your data** | See, edit, download or wipe what the AI knows; switch off learning. |
-
----
-
-## AI features
-
-| Feature | What it does | Where |
-|---|---|---|
-| **Hybrid recommender** | Blends explicit taste (50%), semantic similarity from a pre-trained embedding model (35%) and item-item collaborative filtering (15%). Learns from watch/listen history with a 30-day half-life. | Home, Discover, For You, "more like this" |
-| **"Why this?" on every card** | Spoiler-free reasons — *"Because you loved Squid Game · Thriller & Drama"*, *"Fits your vibe · Cozy & Funny"*, *"Has Money Heist + 4 more you love"*. | Hover/focus any recommended card |
-| **AI mode** | Watch or Listen. An animated quiz (vibe, themes, pace, commitment, hours/week, things to avoid, viewer personality) **or** a chat where Gemini turns free text into structured answers, asking one follow-up at a time. | `/dashboard/ai-mode`, Home spotlight, For You, Discover |
-| **AI roadmaps** | 6–9 ordered steps in phases with a written taste analysis. Runtimes come from catalog data and are scheduled into weeks of your hours. Steps update from real activity; stalled ones get a swap; an adjust-chat ("make it shorter", "more anime") rebuilds the rest and keeps finished steps. | `/dashboard/ai-mode/roadmap` |
-| **Smart collections** | Each week, your strongest learned vibes become collection ideas — mostly your own titles plus close picks. | Collections page |
-| **Social recommendations** | Public collections and communities ranked by taste fit, titles you love inside them, and "kindred" members who share your favourites. | Home, Collections, Community |
-| **AI profile** | Taste map ("your taste reads as…"), what was learned from activity, every answer as a removable chip; switch off learning, download (JSON) or wipe. | Settings → What the AI knows |
-| **AI Match** | Opt-in profile (scope, approximate location, intent). When someone opens a room, AniVerse scores every opted-in user by taste similarity (embeddings), shared favourites, personality and distance, then invites strong matches (≥ 60%) or the best available. Invites arrive as a popup and a notification. Each room gets its own community with a watch channel and a voice channel. | `/dashboard/ai-mode/match` |
-| **Group AI mode** | "What should we watch / listen to?" inside a party. Every member's ranking scores a shared pool; titles most of the group has already seen are dropped. A pick must work for the least-happy member too (60% mean + 40% minimum). Each pick shows the fit for every person, plus a one-line AI verdict. | Watch & listen parties |
-| **Catch me up (RAG)** | Asks where you stopped (prefilled from watch history) and how much you remember. **Retrieves** episode descriptions up to that point, or web research limited to it, then **generates** a recap with a strict "never past the stopping point" rule, with sources shown. Cached per title, stopping point and depth. | "Catch me up" on title pages |
-| **Taste DNA history** | Each month's watching and favourites become a point in embedding space, read against the trait vocabulary on one shared scale. Shows strands for your strongest traits, rising and fading traits, and eras. | Analytics |
-| **AniVerse Wrapped** | A story of your year built from real activity: hours, top titles, songs and artists, genres and format, vibes, eras, rhythm, longest streak, your top-% rank, and an AI-named persona. It ends with a 1080×1920 share card drawn on canvas. | `/dashboard/wrapped` |
-| **Admin AI import & review** | Facts (episodes, cast, durations, members, artwork) mapped in code from metadata APIs; editorial fields drafted by the model; a second AI pass reviews the whole form, with one-click fixes and live progress. | Admin CMS |
-
-**How it's built**
-
-- **Embeddings:** every catalog item becomes a spoiler-free text (type, genres, tags, credits, synopsis), encoded by `gemini-embedding-001` (768 dimensions). Vectors live in `CatalogEmbedding` and are re-embedded only when an item's text changes; the sync runs after every admin save. The catalog is a few hundred items, so similarity search is an in-memory dot product — no vector database.
-- **Grounded generation:** the LLM only ever picks from catalog IDs the recommender hands it (schema-enforced enums), so it can't recommend titles that don't exist. Facts are never generated — they come from metadata APIs.
-- **RAG:** every generative feature retrieves real data first, then generates from it.
-  - AI mode and roadmaps: retrieve ranked catalog candidates, then generate the order and analysis.
-  - Admin import/review: retrieve metadata API facts plus Google-Search-grounded research, then generate drafts.
-  - Recaps: retrieve episode guides up to the stopping point, else web research limited to it, then generate the recap; sources are shown.
-- **Free-tier aware:** Gemini Flash for heavy admin work and roadmaps; it falls back automatically to Flash-Lite when its ~20/day free quota runs out. Flash-Lite handles the high-volume, user-facing calls: chat, recaps, group verdicts and Wrapped personas. Embeddings are paced to 100/min. Without any AI key, everything falls back to the taste engine.
-- **Pluggable provider:** `AI_PROVIDER=gemini` (default, free) or `claude` (Anthropic, paid).
-- **Evaluation:** `npm run eval:recommender` runs a leave-one-out test. Latest titles result: full hybrid **MRR@20 0.350** vs 0.203 popularity baseline and 0.189 taste engine alone ([docs/recommender-evaluation.md](docs/recommender-evaluation.md); small seeded dataset, so treat it as indicative).
-- **Copyright-safe:** no scraped video or audio, no generated or imported lyrics — only official trailers, official previews and links to legal services.
+| ♿ **Accessible & responsive** | 0 axe violations and 0 px horizontal overflow on every route from 320 px to desktop. |
 
 ---
 
@@ -87,19 +67,21 @@ It's a full-stack Next.js application: PostgreSQL + Prisma, NextAuth (credential
 
 | Layer | Technology |
 |---|---|
-| Framework | [Next.js 16](https://nextjs.org) (App Router, React Server Components) + custom `server.ts` |
+| Framework | [Next.js 16](https://nextjs.org) (App Router, React Server Components) + a custom `server.ts` |
 | Language | TypeScript 5 |
 | UI | React 19, Tailwind CSS v4, Framer Motion, Lucide, CVA |
-| Auth | [NextAuth.js v5](https://authjs.dev) — JWT sessions; credentials, Google (Discord wired) |
-| Database | PostgreSQL + Prisma 6 |
+| Auth | [NextAuth.js v5](https://authjs.dev): JWT sessions; credentials, Google (Discord wired) |
+| Database | PostgreSQL 16 + Prisma 6 |
+| Realtime | Socket.IO 4 (`/api/socket/io`) + the Redis adapter; WebRTC for voice and live hosting |
+| Shared state | Redis 7: Socket.IO adapter, party state, cache invalidation, rate limits (optional on one server) |
+| File storage | Local `public/` or Amazon S3 (`@aws-sdk/client-s3`) |
 | Validation | Zod 4 |
-| Realtime | Socket.IO 4 (`/api/socket/io`) |
-| Charts | Recharts 3 |
-| AI | Google Gemini via `@google/genai` (Flash, Flash-Lite, `gemini-embedding-001`); Anthropic Claude optional via `@anthropic-ai/sdk` |
+| AI | Google Gemini via `@google/genai` (Flash, Flash-Lite, `gemini-embedding-001`); Anthropic Claude optional |
 | Metadata APIs | TMDB, AniList, Apple Music (iTunes Search), Deezer, MusicBrainz, JustWatch (via TMDB) |
-| Security | bcryptjs passwords, role-gated admin APIs, server-only AI keys |
+| Testing | Vitest + Testing Library; Playwright (+ axe-core) |
+| Delivery | Docker (multi-stage), GitHub Actions (CI + GHCR images), AWS EC2 + ALB + S3 |
 
-> Use `npm run dev` / `npm start` (runs `tsx server.ts`). Plain `npm run dev:next` starts Next **without** Socket.IO — community chat, live DMs, watch/listen parties and talk rooms won't work.
+> Use `npm run dev` / `npm start` (runs `tsx server.ts`). Plain `npm run dev:next` starts Next **without** Socket.IO, so chat, live DMs, parties and talk rooms won't work.
 
 ---
 
@@ -107,158 +89,163 @@ It's a full-stack Next.js application: PostgreSQL + Prisma, NextAuth (credential
 
 ### Prerequisites
 
-- Node.js 20+
-- PostgreSQL (running locally on `localhost:5432` by default)
-- npm
+- Node.js 20+ (the Docker image uses 22)
+- PostgreSQL on `localhost:5432` (or any `DATABASE_URL`)
+- Redis and S3 are **not** needed locally. Without them the app runs as a single server with memory and disk.
 
-### 1. Install
+### 1. Install and configure
 
 ```bash
-cd aniverse-application
 npm install
-```
-
-### 2. Environment
-
-```bash
 cp .env.example .env.local
 ```
 
 | Variable | Required | Purpose |
 |---|---|---|
 | `DATABASE_URL` | Yes | PostgreSQL connection |
-| `AUTH_SECRET` | Yes | JWT signing (`npx auth secret`) |
-| `AUTH_URL` / `NEXTAUTH_URL` | Yes (dev) | e.g. `http://localhost:3000` |
+| `AUTH_SECRET` | Yes | JWT signing (`npx auth secret`); `NEXTAUTH_SECRET` is also accepted |
+| `AUTH_URL` / `NEXTAUTH_URL` | Yes | Public URL, e.g. `http://localhost:3000` |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` / `ADMIN_NAME` / `ADMIN_HANDLE` | Seed | Super-admin account created by the seed |
-| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Optional | Google sign-in (redirect URI `http://localhost:3000/api/auth/callback/google`) |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Optional | Google sign-in (redirect URI `<url>/api/auth/callback/google`) |
 | `AUTH_DISCORD_ID` / `AUTH_DISCORD_SECRET` | Optional | Discord sign-in |
-| `GEMINI_API_KEY` | Recommended | All AI features — free key from [Google AI Studio](https://aistudio.google.com/apikey) |
+| `GEMINI_API_KEY` | Recommended | All AI features. A free key comes from [Google AI Studio](https://aistudio.google.com/apikey). |
 | `AI_PROVIDER` | Optional | `gemini` (default) or `claude` |
 | `GEMINI_MODEL` / `GEMINI_FAST_MODEL` | Optional | Override `gemini-flash-latest` / `gemini-flash-lite-latest` |
 | `ANTHROPIC_API_KEY` | Optional | Claude as the provider (paid) |
-| `TMDB_API_KEY` or `TMDB_READ_ACCESS_TOKEN` | Optional | Movies/shows/K-drama import, trailers, "where to watch" (anime import via AniList needs no key) |
+| `TMDB_API_KEY` or `TMDB_READ_ACCESS_TOKEN` | Optional | Movie/show import, trailers, "where to watch" |
 | `WATCH_REGION` | Optional | Country for providers, previews and listen links (default `IN`) |
-| `NEXT_PUBLIC_SOCKET_URL` / `NEXT_PUBLIC_APP_URL` | Optional | Socket client URL / public app URL |
+| `NEXT_PUBLIC_APP_URL` | Production | Public URL; also the Socket.IO CORS origin |
+| `REDIS_URL` | Several servers | Turns on the Socket.IO adapter, shared party state, cache sync and shared rate limits |
+| `S3_BUCKET` / `S3_REGION` | Several servers | Uploads go to S3 instead of `public/` (credentials come from the AWS SDK chain, e.g. an instance role) |
+| `S3_ENDPOINT` | Optional | An S3-compatible server in development (e.g. S3Mock) |
+| `SERVER_NAME` | Optional | Shown by `/api/health`, so you can tell servers apart |
+| `SHUTDOWN_DRAIN_MS` | Optional | How long to keep serving after SIGTERM (default 10 000 in production, 0 in dev) |
+| `TURN_URLS` / `TURN_USERNAME` / `TURN_CREDENTIAL` | Optional | TURN relay for voice and live hosting on strict networks |
+| `SERVER_CACHE` | Optional | `off` bypasses the server cache (debugging) |
 
-Never commit `.env.local`; AI and API keys are only read on the server.
+Never commit `.env.local`. AI and API keys are only read on the server.
 
-### 3. Database
+### 2. Database and AI setup
 
 ```bash
-npm run db:generate
 npm run db:migrate      # or: npx prisma migrate deploy
 npm run db:seed
+npm run embed:catalog   # once, after adding GEMINI_API_KEY (~2 min on the free tier)
 ```
 
-### 4. AI setup (once, after adding `GEMINI_API_KEY`)
+### 3. Run
 
 ```bash
-npm run embed:catalog   # embeds every catalog item for the recommender (~2 min on the free tier)
+npm run dev             # http://localhost:3000
 ```
 
-### 5. Run
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-### 6. Seeded accounts
+### Seeded accounts
 
 | Role | Login |
 |---|---|
-| Super admin | `admin@aniverse.local` / `Admin123!` (or your `ADMIN_*` values) |
-| Content admin | `content@aniverse.local` / `Content123!` |
-| Music admin | `music@aniverse.local` / `Music123!` |
-| Artist admin | `artist@aniverse.local` / `Artist123!` |
-| Demo users | Created by the seed; `npx tsx scripts/seed-active-profile.ts` fills an account with realistic activity |
+| Super admin | `admin@entertainverse.local` / `Admin123!` (or your `ADMIN_*` values) |
+| Content admin | `content@entertainverse.local` / `Content123!` |
+| Music admin | `music@entertainverse.local` / `Music123!` |
+| Artist admin | `artist@entertainverse.local` / `Artist123!` |
+| Demo users | `reetam@`, `aisha@`, `vikram@entertainverse.local` / `User123!` |
 
 **Roles:** `USER` · `CONTENT_ADMIN` · `MUSIC_ADMIN` · `ARTIST_ADMIN` · `SUPER_ADMIN`
 
 ### Troubleshooting
 
-- **`prisma generate` fails with `EPERM` on Windows:** stop `npm run dev`, regenerate, restart.
-- **`next build` fails inside `.next/dev/types/...`:** a dev server left a half-written file; restart `npm run dev`.
+- **`prisma generate` fails with `EPERM` on Windows:** stop `npm run dev`, regenerate, then restart.
+- **`next build` fails inside `.next/dev/types/...`:** a dev server left a half-written file. Restart `npm run dev`.
 - **Google sign-in "AccessDenied":** usually PostgreSQL isn't running.
-- **TMDB unreachable in India:** the app already uses `api.tmdb.org` (the `api.themoviedb.org` host is ISP-blocked).
-- **AI says the free-tier limit was reached:** Flash allows ~20 requests/day; the app falls back to Flash-Lite automatically, or try again tomorrow.
-- **A recap says "grounded in the synopsis only":** the free Google Search grounding quota is used up for the day. That recap isn't cached, so a fuller, web-grounded one is written once the quota returns.
-- **Talk room can't connect between two networks:** WebRTC uses public STUN only; very strict NATs need a TURN server.
+- **TMDB unreachable in India:** the app already uses `api.tmdb.org`, because `api.themoviedb.org` is ISP-blocked.
+- **"Free-tier limit reached":** Flash allows about 20 requests/day. The app falls back to Flash-Lite automatically.
+- **Talk room connects but there's no audio between networks:** set a TURN server (`TURN_URLS`, …).
 
 ---
 
 ## Architecture
 
 ```
-Browser (client components)
-   │
-   ├── REST ──────────► app/api/** ──► lib/services/** ──► Prisma ──► PostgreSQL
-   │                        │
-   │                        └── AI routes ──► lib/ai/** (Gemini / Claude)
-   │                                           lib/recommender/** (embeddings, hybrid, social)
-   │                                           lib/catalog-import/sources/** (TMDB, AniList, iTunes, Deezer, MusicBrainz)
-   │
-   ├── NDJSON streams ◄── long AI tasks (admin import/review, roadmap builds) report live progress
-   │
-   ├── Socket.IO ─────► server.ts ──► lib/socket/server.ts (community chat, DM rooms)
-   │                                   lib/socket/parties.ts (synced watch/listen parties, WebRTC voice signalling)
-   │
-   └── RSC pages ─────► lib/data/** (thin accessors) ──► lib/services/** ──► Prisma
-```
-
-**Recommender pipeline**
-
-```
-catalog item ──► spoiler-free text ──► gemini-embedding-001 ──► CatalogEmbedding (768-d)
-                                                                     │
-user: favorites · history (30-day decay) · watchlist · follows · AI-mode answers
-         │                                                           │
-         ▼                                                           ▼
-  taste engine score (50%)  +  semantic similarity to taste centroid (35%)  +  co-occurrence (15%)
-         │
-         ▼
-  diversified ranking + "why this" reason ──► cards · AI mode · roadmaps (LLM orders real IDs only)
+Browser
+  ├── RSC pages ─────► app/**/page.tsx ─► lib/data/** ─► lib/services/** ─► Prisma ─► PostgreSQL
+  ├── REST ──────────► app/api/**/route.ts (Zod, auth) ─► lib/services/**
+  │                         └─ AI routes ─► lib/ai/** · lib/recommender/** · lib/assistant/**
+  ├── NDJSON streams ◄─ long AI tasks (imports, reviews, roadmaps, recaps, assistant)
+  └── Socket.IO ─────► server.ts ─► lib/socket/server.ts   (auth, chat, DMs)
+                                     lib/socket/parties.ts  (parties, talk rooms, live hosting)
+                                     lib/socket/presence.ts (online status, typing)
+                                         │
+                       Redis (optional) ─┘ adapter · shared store · cache sync · rate limits
 ```
 
 | Layer | Responsibility |
 |---|---|
 | `app/**/page.tsx` | Routes, layouts, server data loading |
-| `components/**` | UI by domain |
-| `lib/data/**` | Page-oriented accessors |
-| `lib/services/**` | Business logic (auth, catalog, feeds, social, DMs, analytics, AI profile, roadmaps…) |
-| `lib/ai/**` | LLM provider layer, admin import/review, AI-mode chat, roadmap planner, progress streaming |
-| `lib/recommender/**` | Embeddings store, hybrid scoring, collection/community ranking |
-| `lib/ai-profile/**` · `lib/roadmap/**` | Client-safe AI vocabularies, schemas, quiz, runtime estimates |
-| `lib/catalog-import/**` | Metadata source clients |
-| `lib/mappers/**` · `lib/validators/**` | DB → view models · Zod request schemas |
-| `lib/socket/**` | Realtime auth, rooms, broadcast, party state and voice signalling |
-| `lib/party/**` · `lib/match/**` · `lib/recap/**` · `lib/wrapped/**` · `lib/screen-time/**` | Client-safe types for parties, AI Match, recaps, Wrapped and the daily limit |
+| `app/api/**/route.ts` | REST handlers: validate, authorise, call a service |
+| `components/**` | UI by domain. Client components never import server modules (enforced by a test). |
+| `lib/services/**` | Business logic (40 services); the only layer that uses Prisma |
+| `lib/data/**` · `lib/mappers/**` · `lib/validators/**` | Page accessors · DB → view models · Zod schemas |
+| `lib/cache/**` | Per-server cache (TTL + stale-while-revalidate, single-flight, tags, LRU). Writes invalidate it automatically through a Prisma extension, and invalidations are shared through Redis. |
+| `lib/ai/**` · `lib/recommender/**` · `lib/assistant/**` | LLM providers, recommender maths, RAG |
+| `lib/socket/**` · `lib/redis.ts` · `lib/rate-limit.ts` | Realtime, shared state, rate limiting |
+| `lib/file-storage.ts` | Disk or S3 uploads behind one interface |
 | `prisma/schema.prisma` | Source of truth for the data model |
+
+**Recommender:** `score = 0.50 × taste engine + 0.35 × semantic similarity (embeddings) + 0.15 × collaborative co-occurrence`. History decays with a 30-day half-life. In an offline leave-one-out test, the full hybrid scored **MRR@20 0.350**, against 0.203 for a popularity baseline ([docs/recommender-evaluation.md](docs/recommender-evaluation.md)).
 
 ---
 
-## User flow
+## Running on several servers
+
+The same build runs as one server (local dev) or several behind a load balancer. Setting `REDIS_URL` and `S3_BUCKET` switches on the shared pieces:
+
+| Concern | Single server | Several servers |
+|---|---|---|
+| Socket.IO emits | In process | Redis adapter: an emit reaches users on every server |
+| Party / talk-room state | Memory | Redis store with locked read-modify-write and a TTL |
+| Server cache | Local invalidation | Invalidations published on Redis pub/sub |
+| Online status | Local socket counts | Asks every server before announcing "offline" |
+| Rate limits | Memory | Redis sorted-set sliding window |
+| Uploads | `public/uploads` | S3, served through `/uploads/...` |
+
+- **`GET /api/health`** checks the database and Redis (2 s timeout each). It returns `200 {status:"ok", server, checks}`, or `503` when unhealthy or draining.
+- **On SIGTERM**, the server fails its health check, keeps serving for `SHUTDOWN_DRAIN_MS`, then closes its sockets. Browsers reconnect to the other server and rejoin their rooms, so parties keep their host, position and members.
+
+---
+
+## Testing
+
+| Suite | Command | What |
+|---|---|---|
+| Unit | `npm test` | **449 tests** (Vitest): services with a Prisma mock, recommender maths, cache and invalidation, the shared store, rate limits, file storage, auth helpers, hooks, health route, and an architecture test for client/server imports |
+| E2E | `npm run test:e2e` | Playwright against a production build: auth flows (including the open-redirect guard and the sign-out race), mobile layout and navigation |
+| E2E, two servers | `npm run test:e2e:stack` | Builds the Docker image and runs nginx + 2 app servers + Postgres + Redis + S3 mock. Tests cross-server DMs, party sync, shared uploads and cache clearing, then **stops a server mid-party (failover)**. Add `-- --keep` to leave it at `http://localhost:8080`. |
+
+**CI** (`.github/workflows/ci.yml`) runs typecheck → lint → unit tests → build, plus the E2E job, on every push and PR. `.github/workflows/docker.yml` builds the image and pushes it to GHCR (`:latest` and `:<commit-sha>`) on every push to `main`.
+
+---
+
+## Deployment (AWS)
 
 ```
-Landing (/)
-   ├── Login (/login) ── credentials or Google ──► /api/auth/redirect-destination
-   │                                                  ├── onboarding incomplete → /onboarding
-   │                                                  └── else → /dashboard
-   └── Signup (/signup) ── POST /api/auth/register ──► /onboarding (taste quiz → TasteProfile)
-
-Dashboard (/dashboard)
-   ├── Home ── AI-mode spotlight (tonight's picks · roadmap progress) · feeds · communities · collections
-   ├── AI Mode ── Watch / Listen ── quiz or chat ──► explained picks ──► Build my roadmap
-   │          └── AI Match ── open a room ──► matched users get a popup ──► room community (party · talk room · DMs)
-   ├── Discover · For You · Watchlist · Collections (+ smart ideas) · Favourites
-   ├── Analytics (+ Taste DNA history) · Wrapped · Messages · Community · Settings (+ What the AI knows, daily limit)
-   ├── Search (/search?q=…)
-   └── Detail & play: /content/[id] (+ in-hero trailer, Catch me up, where to watch, /watch) · /song/[id] (+ preview, listen links)
-                      /artist/[id] · /collection/[id] (+ /play) · /profile/[handle] · /community/[slug]
-
-Admin (/admin) ── role-gated CMS ── AI import · AI review · clear form
+Browser ─HTTPS─► Cloudflare quick tunnel ─► ALB (HTTP :80, sticky, /api/health)
+                                              ├─► Server A  app + Postgres + Redis   (t3.small, zone 2b)
+                                              └─► Server B  app                     (t3.small, zone 2a)
+                                                       uploads ─► S3 (via IAM role)
 ```
+
+| Piece | Where |
+|---|---|
+| Image | `Dockerfile`: multi-stage, `node:22-bookworm-slim`, non-root, `HEALTHCHECK`, Node as PID 1 for clean SIGTERM. Builds without a database. |
+| Registry | `ghcr.io/reetam-dutta-24/entertainverse`, built by GitHub Actions |
+| Server config | `deploy/server-a.compose.yml`, `deploy/server-b.compose.yml`, and `deploy/env.example` (copied to `~/entertainverse/` on each server) |
+| Networking | Port 3000 only from the ALB's security group. Postgres and Redis bound to A's private IP and open only to the app servers. The S3 bucket is private and reached through an instance role. |
+| On demand | `.\deploy\up.ps1` starts the servers, creates the ALB, opens an HTTPS quick tunnel, points the apps at its URL, and waits until both targets are healthy. `.\deploy\down.ps1` deletes the ALB and stops the servers. |
+
+To ship a new version: push to `main`, then on each server (one at a time) run `docker compose pull && docker compose up -d`. If the schema changed, first run `docker compose run --rm app npx prisma migrate deploy` on server A.
+
+Full walkthrough, AWS resources, runbook and limits: [project-roadmap.md §11](project-roadmap.md#11-containers-and-production-on-aws).
+
+<img width="2868" height="1528" alt="EntertainVerse running on AWS EC2" src="https://github.com/user-attachments/assets/ca182eb8-ae1c-4b38-a16c-5d934f9c4817" />
 
 ---
 
@@ -268,7 +255,7 @@ Admin (/admin) ── role-gated CMS ── AI import · AI review · clear form
 
 | Route | Description |
 |---|---|
-| `/` | Marketing landing |
+| `/` | Landing |
 | `/login` · `/signup` | Credentials + Google |
 | `/search?q=` | Ranked search results |
 
@@ -276,160 +263,103 @@ Admin (/admin) ── role-gated CMS ── AI import · AI review · clear form
 
 | Route | Description |
 |---|---|
-| `/onboarding` | Taste quiz (DB-persisted) |
+| `/onboarding` | Taste quiz |
 | `/dashboard` | Home: AI-mode spotlight, feeds, communities, collections |
-| `/dashboard/ai-mode` | AI mode — Watch/Listen, quiz or chat, explained picks |
-| `/dashboard/ai-mode/roadmap` | AI roadmaps (`?mode=watch|listen`) |
-| `/dashboard/ai-mode/match` | AI Match: profile, open a room, your rooms |
-| `/dashboard/discover` · `/dashboard/for-you` | Hybrid-ranked feeds + AI-mode launcher |
-| `/dashboard/watchlist` · `/dashboard/favorites` | Library |
-| `/dashboard/collections` | Collections hub + "AI made these for you" |
-| `/dashboard/community` | Community hub |
-| `/dashboard/analytics` | Live analytics + Taste DNA history |
-| `/dashboard/wrapped` | AniVerse Wrapped story + share card |
-| `/dashboard/messages` · `/dashboard/notifications` | DMs · notifications |
-| `/dashboard/settings` · `/dashboard/settings/ai` | Settings (incl. daily limit) · What the AI knows |
+| `/dashboard/ai-mode` (+ `/roadmap`, `/match`) | AI mode · roadmaps · AI Match |
+| `/dashboard/discover` · `/dashboard/for-you` | Hybrid-ranked feeds |
+| `/dashboard/watchlist` · `/dashboard/favorites` · `/dashboard/collections` | Library |
+| `/dashboard/community` · `/dashboard/messages` · `/dashboard/notifications` | Social |
+| `/dashboard/analytics` · `/dashboard/wrapped` | Analytics + Taste DNA · Wrapped |
+| `/dashboard/settings` (+ `/ai`) | Settings, daily limit · what the AI knows |
 
-### Detail & play
+### Detail and play
 
 | Route | Description |
 |---|---|
-| `/content/[contentid]` | Title detail; "Watch trailer" plays inside the hero image panel; "Catch me up" recap; where to watch |
-| `/content/[contentid]/watch` · `/watch/[episodeid]` | Player + watch events |
-| `/song/[songid]` | Track detail, 30s preview, listen links |
-| `/artist/[artistid]` · `/play` | Artist detail, listen links · artist play flow |
-| `/collection/[collectionid]` · `/play` | Collection (content or music) · player |
-| `/music-collection/[collectionid]` | Legacy redirect → `/collection/...` |
-| `/profile/[userid]` · `/friends` | Profile · friends |
-| `/community/[communityid]` · `/dashboard/[section]` | Community landing · in-community dashboard |
-
-**Community sections:** `posts` · `chat` · `anime-chat` · `watch-channel` (watch party) · `listen-party` · `voice-channel` (talk rooms) · `announcements` · `analytics` · `settings`
+| `/content/[id]` (+ `/watch`, `/watch/[episode]`) | Title page (in-hero trailer, Catch me up, where to watch) · player |
+| `/song/[id]` · `/artist/[id]` (+ `/play`) | Track (preview, listen links) · artist |
+| `/collection/[id]` (+ `/play`) | Collection · player |
+| `/profile/[handle]` (+ `/friends`) | Profile · friends |
+| `/community/[id]` (+ `/dashboard/[section]`) | Community landing · dashboard: `posts`, `chat`, `anime-chat`, `watch-channel`, `listen-party`, `voice-channel`, `announcements`, `analytics`, `settings` |
 
 ### Admin
 
-| Route | Description |
-|---|---|
-| `/admin` | CMS overview |
-| `/admin/{content,music,artists,collections,communities}` (+ `/new`, `/[id]/edit`) | Role-gated CRUD with AI import (content, music, artists), AI review and clear-form |
+`/admin`, and `/admin/{content,music,artists,collections,communities}` (+ `/new`, `/[id]/edit`): role-gated CRUD with AI import and AI review.
 
 ---
 
 ## API surface
 
-108 route handlers under `app/api/**`, grouped:
+112 route handlers under `app/api/**`, plus `/uploads/[...path]`:
 
 | Group | Routes |
 |---|---|
 | **Auth** | `/api/auth/[...nextauth]` · `register` · `redirect-destination` · `clear-stale-session` |
 | **Onboarding** | `/api/onboarding/profile` · `complete` · `recommendations` |
-| **Users & social** | `/api/users/search` · `[handle]` (+ `follow`) · `me` (+ `settings`, `password`, `delete`) · `/api/friend-requests/[id]/accept|reject` |
-| **Content** | `/api/content/[slug]/` `favorite` · `watchlist` · `reviews` · `view` · `watch-start` · `watch-event` · `engagement` · `recap` (GET options, POST streaming) |
-| **Music & artists** | `/api/song/[slug]/favorite|reviews|listen` · `/api/artist/[slug]/favorite|follow|play|reviews` |
-| **Collections** | `/api/collections` (+ `[slug]`, `items`, `items/[itemId]`, `favorite`, `follow`, `play`, `collaborators`) |
-| **Watchlist & reviews** | `/api/watchlist` (+ `[id]`) · `/api/reviews/[id]` (+ `like`) |
-| **Communities** | create/list · `[slug]` · `join` · `join-code` · `join-by-code` · `invite-friends` · `members` · `posts` (+ `like`) · `chat` · `reviews` · `voice-channels` · `watch-channels` · `group-picks` |
-| **DMs** | `/api/dm/conversations` (+ `messages`, `read`) · `send` · `messages/[id]` · `unread` |
-| **AI (users)** | `/api/ai/profile` (GET/PATCH/DELETE) · `profile/export` · `mode/chat` · `mode/picks` · `roadmaps` (GET/POST streaming) · `roadmaps/[id]` · `roadmaps/[id]/steps/[stepId]` · `smart-collections` (+ `[id]`) |
-| **AI Match** | `/api/match/profile` · `rooms` (+ `[id]`: join, decline, seen, leave) · `invites` |
-| **Wellbeing** | `/api/screen-time` (settings) · `screen-time/heartbeat` |
-| **Admin** | `/api/admin/{content,music,artists,collections,communities}` (+ `[id]`) · `catalog-search` |
-| **Admin AI** | `/api/admin/ai/{content,music,artists}/{search,import,review}` (import/review stream progress) |
-| **Other** | `/api/search` (autocomplete) · `/api/upload` · `/api/analytics` · `/api/notifications` (+ `[id]`) |
+| **Users & social** | `/api/users/search` · `[handle]` (+ `follow`) · `me` (+ `settings`, `password`, `delete`) · `/api/friend-requests/[id]/accept\|reject` |
+| **Content, music, artists** | `/api/content/[slug]/` `favorite` · `watchlist` · `reviews` · `view` · `watch-start` · `watch-event` · `engagement` · `recap` · `/api/song/[slug]/…` · `/api/artist/[slug]/…` |
+| **Collections & watchlist** | `/api/collections` (+ items, favourite, follow, play, collaborators) · `/api/watchlist` · `/api/reviews/[id]` (+ `like`) |
+| **Communities** | create/list · `[slug]` · join (+ by code) · invite · members · posts · chat · reviews · voice/watch channels · `group-picks` |
+| **DMs** | `/api/dm/conversations` (+ messages, read) · `send` · `messages/[id]` · `unread` |
+| **AI** | `/api/ai/profile` (+ export) · `mode/chat` · `mode/picks` · `roadmaps` (+ steps) · `smart-collections` · `/api/assistant/chat` (streamed, rate-limited) |
+| **AI Match** | `/api/match/profile` · `rooms` (+ join, decline, seen, leave) · `invites` |
+| **Admin** | `/api/admin/{content,music,artists,collections,communities}` · `catalog-search` · `/api/admin/ai/{content,music,artists}/{search,import,review}` |
+| **Platform** | `/api/health` · `/api/realtime/ice` · `/api/internal/warm` (token-guarded) · `/api/upload` · `/api/search` · `/api/analytics` · `/api/notifications` · `/api/screen-time` (+ `heartbeat`) |
 
-**Socket.IO events:** `party:join|leave|control|chat|reaction` (host-controlled sync with clock-skew correction) · `voice:join|signal|state|leave` (WebRTC mesh signalling, public STUN).
+**Socket.IO events:**
+
+| Area | Events |
+|---|---|
+| Chat | `chat:join\|leave\|send\|typing` |
+| DMs | `dm:join\|leave\|typing` |
+| Presence | `presence:watch` |
+| Parties | `party:join\|leave\|control\|chat\|reaction` |
+| Live hosting | `live:start\|stop\|request\|signal` |
+| Talk rooms | `voice:join\|signal\|state\|leave` |
 
 ---
 
 ## Data model
 
-57 Prisma models across 32 additive migrations.
+57 Prisma models and 10 enums across 35 additive migrations.
 
 | Domain | Models |
 |---|---|
 | **Identity** | `User`, `Account`, `TasteProfile`, `UserPreferences` |
-| **Catalog** | `Content` (+ `ContentSeason`, `ContentEpisode`, `ContentCharacter`, `ContentFeaturedTrack`, `ContentRelated`), `MusicTrack`, `Artist`, `ArtistMember`, `Genre`, `ContentGenre`, `CatalogReview` |
-| **Library** | `WatchlistItem`, `Collection` (+ `CollectionItem`, `CollectionFavorite`, `CollectionFollow`, `CollectionCollaborator`), `ContentFavorite`, `ArtistFavorite`, `ArtistFollow`, `TrackFavorite` |
-| **Social** | `UserFollow`, `FriendRequest`, `Community` (+ members, posts, likes, chat messages, voice/watch channels and members), `Review`, `ReviewLike` |
+| **Catalog** | `Content` (+ seasons, episodes, characters, featured tracks, related), `MusicTrack`, `Artist`, `ArtistMember`, `Genre`, `ContentGenre`, `CatalogReview` |
+| **Library** | `WatchlistItem`, `Collection` (+ items, favourites, follows, collaborators), content/artist/track favourites, `ArtistFollow` |
+| **Social** | `UserFollow`, `FriendRequest`, `Community` (+ members, posts, likes, chat, voice/watch channels), `Review`, `ReviewLike` |
 | **Messaging** | `DirectConversation`, `DirectMessage`, `DirectConversationRead` |
 | **Activity** | `Notification`, `Rating`, `WatchEvent`, `ListenEvent` |
 | **AI** | `CatalogEmbedding`, `AiTasteProfile`, `AiRoadmap`, `AiRoadmapStep`, `AiCollectionSuggestion`, `AiRecap` |
-| **AI Match** | `MatchProfile`, `MatchCircle` (rooms), `MatchCircleMember` |
+| **AI Match** | `MatchProfile`, `MatchCircle`, `MatchCircleMember` |
 | **Wellbeing** | `ScreenTimeSettings`, `ScreenTimeDay` |
-
-Media fields: `Content.trailerUrl` / `tmdbId` / `tmdbKind`, `MusicTrack.previewUrl` / `listenLinks`, `Artist.listenLinks`.
-
----
-
-## Feature wiring map
-
-| Feature | UI | Service | Persistence | Realtime |
-|---|---|---|---|---|
-| Login / signup / Google | `components/auth/*` | `user.service`, `findOrCreateOAuthUser` | `User`, `Account` | — |
-| Onboarding | `components/onboarding/*` | `onboarding*.service` | `TasteProfile` | — |
-| Feeds + "why this" | Dashboard pages, cards | `taste-engine.service`, `lib/recommender/*` | catalog + `CatalogEmbedding` + events | — |
-| AI mode | `components/ai-mode/*` | `ai-mode.service`, `lib/ai/ai-mode-chat` | `AiTasteProfile` | — |
-| AI roadmaps | `roadmap-board` | `roadmap.service`, `lib/ai/roadmap-planner` | `AiRoadmap`, `AiRoadmapStep` | NDJSON progress |
-| Smart collections | `smart-collection-ideas` | `smart-collections.service` | `AiCollectionSuggestion` → `Collection` | — |
-| AI profile | `components/settings/ai-profile-view` | `ai-profile.service` | `AiTasteProfile` | — |
-| Admin AI import/review | `components/admin/ai/*` | `lib/ai/*-import`, `*-review` | catalog models | NDJSON progress |
-| Watch / listen | Play views | content/music play services | `WatchEvent`, `ListenEvent` | — |
-| Collections | Hub, detail, play | `collection*.service` | `Collection*` | — |
-| Communities | Community dashboard | `community*.service` | community tables | Socket.IO chat |
-| DMs | Messages panel | `dm.service` | DM tables | Socket.IO + REST |
-| Notifications | Bell + page | `notification.service` | `Notification` | HTTP polling |
-| Analytics + Taste DNA | Charts, `taste-dna-history` | `analytics.service`, `wrapped.service` | events + ratings + `CatalogEmbedding` | live refresh |
-| Wrapped | `components/wrapped/*` | `wrapped.service` | events, favorites, community activity | — |
-| AI Match | `match-experience`, `match-invite-popup` | `match.service` | `MatchProfile`, `MatchCircle*` → `Community` | popup polling + notifications |
-| Watch / listen parties | `components/party/*` | `lib/socket/parties.ts` | in-memory party state; watch/listen events | Socket.IO |
-| Talk rooms (voice) | `talk-room` | `lib/socket/parties.ts` | — | Socket.IO signalling + WebRTC |
-| Group AI mode | `group-picks` | `group-picks.service` | taste signals + embeddings | — |
-| Catch me up | `recap-dialog` | `lib/ai/recap.ts` | `AiRecap` (shared cache) | NDJSON progress |
-| Daily limit | `components/screen-time/*` | `screen-time.service` | `ScreenTimeSettings`, `ScreenTimeDay` | heartbeat |
-
-**Media behaviour**
-
-- Title pages have a "Watch trailer" button over the hero image; the official trailer (`youtube-nocookie`) plays inside that panel, and the poster stays the default. Live streaming providers for `WATCH_REGION` are shown below it.
-- Players use full audio when an admin sets a licensed `audioUrl`, then the official 30s preview, then a demo track (badged).
-- Watch parties sync the shared player (licensed video or the trailer) and listen parties sync a shared queue (licensed audio or the 30s preview). The host controls playback; others can add songs and suggest picks. Party state lives in memory on the Socket.IO server.
-- Talk rooms are peer-to-peer WebRTC voice (a mesh, best for small groups) over public STUN. Strict NATs would need a TURN server.
 
 ---
 
 ## Project structure
 
 ```
-aniverse-application/
-├── app/
-│   ├── (auth)/                  # login, signup
-│   ├── admin/                   # role-gated CMS
-│   ├── api/                     # 108 REST route handlers (incl. api/ai, api/match, api/admin/ai)
-│   ├── dashboard/               # hubs, ai-mode (+ roadmap, match), wrapped, settings (+ ai)
-│   └── content|song|artist|collection|community|profile|search|onboarding/
-├── components/
-│   ├── ai-mode/                 # quiz, chat, results, roadmap board, spotlight, launcher, AI Match
-│   ├── party/                   # watch party, listen party, talk room, group picks
-│   ├── wrapped/                 # Wrapped story + canvas share card
-│   ├── screen-time/             # daily-limit gate, warning, lock screen
-│   ├── admin/ (+ ai/)           # CMS forms, AI import/review panels
-│   ├── cards/ · dashboard/ · collections/ · community/ · settings/ · …
-├── hooks/                       # AI task progress, drafts, chat, layout helpers
+├── app/                    # pages, layouts, 112 API route handlers, /uploads route
+├── components/             # UI by domain (ai-mode, party, wrapped, admin, cards, …)
+├── hooks/                  # carousel autoplay, column count, AI task progress, …
 ├── lib/
-│   ├── ai/                      # provider layer (Gemini/Claude), imports, reviews, chat, roadmap planner, recaps
-│   ├── ai-profile/              # AI-mode vocabulary, schemas, quiz, summaries (client-safe)
-│   ├── recommender/             # embeddings, hybrid scoring, social ranking
-│   ├── roadmap/                 # runtime estimates, view types
-│   ├── catalog-import/          # TMDB, AniList, iTunes, Deezer, MusicBrainz clients
-│   ├── party/ · match/ · recap/ · wrapped/ · screen-time/   # client-safe types
-│   ├── services/ · data/ · mappers/ · validators/ · socket/
-│   └── auth.ts · auth-guards.ts · api-auth.ts · admin-auth.ts
-├── prisma/                      # schema.prisma, seed.ts, migrations/
-├── scripts/                     # embed-catalog, eval-recommender, backfill-trailers, seed-match-demo, seed-active-profile, …
-├── docs/                        # recommender-evaluation.md
-├── types/                       # domain types + next-auth.d.ts
-├── middleware.ts                # protects dashboard / onboarding / admin
-├── server.ts                    # Next + Socket.IO
-├── project-roadmap.md           # history, status, what's left
-└── .env.example
+│   ├── ai/ · ai-profile/ · recommender/ · assistant/ · roadmap/ · recap/ · wrapped/
+│   ├── socket/             # Socket.IO server, parties, presence, Redis adapter, shared store
+│   ├── cache/              # server cache, Prisma invalidation extension, cross-server sync
+│   ├── services/ · data/ · mappers/ · validators/
+│   ├── catalog-import/     # TMDB, AniList, iTunes, Deezer, MusicBrainz clients
+│   ├── file-storage.ts · redis.ts · rate-limit.ts · server-lifecycle.ts · auth.ts
+├── prisma/                 # schema.prisma, seed.ts, 35 migrations
+├── tests/                  # unit/ (Vitest), e2e/ (Playwright), helpers/
+├── scripts/                # embed-catalog, eval-recommender, e2e-stack, seed helpers, …
+├── deploy/                 # production compose files, env template, up/down scripts
+├── docker/                 # nginx config for the two-server test stack
+├── .github/workflows/      # ci.yml, docker.yml
+├── Dockerfile · docker-compose.e2e.yml
+├── middleware.ts           # guards /dashboard, /onboarding, /admin
+├── server.ts               # Next + Socket.IO + graceful shutdown
+└── project-roadmap.md      # history, deep dive, decisions, interview notes
 ```
 
 ---
@@ -438,69 +368,56 @@ aniverse-application/
 
 | Command | Description |
 |---|---|
-| `npm run dev` | Dev server with Socket.IO (`tsx server.ts`) |
+| `npm run dev` / `npm start` | Next + Socket.IO (`tsx server.ts`) |
 | `npm run dev:next` | Next only (no Socket.IO) |
 | `npm run build` | Production build |
-| `npm start` | Production server + Socket.IO |
 | `npm run lint` | ESLint |
-| `npm run db:generate` | Prisma client generate |
-| `npm run db:migrate` | Prisma migrate dev |
-| `npm run db:push` | Prisma db push |
-| `npm run db:studio` | Prisma Studio |
-| `npm run db:seed` | Seed catalog, admins and demo users |
-| `npm run db:reset` | Wipe and reseed |
-| `npm run db:recovery` | Recovery seed script |
-| `npm run embed:catalog` | Embed the catalog for the recommender (incremental; `-- --force` to redo all) |
-| `npm run eval:recommender` | Offline leave-one-out evaluation → `docs/recommender-evaluation.md` |
-| `npm run backfill:trailers` | Link TMDB ids and official trailers for existing titles |
-| `npx tsx scripts/seed-match-demo.ts` | Demo users with AI Match profiles, for testing rooms and invites |
-| `npx tsx scripts/seed-active-profile.ts` | Fill an account with realistic favourites, history and collections |
+| `npm test` · `npm run test:coverage` | Unit tests · with coverage |
+| `npm run test:e2e` | Single-server E2E (resets and seeds a dedicated test database) |
+| `npm run test:e2e:stack` | Two-server E2E in Docker |
+| `npm run db:migrate` · `db:generate` · `db:studio` | Prisma |
+| `npm run db:seed` · `db:reset` · `db:recovery` | Seed, wipe-and-reseed, recovery seed |
+| `npm run embed:catalog` | Embed the catalog (incremental; `-- --force` to redo all) |
+| `npm run eval:recommender` | Offline evaluation → `docs/recommender-evaluation.md` |
+| `npm run backfill:trailers` | Link TMDB ids and official trailers |
+| `npx tsx scripts/seed-match-demo.ts` | Demo users with AI Match profiles |
+| `npx tsx scripts/seed-active-profile.ts` | Fill an account with realistic activity |
 
 ---
 
 ## Design system
 
-Tokens live in `app/globals.css` (Tailwind v4 `@theme`) — use them instead of arbitrary values.
+Tokens live in `app/globals.css` (Tailwind v4 `@theme`). Use them instead of arbitrary values.
 
 | Token | Rule |
 |---|---|
-| **Radius** | `lg` 8 · `xl` 12 · `2xl` 16 · `card` 20 · `3xl` 24 · `full`. Same component type = same radius (every card is `rounded-card`). |
-| **Type** | `micro` 11 (chip/badge labels only) · `caption` 12 · `small` 13 · `body` 15 · `subtitle` 16 · `lead` 18 · `heading` 24 · `title` 32 · `display` 64 (landing hero only). Nothing readable below 12px. |
-| **Font** | Geist (via `next/font`) on every platform. |
-| **Colour** | Brand `brand-purple → brand-fuchsia → brand-magenta`, accent text `brand-pink`; surfaces `background`, `surface`, `night`, `popover`, `popover-deep`. Genre chip gradients meet WCAG AA. |
-| **Glow** | One soft halo, reserved for the primary CTA, active nav, now-playing and card hover. |
-| **Layout** | Mobile-first, 320px → desktop. Dashboard pages: `max-w-[1200px]`, `gap-5 sm:gap-6`, `px-4 sm:px-6 lg:px-8`. Drawer + bottom nav below `lg`. |
-
-Shared building blocks: `Button` / `GradientButton`, `EmptyState`, `useConfirm()` / `useToast()`, `ComingSoonNotice` and `PreviewBadge` for unfinished or preview features, route skeletons in `components/skeletons/`, `CardBlurb` for "why this" lines. Focus rings and `prefers-reduced-motion` (including Framer Motion) are handled globally.
+| **Radius** | `lg` 8 · `xl` 12 · `2xl` 16 · `card` 20 · `3xl` 24 · `full`. Same component type, same radius. |
+| **Type** | `micro` 11 · `caption` 12 · `small` 13 · `body` 15 · `subtitle` 16 · `lead` 18 · `heading` 24 · `title` 32 · `display` 64. Nothing readable below 12 px. |
+| **Colour** | Brand `brand-purple → brand-fuchsia → brand-magenta`, accent `brand-pink`. All text meets WCAG AA contrast. |
+| **Glow** | One soft halo, reserved for the primary CTA, active nav, now-playing and card hover |
+| **Layout** | Mobile-first, 320 px → desktop. Dashboard pages: `max-w-[1200px]`, `gap-5 sm:gap-6`, `px-4 sm:px-6 lg:px-8`. Drawer + bottom nav below `lg`. |
 
 ---
 
-## Deployment in EC2 Instance (t3.small) in AWS
-<img width="2868" height="1528" alt="image" src="https://github.com/user-attachments/assets/ca182eb8-ae1c-4b38-a16c-5d934f9c4817" />
-
-
-## Status & what's left
+## Status
 
 | Area | Status |
 |---|---|
-| UI, design system, accessibility, responsive layout | ✅ Done |
-| Auth (credentials + Google), onboarding | ✅ Done |
-| Catalog, Admin CMS with AI import/review | ✅ Done |
-| Feeds, search, collections, watchlist, favourites | ✅ Done |
-| Hybrid recommender, AI mode, roadmaps, smart collections, AI profile | ✅ Done |
-| Communities, chat, DMs, friends, live analytics | ✅ Done |
-| AI Match rooms, watch/listen parties, talk rooms (voice), group AI mode | ✅ Done |
-| Catch me up (RAG recaps), Taste DNA history, Wrapped, in-hero trailers | ✅ Done |
-| Daily limit (warning + lock until midnight) | ✅ Done |
-| Notifications | 🟡 HTTP polling (not socket-pushed) |
-| Media | 🟡 Trailers, previews and listen/watch links; full media only with licensed URLs |
-| Voice at scale | 🟡 WebRTC mesh over public STUN — fine for small rooms; needs TURN/SFU for big groups |
-| Automated tests, CI, deployment | 🔴 Not yet |
+| Product features (discovery, AI, social, realtime, admin, wellbeing) | ✅ Done |
+| Accessibility & responsive (axe + 5 widths, every route) | ✅ 0 violations, 0 overflow |
+| Unit tests, E2E, two-server E2E with failover, CI | ✅ Done |
+| Multi-server readiness (Redis, S3, health, graceful shutdown) | ✅ Done |
+| Docker image + GHCR | ✅ Done |
+| AWS production (2 × EC2, ALB, S3, on-demand `up` / `down`) | ✅ Live on demand |
+| Notifications | 🟡 Polled over HTTP (DMs and chat are pushed) |
+| Data tier | 🟡 Postgres and Redis on one server; no automated backups |
+| HTTPS | 🟡 Cloudflare quick tunnel: the URL changes every demo, so Google sign-in is off in production |
+| Voice at scale | 🟡 WebRTC mesh (≤ 8 per room); TURN supported but not configured in production |
 
-**Next up:** manual test pass of the AI and party screens → deployment (a host that runs `server.ts`) → automated tests and CI → socket-pushed notifications → TURN server for voice. Details, dates and every commit are in [project-roadmap.md](project-roadmap.md).
+Trade-offs, limits and what's next: [project-roadmap.md §14–15](project-roadmap.md#14-trade-offs-and-honest-limits).
 
 ---
 
 ## License
 
-Private project — all rights reserved.
+Private project. All rights reserved.
