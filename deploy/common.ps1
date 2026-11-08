@@ -9,6 +9,8 @@ $AlbSecurityGroup = "sg-066f2179e227c977d"
 $Subnets = @("subnet-04fe2616a36552ef4", "subnet-0292fe915185d8101")   # 2a, 2b
 $TargetGroupArn = "arn:aws:elasticloadbalancing:ap-southeast-2:978387602393:targetgroup/entertainverse-tg/6899e6fbb9fe2fd9"
 $SshKey = "$HOME\.ssh\entertainverse-key.pem"
+$SiteUrl = "https://entertainverse.dpdns.org"   # fixed: Cloudflare named tunnel
+$TunnelName = "entertainverse"
 
 # The VS Code terminal can have a stale PATH, so fall back to the installer location.
 $Aws = (Get-Command aws -ErrorAction SilentlyContinue).Source

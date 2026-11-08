@@ -1,6 +1,6 @@
 # Brings the production site up for a demo: starts both servers, creates the
-# load balancer, opens a Cloudflare quick tunnel for HTTPS, points the apps at
-# the tunnel's address and waits until both servers pass the health check.
+# load balancer, connects the Cloudflare tunnel that serves the fixed HTTPS
+# address, starts the apps and waits until both servers pass the health check.
 # Usage (from the repo root): .\deploy\up.ps1
 . "$PSScriptRoot\common.ps1"
 
@@ -24,24 +24,30 @@ Invoke-Aws elbv2 create-listener --load-balancer-arn $alb.Arn --protocol HTTP --
 Invoke-Aws elbv2 register-targets --target-group-arn $TargetGroupArn `
   --targets "Id=$ServerA,Port=3000" "Id=$ServerB,Port=3000" | Out-Null
 
-Write-Host "3/6 Opening the HTTPS tunnel on server A..."
-# A quick tunnel gets a new random address each time it starts, so it never
-# restarts on its own: a stale address would be worse than none.
-$tunnelUrl = Invoke-Remote $ipA @"
+Write-Host "3/6 Connecting the HTTPS tunnel on server A..."
+# A named Cloudflare tunnel: its public address ($SiteUrl) never changes, and
+# Cloudflare's DNS already points it at this tunnel. Only the load balancer's
+# DNS name is new each demo, so the tunnel is restarted pointing at it.
+# Its credentials live in ~/entertainverse/cloudflared/tunnel.json (not in git,
+# owner-only), so the container runs as the same user to be able to read them.
+Invoke-Remote $ipA @"
+cd ~/entertainverse/cloudflared
+id=`$(grep -o '"TunnelID":"[^"]*"' tunnel.json | cut -d'"' -f4)
 docker rm -f tunnel >/dev/null 2>&1 || true
-docker run -d --name tunnel --restart no cloudflare/cloudflared:latest \
-  tunnel --no-autoupdate --url http://$($alb.Dns) >/dev/null
+docker run -d --name tunnel --restart unless-stopped --user "`$(id -u):`$(id -g)" -v "`$PWD:/etc/cloudflared:ro" \
+  cloudflare/cloudflared:latest tunnel --no-autoupdate \
+  --credentials-file /etc/cloudflared/tunnel.json --url http://$($alb.Dns) run "`$id" >/dev/null
 for i in `$(seq 1 30); do
-  url=`$(docker logs tunnel 2>&1 | grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' | head -n 1)
-  [ -n "`$url" ] && echo "`$url" && exit 0
+  docker logs tunnel 2>&1 | grep -q 'Registered tunnel connection' && exit 0
   sleep 2
 done
-echo "tunnel did not report an address" >&2; docker logs --tail 20 tunnel >&2; exit 1
-"@
-$tunnelUrl = ($tunnelUrl | Select-Object -Last 1).ToString().Trim()
+echo "tunnel did not connect" >&2; docker logs --tail 20 tunnel >&2; exit 1
+"@ | Out-Null
+$tunnelUrl = $SiteUrl
 
-Write-Host "4/6 Pointing both apps at $tunnelUrl..."
-# Changing APP_URL in .env makes compose recreate the app container with it.
+Write-Host "4/6 Starting both apps at $tunnelUrl..."
+# APP_URL is fixed now; setting it is a no-op unless .env still has an old one,
+# and only a changed .env makes compose recreate the app container.
 $setUrl = @"
 cd ~/entertainverse
 sed -i 's|^APP_URL=.*|APP_URL=$tunnelUrl|' .env
