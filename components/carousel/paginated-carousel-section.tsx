@@ -155,7 +155,11 @@ function PaginatedCarouselInner({
             overflowVisible ? "overflow-visible" : "overflow-hidden",
           )}
         >
-          <div ref={rowsRef}>
+          {/* Clip here, not at the padded box, so the next page doesn't peek in
+              beside the arrow. "Visible" rows still clip sideways (x-clip keeps
+              y visible for hover growth): the off-screen pages otherwise made
+              the whole page scroll horizontally. */}
+          <div ref={rowsRef} className={overflowVisible ? "overflow-x-clip" : "overflow-hidden"}>
           {(() => {
             const rowClassName = cn(
               "flex transition-transform duration-700 ease-in-out",
