@@ -68,9 +68,11 @@ export function ReviewsSection({ reviews }: ReviewsSectionProps) {
         />
       </ScrollFadeIn>
 
-      <ScrollFadeIn delay={0.12} amount={0.25}>
+      {/* w-full here: in this centred column the wrapper would otherwise size to
+          the no-wrap card track (1200px) and push the arrows off-screen. */}
+      <ScrollFadeIn delay={0.12} amount={0.25} className="w-full max-w-[1200px]">
       <div
-        className="relative w-full max-w-[1200px]"
+        className="relative w-full"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
