@@ -234,6 +234,12 @@ The site went live on 27 Oct.
 
 **8 Nov: a fixed address and Google sign-in.** The quick tunnel's random URL was replaced with a free domain, `entertainverse.dpdns.org`, served by a Cloudflare *named* tunnel, and Google sign-in was switched on in production. Details in [§11.4](#114-https-and-the-fixed-address).
 
+**8 Nov: a responsive pass with a headless browser.** Every page was loaded at 320, 375, 414, 768, 1024, 1280 and 1440px, flagging anything that stuck out of the screen, then screenshotted section by section. It found four layout bugs, each fixed in its own commit (`8c6eecf` `ab860bf` `a9bfca6` `761cf2c`):
+- The landing reviews carousel was 1200px wide below 1280px, pushing its arrows off-screen.
+- Analytics pie labels were cut off on phones.
+- Detail-page carousels used a fixed count per page: six posters stacked on top of each other on phones, and cards clipped out of reach in favourites and characters. They now fit the count to their width, as the dashboard carousels already did.
+- Carousels with visible overflow (episodes, reviews, band members) made every page that had one scroll sideways, at every width.
+
 **Deliberately skipped:** nightly `pg_dump` backups to S3, and a k6 load test (one server against two). Both were planned and cut to finish the project.
 
 ---
