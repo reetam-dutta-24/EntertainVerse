@@ -232,6 +232,8 @@ The AWS console setup is not in git, so it is written down in [§11](#11-contain
 
 The site went live on 27 Oct.
 
+**8 Nov: a fixed address and Google sign-in.** The quick tunnel's random URL was replaced with a free domain, `entertainverse.dpdns.org`, served by a Cloudflare *named* tunnel, and Google sign-in was switched on in production. Details in [§11.4](#114-https-and-the-fixed-address).
+
 **Deliberately skipped:** nightly `pg_dump` backups to S3, and a k6 load test (one server against two). Both were planned and cut to finish the project.
 
 ---
@@ -243,7 +245,7 @@ The site went live on 27 Oct.
 ```
                     Browser (HTTPS)
                          │
-            Cloudflare quick tunnel  (random https://*.trycloudflare.com per demo)
+            Cloudflare named tunnel  (fixed https://entertainverse.dpdns.org)
                          │   cloudflared runs as a container on server A
                          ▼
          Application Load Balancer  (HTTP :80, sticky cookie, health checks)
@@ -697,7 +699,7 @@ runtime    source + prod node_modules + .next, USER node, HEALTHCHECK, CMD node 
 | Resource | Setup |
 |---|---|
 | **Region** | ap-southeast-2 (Sydney) |
-| **Server A** `entertainVerse-server1-prod` | t3.small, Ubuntu, 25 GiB, zone 2b. Runs app + Postgres 16 + Redis 7 + cloudflared. |
+| **Server A** `entertainVerse-server1-prod` | t3.small, Ubuntu, 25 GiB, zone 2b. Runs app + Postgres 16 + Redis 7 + cloudflared (the tunnel). |
 | **Server B** `entertainVerse-server2-prod` | t3.small, zone 2a. Runs the app only. Two zones mean one zone failure doesn't take out both apps. |
 | **Security groups** | `alb-sg`: 80/443 from anywhere. `app-sg`: 3000 **only from `alb-sg`**, and 22 from home IPs. `data-sg` (server A): 5432/6379 **only from `app-sg`**. |
 | **Target group** `entertainverse-tg` | Health check `/api/health` every 10 s, 5 s timeout, 2 healthy / 2 unhealthy, expects 200. Sticky `lb_cookie` for 1 day. Deregistration delay 30 s. Targets are registered on port 3000. |
@@ -706,6 +708,9 @@ runtime    source + prod node_modules + .next, USER node, HEALTHCHECK, CMD node 
 | **IAM role** `entertainverse-ec2-role` | Attached to both servers. Its inline policy allows access to *this bucket only*. The SDK picks it up automatically, so there are no keys on the servers. |
 | **IAM user** `entertainverse-cli` | Used from the laptop by the scripts. It can only describe resources, start and stop **these two instances**, create, delete and register ELB resources, and `ec2:GetSecurityGroupsForVpc` (which ALB creation needs). It has no S3 access. |
 | **GHCR** | The image is public: `ghcr.io/reetam-dutta-24/entertainverse`. |
+| **Domain** `entertainverse.dpdns.org` | Free from DigitalPlat FreeDomain, registered 8 Nov 2026, **expires 8 Nov 2027** (free renewal opens 120 days before). Its nameservers point to Cloudflare (free plan), where the tunnel's DNS record lives. |
+| **Cloudflare tunnel** `entertainverse` | Named tunnel, ID `8e0e3a3e-…`. Its credentials (`cert.pem`, `tunnel.json`) are on server A in `~/entertainverse/cloudflared/`, owner-only, not in git. |
+| **Google OAuth client** | The same client as local dev, with `https://entertainverse.dpdns.org` added as a JavaScript origin and `…/api/auth/callback/google` as a redirect URI. Published (in production), so any Google account can sign in. |
 
 Other server setup:
 - Docker is installed with log rotation capped.
@@ -718,7 +723,7 @@ Other server setup:
 |---|---|
 | `deploy/server-a.compose.yml` → `~/entertainverse/compose.yml` on A | Postgres (volume `pgdata`), Redis (`--requirepass`), app (`SERVER_NAME=a`, database and Redis by service name). Health-gated `depends_on`, `stop_grace_period: 30s`. |
 | `deploy/server-b.compose.yml` → `~/entertainverse/compose.yml` on B | The app only (`SERVER_NAME=b`, database and Redis at A's private IP). |
-| `deploy/env.example` → `~/entertainverse/.env` (`chmod 600`) | `AUTH_SECRET`, `POSTGRES_PASSWORD`, `REDIS_PASSWORD` (hex only, because they go inside URLs), `PRIVATE_IP`/`SERVER_A_IP`, `APP_URL`, `S3_BUCKET`, `S3_REGION`, and the AI keys. |
+| `deploy/env.example` → `~/entertainverse/.env` (`chmod 600`) | `AUTH_SECRET`, `POSTGRES_PASSWORD`, `REDIS_PASSWORD` (hex only, because they go inside URLs), `PRIVATE_IP`/`SERVER_A_IP`, `APP_URL`, `S3_BUCKET`, `S3_REGION`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, and the AI keys. |
 
 The `.env` file does two jobs:
 - compose uses it to fill `${…}` in the compose file
@@ -726,25 +731,30 @@ The `.env` file does two jobs:
 
 `AUTH_URL`, `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` are all set from `APP_URL`.
 
-### 11.4 HTTPS without a domain
+### 11.4 HTTPS and the fixed address
 
-There's no domain, so no ACM certificate. Instead, a **Cloudflare quick tunnel**:
+The site lives at **https://entertainverse.dpdns.org**, with HTTPS from a **Cloudflare named tunnel** and no ACM certificate:
 
-- `cloudflared` runs as a container on server A with `--url http://<ALB DNS>`.
-- It dials *out* to Cloudflare, so no inbound port is needed.
-- Cloudflare gives a random `https://<words>.trycloudflare.com` and forwards to the ALB.
-- **The address changes every time the tunnel starts.** The up script therefore reads the new URL and writes it into `APP_URL`, which NextAuth needs for callbacks and secure cookies.
+- **The domain is free:** a `dpdns.org` subdomain from DigitalPlat FreeDomain, with its nameservers pointed at a free Cloudflare account.
+- `cloudflared` runs as a container on server A. It dials *out* to Cloudflare, so no inbound port is needed, and Cloudflare forwards `entertainverse.dpdns.org` to it, then on to the ALB.
+- **Why a tunnel and not ACM on the ALB:** the ALB is deleted and recreated every demo, so its DNS name changes. With ACM, the DNS record would need updating each time. The tunnel's DNS record (`entertainverse.dpdns.org → <tunnel-id>.cfargotunnel.com`) never changes; `up` just restarts cloudflared pointed at the new ALB (`--url http://<ALB DNS>`).
 - **Set `AUTH_URL` explicitly:** the ALB rewrites `X-Forwarded-Proto` to `http`, so NextAuth's `trustHost` alone would treat the site as plain HTTP.
-- **Google sign-in is left off in production:** its redirect URI must be registered in advance, and the URL changes per demo.
-- The tunnel container runs with `--restart no`, because a restarted tunnel would have a *different* address than the apps were told.
+- **Google sign-in works**, because its redirect URI (`https://entertainverse.dpdns.org/api/auth/callback/google`) is registered once and stays valid.
+
+**One-time setup (8 Nov), for the record:**
+1. Registered the domain at DigitalPlat, added it to Cloudflare (Free plan), and copied Cloudflare's two nameservers into DigitalPlat.
+2. On server A: `cloudflared tunnel login` (opens a browser link to authorize the zone, which saves `cert.pem`), then `tunnel create entertainverse` (writes `tunnel.json`), then `tunnel route dns entertainverse entertainverse.dpdns.org` (creates the DNS record).
+3. Added the production origin and redirect URI to the existing Google OAuth client, published it, and put `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET` in both servers' `.env`.
+
+**Before 8 Nov:** a Cloudflare *quick* tunnel gave a random `https://<words>.trycloudflare.com` per demo. The up script scraped that URL from the logs and wrote it into `APP_URL`, and Google sign-in had to stay off because its redirect URI can't be registered in advance.
 
 ### 11.5 `deploy/up.ps1` and `deploy/down.ps1`
 
 `up.ps1`:
 1. Start both instances and wait until they're running.
 2. Create the ALB, if missing, and its HTTP:80 listener (rerunning is a no-op). Register both instances on port 3000.
-3. On A over SSH: start cloudflared and wait until its logs show the `trycloudflare.com` URL.
-4. On both servers: `sed` the URL into `APP_URL` in `.env`, then `docker compose up -d`, which recreates the app container because its environment changed.
+3. On A over SSH: restart the named tunnel pointed at this ALB, and wait until its logs show a registered connection.
+4. On both servers: make sure `APP_URL` in `.env` is the fixed address, then `docker compose up -d` (a no-op unless something changed).
 5. `aws elbv2 wait target-in-service` for both targets.
 6. `GET <tunnel>/api/health`, then print the site URL, the ALB DNS name and the SSH IPs.
 
@@ -905,7 +915,7 @@ It only selects from catalog IDs I pass in, enforced as enums in the response sc
 **Walk me through your deployment.**
 GitHub Actions builds a multi-stage Docker image and pushes it to GHCR, tagged `latest` and with the commit SHA. Two EC2 instances in different availability zones run it with Docker Compose. Server A also runs Postgres and Redis, bound to its private IP and reachable only from the app security group.
 
-A PowerShell `up` script starts the instances, creates the ALB and listener, registers targets, opens a Cloudflare quick tunnel for HTTPS, writes the tunnel URL into each server's config, restarts the apps, and waits until the ALB reports both healthy. `down` deletes the ALB and stops the servers to save cost.
+A PowerShell `up` script starts the instances, creates the ALB and listener, registers targets, connects a Cloudflare named tunnel that serves the fixed HTTPS address, starts the apps, and waits until the ALB reports both healthy. `down` deletes the ALB and stops the servers to save cost.
 
 **Why is Node PID 1 in your container?**
 `docker stop` sends SIGTERM to PID 1. If npm is PID 1, the signal may not reach Node, so there's no graceful shutdown and Docker kills it after the grace period.
@@ -931,8 +941,8 @@ The failover test found that a reconnecting host lost the host role because of a
 
 ### 13.8 Behavioural angles
 
-- **A trade-off you made:** a quick tunnel instead of a domain and ACM, which got HTTPS at zero cost but means a new URL per demo. Skipping backups and load testing to finish was a conscious scope cut, written down.
-- **Something you'd do differently:** use managed Postgres and Redis from the start; add a domain so OAuth works in production; write integration tests per service against a real database, alongside the mocks.
+- **A trade-off you made:** a free domain and a Cloudflare tunnel instead of a paid domain and ACM: HTTPS and a fixed URL at zero cost, but it depends on a free registrar and adds one hop. Skipping backups and load testing to finish was a conscious scope cut, written down.
+- **Something you'd do differently:** use managed Postgres and Redis from the start; get a fixed domain from day one, so OAuth works in production from the start; write integration tests per service against a real database, alongside the mocks.
 - **Ownership:** a full accessibility and responsive audit (axe on every route at 5 widths) took all violations to 0.
 
 ---
@@ -944,8 +954,7 @@ The failover test found that a reconnecting host lost the host role because of a
 | **Postgres and Redis only on server A** | If A goes down, B can't serve pages either. The app tier is redundant; the data tier isn't. | Cost. Fix: RDS Multi-AZ + ElastiCache. Only the connection URLs change. |
 | **No automated backups** | Losing A's disk loses the data. | Cut to finish (the plan was a nightly `pg_dump` to S3 with 14-day expiry). Fix: RDS snapshots, or that cron. |
 | **No load-test numbers** | No measured capacity for one server against two. | Cut to finish (the plan was k6 against the ALB DNS). |
-| **The tunnel URL changes every demo** | Links aren't stable; Google sign-in is off in production. | Free HTTPS with no domain. Fix: a domain + ACM certificate on an HTTPS ALB listener. |
-| **Quick tunnels have no SLA** | Fine for demos, not for real users. | Same fix as above. |
+| **Free domain and a tunnel** | `dpdns.org` is a free nonprofit registrar (renew by Nov 2027), and all traffic takes an extra hop through Cloudflare to server A's cloudflared. If server A is down, the site is unreachable even though B is healthy. | Zero cost with a fixed URL. Fix: a paid domain, plus ACM on an HTTPS ALB listener (or a second cloudflared replica on B). |
 | **Drain window (10 s) shorter than the ALB's detection (2 × 10 s)** | During a stop, the ALB may send requests for up to about 10 s to a server that has closed. | Clients retry and sockets reconnect. Fix: `SHUTDOWN_DRAIN_MS=25000` (the 30 s grace period allows it). |
 | **Target group created with port 80** | Cosmetic. | `up` registers targets with `Port=3000` explicitly. |
 | **Uploads are served through the app** | App servers spend bandwidth on files. | Simple, and URLs are backend-agnostic. Fix: CloudFront or signed S3 URLs. |
@@ -963,7 +972,7 @@ The failover test found that a reconnecting host lost the host role because of a
 ## 15. What I would do next
 
 1. **Data tier:** RDS Postgres Multi-AZ and ElastiCache Redis. Server A becomes just another app server.
-2. **A domain + ACM:** an HTTPS listener on the ALB, a stable URL, and Google sign-in in production.
+2. **A paid domain + ACM:** an HTTPS listener on the ALB directly, so the tunnel hop (and its dependence on server A) goes away.
 3. **Backups and monitoring:** automated snapshots; CloudWatch alarms on target health, CPU and 5xx; structured logs.
 4. **Load test:** k6 against one server and then two, to find the real capacity and the first bottleneck (likely Postgres connections or the CPU on t3.small).
 5. **Auto Scaling group:** with a launch template, instead of two hand-made servers. Deploys as rolling instance refreshes.
@@ -1010,6 +1019,7 @@ The failover test found that a reconnecting host lost the host role because of a
 | **RSC** | React Server Components: components rendered on the server that can read data directly. |
 | **Edge runtime** | Next's lightweight runtime for middleware: no Node built-ins, no Prisma. |
 | **Quick tunnel** | `cloudflared tunnel --url …`: an outbound connection to Cloudflare that gives a temporary public HTTPS URL. |
+| **Named tunnel** | A Cloudflare tunnel with a fixed ID and credentials; a DNS record on your own domain points at it, so the public URL never changes. |
 
 ---
 

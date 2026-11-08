@@ -18,9 +18,9 @@ It is a full-stack Next.js application:
 
 > **Why it exists:** people pay for several streaming apps and still lose 20 minutes scrolling. They don't know what to watch next, or in what order. EntertainVerse answers *what*, *why* and *in what order*.
 
-🌐 **Live demo:** https://showed-automotive-opinions-travelling.trycloudflare.com
+🌐 **Live demo:** https://entertainverse.dpdns.org
 
-> The demo runs on demand to keep AWS costs down. Each time the servers are started, the free HTTPS tunnel gets a **new address**, so this link only works while that demo is up. If it doesn't load, the demo is off; ask for a fresh link. Sign in with a demo account from [Seeded accounts](#seeded-accounts), e.g. `reetam@entertainverse.local` / `User123!`.
+> The demo runs on demand to keep AWS costs down, so if the link doesn't load, the servers are off right now. The address itself never changes. Sign in with **Google**, or with a demo account from [Seeded accounts](#seeded-accounts), e.g. `reetam@entertainverse.local` / `User123!`.
 
 📍 **Full history, architecture deep dive, decisions, bugs and interview notes:** [project-roadmap.md](project-roadmap.md)
 
@@ -231,7 +231,7 @@ The same build runs as one server (local dev) or several behind a load balancer.
 ## Deployment (AWS)
 
 ```
-Browser ─HTTPS─► Cloudflare quick tunnel ─► ALB (HTTP :80, sticky, /api/health)
+Browser ─HTTPS─► Cloudflare named tunnel ─► ALB (HTTP :80, sticky, /api/health)
                                               ├─► Server A  app + Postgres + Redis   (t3.small, zone 2b)
                                               └─► Server B  app                     (t3.small, zone 2a)
                                                        uploads ─► S3 (via IAM role)
@@ -243,7 +243,7 @@ Browser ─HTTPS─► Cloudflare quick tunnel ─► ALB (HTTP :80, sticky, /ap
 | Registry | `ghcr.io/reetam-dutta-24/entertainverse`, built by GitHub Actions |
 | Server config | `deploy/server-a.compose.yml`, `deploy/server-b.compose.yml`, and `deploy/env.example` (copied to `~/entertainverse/` on each server) |
 | Networking | Port 3000 only from the ALB's security group. Postgres and Redis bound to A's private IP and open only to the app servers. The S3 bucket is private and reached through an instance role. |
-| On demand | `.\deploy\up.ps1` starts the servers, creates the ALB, opens an HTTPS quick tunnel, points the apps at its URL, and waits until both targets are healthy. `.\deploy\down.ps1` deletes the ALB and stops the servers. |
+| On demand | `.\deploy\up.ps1` starts the servers, creates the ALB, connects the Cloudflare tunnel behind https://entertainverse.dpdns.org to that ALB, starts the apps, and waits until both targets are healthy. `.\deploy\down.ps1` deletes the ALB and stops the servers. |
 
 To ship a new version: push to `main`, then on each server (one at a time) run `docker compose pull && docker compose up -d`. If the schema changed, first run `docker compose run --rm app npx prisma migrate deploy` on server A.
 
@@ -415,7 +415,7 @@ Tokens live in `app/globals.css` (Tailwind v4 `@theme`). Use them instead of arb
 | AWS production (2 × EC2, ALB, S3, on-demand `up` / `down`) | ✅ Live on demand |
 | Notifications | 🟡 Polled over HTTP (DMs and chat are pushed) |
 | Data tier | 🟡 Postgres and Redis on one server; no automated backups |
-| HTTPS | 🟡 Cloudflare quick tunnel: the URL changes every demo, so Google sign-in is off in production |
+| HTTPS + fixed URL | ✅ `entertainverse.dpdns.org` (free domain) via a Cloudflare named tunnel; Google sign-in works in production |
 | Voice at scale | 🟡 WebRTC mesh (≤ 8 per room); TURN supported but not configured in production |
 
 Trade-offs, limits and what's next: [project-roadmap.md §14–15](project-roadmap.md#14-trade-offs-and-honest-limits).
