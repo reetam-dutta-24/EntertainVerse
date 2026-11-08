@@ -43,12 +43,12 @@ export function AniPieChart({
             dataKey="value"
             nameKey="name"
             innerRadius={innerRadius}
-            outerRadius="80%"
+            outerRadius="72%"
             stroke="var(--color-background)"
             strokeWidth={2}
-            label={({ name, percent }) =>
-              `${name} ${Math.round((percent ?? 0) * 100)}%`
-            }
+            // Percent only: "Name 42%" labels ran off narrow cards. The legend
+            // below names each slice, and the tooltip shows both.
+            label={({ percent }) => `${Math.round((percent ?? 0) * 100)}%`}
           >
             {data.map((datum, i) => (
               <Cell
