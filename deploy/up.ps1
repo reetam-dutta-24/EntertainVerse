@@ -45,12 +45,14 @@ echo "tunnel did not connect" >&2; docker logs --tail 20 tunnel >&2; exit 1
 "@ | Out-Null
 $tunnelUrl = $SiteUrl
 
-Write-Host "4/6 Starting both apps at $tunnelUrl..."
-# APP_URL is fixed now; setting it is a no-op unless .env still has an old one,
-# and only a changed .env makes compose recreate the app container.
+Write-Host "4/6 Starting both apps (latest image) at $tunnelUrl..."
+# Pull first, so every demo runs the newest image GitHub Actions published;
+# compose only recreates the app container if the image or .env changed.
+# APP_URL is fixed now; setting it is a no-op unless .env still has an old one.
 $setUrl = @"
 cd ~/entertainverse
 sed -i 's|^APP_URL=.*|APP_URL=$tunnelUrl|' .env
+docker compose pull -q app
 docker compose up -d 2>&1 | tail -n 3
 "@
 Invoke-Remote $ipA $setUrl | Write-Host
