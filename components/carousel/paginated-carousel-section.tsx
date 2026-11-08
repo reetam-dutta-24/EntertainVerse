@@ -11,11 +11,13 @@ import {
 } from "@/components/carousel/carousel-section-context";
 import { PaginationDots } from "@/components/dashboard/pagination-dots";
 import { CAROUSEL_AUTOPLAY_MS, useCarouselAutoplay } from "@/hooks/use-carousel-autoplay";
+import { useColumnCount } from "@/hooks/use-column-count";
 import {
   CAROUSEL_ITEMS_COMMUNITY,
   CAROUSEL_ITEMS_CONTENT,
   CAROUSEL_ITEMS_EPISODE,
   CAROUSEL_ITEMS_REVIEW,
+  DETAIL_CAROUSEL_FIT,
 } from "@/lib/grid-section-config";
 import { pageItems } from "@/lib/carousel-pages";
 import { resolveCardTint } from "@/lib/card-theme";
@@ -48,7 +50,10 @@ export interface PaginatedCarouselSectionProps {
   slides: CarouselSlide[];
   sectionTitle?: string;
   variant?: PaginatedCarouselVariant;
+  /** Most items per page; the real count fits the row's width (default per variant). */
   itemsPerPage?: number;
+  /** Card width when it differs from the variant's usual card (e.g. character cards). */
+  slotWidth?: number;
   className?: string;
   overflowVisible?: boolean;
   itemsCenter?: boolean;
@@ -63,6 +68,7 @@ function PaginatedCarouselInner({
   slides,
   variant = "content",
   itemsPerPage,
+  slotWidth,
   className,
   overflowVisible = false,
   itemsCenter = false,
@@ -73,8 +79,22 @@ function PaginatedCarouselInner({
   const [page, setPage] = useState(0);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const rowsRef = useRef<HTMLDivElement>(null);
   const tintSeed = useCarouselTintSeed();
-  const perPage = itemsPerPage ?? VARIANT_ITEMS[variant];
+
+  // Fit the page to the row's width: a fixed count crammed six posters into a phone
+  // row (or clipped the extras out of reach). Small cards in hover rows may shrink a
+  // little to keep two per page like the dashboard; fixed-width rows can drop to one.
+  const fit = DETAIL_CAROUSEL_FIT[variant];
+  const maxPerPage = itemsPerPage ?? VARIANT_ITEMS[variant];
+  const { cols } = useColumnCount(fit.breakpoints, 1, {
+    ref: rowsRef,
+    slotWidth: slotWidth ?? fit.slotWidth,
+    gap: fit.gap,
+    min: rowHover ? Math.min(fit.min, maxPerPage) : 1,
+    max: maxPerPage,
+  });
+  const perPage = Math.min(cols, maxPerPage);
 
   const pages = useMemo(() => pageItems(slides, perPage), [slides, perPage]);
   const totalPages = pages.length;
@@ -135,6 +155,7 @@ function PaginatedCarouselInner({
             overflowVisible ? "overflow-visible" : "overflow-hidden",
           )}
         >
+          <div ref={rowsRef}>
           {(() => {
             const rowClassName = cn(
               "flex transition-transform duration-700 ease-in-out",
@@ -221,6 +242,7 @@ function PaginatedCarouselInner({
               </div>
             );
           })()}
+          </div>
         </div>
 
         {totalPages > 1 ? (

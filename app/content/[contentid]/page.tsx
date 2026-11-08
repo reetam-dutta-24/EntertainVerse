@@ -27,6 +27,7 @@ import {
 import { isContentFavorited } from "@/lib/services/favorite.service";
 import { isContentOnWatchlist } from "@/lib/services/watchlist.service";
 import { ContentWatchOptions } from "@/components/content/content-watch-options";
+import { CHARACTER_CARD_SLOT } from "@/lib/grid-section-config";
 
 interface ContentPageProps {
   params: Promise<{ contentid: string }>;
@@ -104,6 +105,7 @@ export default async function ContentDetailPage({ params }: ContentPageProps) {
         title="🎭 Characters"
         variant="content"
         rowHover={false}
+        slotWidth={CHARACTER_CARD_SLOT}
         slides={content.characters.map((character) => ({
           id: character.id,
           node: (

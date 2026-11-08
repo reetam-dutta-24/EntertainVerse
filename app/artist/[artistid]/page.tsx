@@ -12,6 +12,7 @@ import { ListenLinksSection } from "@/components/song/listen-links-section";
 import { getArtistDetail } from "@/lib/data/artist-detail";
 import { getCommunityMemberPreview } from "@/lib/data/community";
 import { getOptionalUser } from "@/lib/data/user";
+import { CHARACTER_CARD_SLOT } from "@/lib/grid-section-config";
 
 interface ArtistPageProps {
   params: Promise<{ artistid: string }>;
@@ -84,6 +85,7 @@ export default async function ArtistDetailPage({ params }: ArtistPageProps) {
             variant="content"
             rowHover={false}
             itemsPerPage={5}
+            slotWidth={CHARACTER_CARD_SLOT}
             overflowVisible
             itemsCenter
             emptyMessage="No band members listed for this artist."

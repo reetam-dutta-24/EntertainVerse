@@ -16,6 +16,8 @@ export interface ContentPageSectionProps {
   slides: CarouselSlide[];
   variant?: ContentCarouselVariant;
   itemsPerPage?: number;
+  /** Card width when it differs from the variant's usual card (e.g. character cards). */
+  slotWidth?: number;
   overflowVisible?: boolean;
   itemsCenter?: boolean;
   compact?: boolean;
@@ -38,6 +40,7 @@ export function ContentPageSection({
   slides,
   variant = "content",
   itemsPerPage,
+  slotWidth,
   overflowVisible = false,
   itemsCenter = false,
   compact = false,
@@ -87,6 +90,7 @@ export function ContentPageSection({
           sectionTitle={title}
           variant={variant}
           itemsPerPage={itemsPerPage}
+          slotWidth={slotWidth}
           overflowVisible={overflowVisible}
           itemsCenter={itemsCenter}
           compact={compact}
