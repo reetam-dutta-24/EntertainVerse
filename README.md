@@ -245,7 +245,7 @@ Browser ─HTTPS─► Cloudflare named tunnel ─► ALB (HTTP :80, sticky, /ap
 | Networking | Port 3000 only from the ALB's security group. Postgres and Redis bound to A's private IP and open only to the app servers. The S3 bucket is private and reached through an instance role. |
 | On demand | `.\deploy\up.ps1` starts the servers, creates the ALB, connects the Cloudflare tunnel behind https://entertainverse.dpdns.org to that ALB, starts the apps, and waits until both targets are healthy. `.\deploy\down.ps1` deletes the ALB and stops the servers. |
 
-To ship a new version: push to `main`, then on each server (one at a time) run `docker compose pull && docker compose up -d`. If the schema changed, first run `docker compose run --rm app npx prisma migrate deploy` on server A.
+To ship a new version: push to `main` and wait for the image build. If the demo is off, `.\deploy\up.ps1` pulls the new image on its own. If it is running, on each server (one at a time) run `docker compose pull && docker compose up -d`. If the schema changed, first run `docker compose run --rm app npx prisma migrate deploy` on server A.
 
 Full walkthrough, AWS resources, runbook and limits: [project-roadmap.md §11](project-roadmap.md#11-containers-and-production-on-aws).
 

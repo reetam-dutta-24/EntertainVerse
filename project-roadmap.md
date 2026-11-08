@@ -760,7 +760,7 @@ The site lives at **https://entertainverse.dpdns.org**, with HTTPS from a **Clou
 1. Start both instances and wait until they're running.
 2. Create the ALB, if missing, and its HTTP:80 listener (rerunning is a no-op). Register both instances on port 3000.
 3. On A over SSH: restart the named tunnel pointed at this ALB, and wait until its logs show a registered connection.
-4. On both servers: make sure `APP_URL` in `.env` is the fixed address, then `docker compose up -d` (a no-op unless something changed).
+4. On both servers: make sure `APP_URL` in `.env` is the fixed address, `docker compose pull` the latest image, then `docker compose up -d` (a no-op unless something changed). So a demo always starts on the newest image GitHub Actions built.
 5. `aws elbv2 wait target-in-service` for both targets.
 6. `GET <tunnel>/api/health`, then print the site URL, the ALB DNS name and the SSH IPs.
 
